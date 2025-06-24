@@ -1,0 +1,15 @@
+version: "3.8"
+services:
+  memgraph:
+    image: memgraph/memgraph-platform:latest
+    ports:
+      - "7687:7687"
+      - "3000:3000"
+  redis:
+    image: redis:7-alpine
+  worker:
+    build: .
+    command: celery -A meshmind.tasks.celery_app worker -B -l info
+    depends_on:
+      - memgraph
+      - redis

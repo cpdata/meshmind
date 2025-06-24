@@ -1,0 +1,24 @@
+[project]
+name = "meshmind"
+version = "0.1.0"
+description = "AI Agent Memory management system using LLMs and graph databases"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "openai>=1.78.0",
+    "pydantic>=2.11.4",
+    "pydantic-settings>=2.9.1",
+    "pytest>=8.3.5",
+    "rapidfuzz>=3.13.0",
+    "scikit-learn>=1.6.1",
+    "numpy>=2.2.5",
+    "celery[redis]>=5.5.2",
+    "python-dotenv>=1.1.0",
+    "sentence-transformers>=4.1.0",
+    "typing-extensions>=4.13.2",
+    "tiktoken>=0.9.0",
+    "pymgclient>=1.4.0",
+]
+
+[project.scripts]
+meshmind = "meshmind.cli.__main__:main"
