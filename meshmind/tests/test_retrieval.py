@@ -1,76 +1,127 @@
 import pytest
 
-from meshmind.core.types import Memory, SearchConfig
-from meshmind.retrieval.bm25 import bm25_search
-from meshmind.retrieval.fuzzy import fuzzy_search
+from meshmind.client import MeshMind
+from meshmind.core.types import SearchConfig
+from meshmind.db.in_memory_driver import InMemoryGraphDriver
+from meshmind.retrieval import (
+    apply_reranker,
+    llm_rerank,
+    search,
+    search_bm25,
+    search_exact,
+    search_fuzzy,
+    search_regex,
+    search_vector,
+)
 from meshmind.retrieval.hybrid import hybrid_search
-from meshmind.retrieval.search import search, search_bm25, search_fuzzy
 
 
-def make_memory(name: str) -> Memory:
-    return Memory(namespace="ns", name=name, entity_label="Test")
+def test_bm25_search(memory_factory):
+    docs = [
+        memory_factory("apple pie"),
+        memory_factory("banana split"),
+        memory_factory("cherry tart"),
+    ]
+    results = search_bm25("apple", docs, top_k=2)
+    assert results and results[0].name == "apple pie"
 
 
-@pytest.fixture(autouse=True)
-def add_embeddings():
-    # Assign dummy embeddings equal to length of name
-    def _hook(mem: Memory):
-        mem.embedding = [len(mem.name)]
-        return mem
-    Memory.pre_init = _hook
-    yield
-    delattr(Memory, 'pre_init')
+def test_fuzzy_search(memory_factory):
+    docs = [memory_factory("apple pie"), memory_factory("banana split")]
+    results = search_fuzzy("apple pie", docs, top_k=2)
+    assert results and results[0].name == "apple pie"
 
 
-def test_bm25_search():
-    docs = [make_memory("apple pie"), make_memory("banana split"), make_memory("cherry tart")]
-    results = bm25_search("apple", docs, top_k=2)
-    # Expect 'apple pie' first
-    assert results and results[0][0].name == "apple pie"
-    assert results[0][1] > 0
+def test_hybrid_search(memory_factory, dummy_encoder):
+    m1 = memory_factory("apple", embedding=[1.0])
+    m2 = memory_factory("banana", embedding=[0.0])
+    config = SearchConfig(encoder=dummy_encoder, top_k=2, hybrid_weights=(0.5, 0.5))
+    ranked = hybrid_search("apple", [m1, m2], config)
+    assert ranked[0][0].name == "apple"
 
 
-def test_fuzzy_search():
-    docs = [make_memory("apple pie"), make_memory("banana split")]
-    results = fuzzy_search("apple pie", docs, top_k=2)
-    assert results and results[0][0].name == "apple pie"
-    assert 0 < results[0][1] <= 1.0
+def test_vector_search(memory_factory, dummy_encoder):
+    m1 = memory_factory("apple", embedding=[1.0])
+    m2 = memory_factory("banana", embedding=[0.0])
+    config = SearchConfig(encoder=dummy_encoder, top_k=1)
+    results = search_vector("apple", [m1, m2], config=config)
+    assert results == [m1]
 
 
-def test_hybrid_search():
-    # Setup memories
-    m1 = make_memory("apple")
-    m2 = make_memory("banana")
-    m1.embedding = [1.0]
-    m2.embedding = [0.0]
-    docs = [m1, m2]
-    config = SearchConfig(encoder="dummy", top_k=2, hybrid_weights=(0.5, 0.5))
-    # Register dummy encoder that returns [1] for 'apple' and [0] for 'banana'
-    class DummyEncoder:
-        def encode(self, texts):
-            return [[1.0] if "apple" in t else [0.0] for t in texts]
-    from meshmind.core.embeddings import EncoderRegistry
-    EncoderRegistry.register("dummy", DummyEncoder())
-    results = hybrid_search("apple", docs, config)
-    # apple should have highest hybrid score
-    assert results[0][0].name == "apple"
+def test_regex_search(memory_factory):
+    docs = [
+        memory_factory("Visit Paris", metadata={"city": "Paris"}),
+        memory_factory("Visit Berlin", metadata={"city": "Berlin"}),
+    ]
+    results = search_regex("paris", docs, top_k=5)
+    assert len(results) == 1 and results[0].name == "Visit Paris"
 
 
-def test_search_dispatcher():
-    m1 = make_memory("apple")
-    m2 = make_memory("banana")
-    m1.embedding = [1.0]
-    m2.embedding = [0.0]
-    docs = [m1, m2]
-    from meshmind.core.embeddings import EncoderRegistry
-    class DummyEncoder:
-        def encode(self, texts): return [[1.0] if "apple" in t else [0.0] for t in texts]
-    EncoderRegistry.register("dummy", DummyEncoder())
-    config = SearchConfig(encoder="dummy", top_k=1, hybrid_weights=(0.5,0.5))
-    res = search("apple", docs, namespace="ns", entity_labels=["Test"], config=config)
-    assert len(res) == 1 and res[0].name == "apple"
-    # BM25 and fuzzy via dispatcher
-    res2 = search_bm25("banana", docs)
-    assert res2 and res2[0].name == "banana"
-    res3 = search_fuzzy("banana", docs)
-    assert res3 and res3[0].name == "banana"
+def test_exact_search(memory_factory):
+    docs = [
+        memory_factory("Python"),
+        memory_factory("Rust", metadata={"language": "Rust"}),
+    ]
+    results = search_exact("rust", docs, fields=["metadata"], case_sensitive=False)
+    assert results and results[0].name == "Rust"
+
+
+def test_search_dispatcher_with_rerank(memory_factory, dummy_encoder):
+    m1 = memory_factory("apple", embedding=[1.0])
+    m2 = memory_factory("banana", embedding=[0.1])
+    docs = [m2, m1]
+    config = SearchConfig(encoder=dummy_encoder, top_k=2, rerank_k=2)
+
+    class DummyLLM:
+        class responses:
+            @staticmethod
+            def create(**kwargs):
+                return type(
+                    "Resp",
+                    (),
+                    {
+                        "output": [
+                            type(
+                                "Out",
+                                (),
+                                {
+                                    "content": [
+                                        type("Text", (), {"text": '{"order": [1, 0]}'})
+                                    ]
+                                },
+                            )
+                        ]
+                    },
+                )
+
+    reranked = search(
+        "apple",
+        docs,
+        config=config,
+        reranker=lambda q, c, k: llm_rerank(q, c, DummyLLM(), k, model="dummy"),
+    )
+    assert reranked[0].name == "apple"
+
+
+def test_apply_reranker_default(memory_factory):
+    docs = [memory_factory("alpha"), memory_factory("beta")]
+    ranked = apply_reranker("alpha", docs, top_k=1)
+    assert ranked == [docs[0]]
+
+
+def test_llm_rerank_failure(memory_factory):
+    docs = [memory_factory("alpha"), memory_factory("beta")]
+    result = llm_rerank("alpha", docs, llm_client=None, top_k=2)
+    assert len(result) == 2
+
+
+def test_client_search_uses_graph_when_memories_none(dummy_encoder, memory_factory):
+    driver = InMemoryGraphDriver()
+    client = MeshMind(llm_client=object(), embedding_model=dummy_encoder, graph_driver=driver)
+    memory = memory_factory("apple", embedding=[1.0])
+    client.create_memory(memory)
+    config = SearchConfig(encoder=dummy_encoder, top_k=1)
+
+    results = client.search("apple", memories=None, namespace="ns", config=config)
+
+    assert results and results[0].name == "apple"
