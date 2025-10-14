@@ -1,0 +1,44 @@
+name: CI
+
+on:
+  push:
+    branches: ["main", "review", "review-1"]
+  pull_request:
+
+env:
+  PIP_DISABLE_PIP_VERSION_CHECK: "1"
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install toolchain
+        run: |
+          pip install uv
+          uv pip install -e .
+          uv pip install ruff pyright typeguard toml-sort yamllint
+      - name: Lint and format checks
+        run: make fmt-check
+
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: |
+          pip install uv
+          uv pip install -e .
+          uv pip install pytest
+      - name: Run pytest
+        run: make test
