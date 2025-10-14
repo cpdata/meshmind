@@ -1,24 +1,36 @@
 import pytest
 
 from meshmind.pipeline.preprocess import deduplicate, score_importance, compress
-from meshmind.pipeline.store import store_memories
+from meshmind.pipeline.store import store_memories, store_triplets
 from meshmind.api.memory_manager import MemoryManager
-from meshmind.core.types import Memory
+from meshmind.core.types import Memory, Triplet
+from meshmind.models.registry import PredicateRegistry
 
 
 class DummyDriver:
     def __init__(self):
         self.entities = []
         self.deleted = []
+        self.edges = []
+        self.deleted_edges = []
 
     def upsert_entity(self, label, name, props):
         self.entities.append((label, name, props))
 
+    def upsert_edge(self, subj, pred, obj, props):
+        self.edges.append((subj, pred, obj, props))
+
     def delete(self, uuid):
         self.deleted.append(uuid)
 
+    def delete_triplet(self, subj, pred, obj):
+        self.deleted_edges.append((subj, pred, obj))
+
     def find(self, cypher, params):
         # Return empty for simplicity
+        return []
+
+    def list_triplets(self, namespace=None):
         return []
 
 
@@ -57,6 +69,21 @@ def test_store_memories_calls_driver():
     assert d.entities[0][1] == "node1"
 
 
+def test_store_triplets_registers_predicate():
+    PredicateRegistry.clear()
+    d = DummyDriver()
+    triplet = Triplet(
+        subject="s",
+        predicate="RELATES",
+        object="o",
+        namespace="ns",
+        entity_label="Relation",
+    )
+    store_triplets([triplet], d)
+    assert d.edges and d.edges[0][1] == "RELATES"
+    assert "RELATES" in PredicateRegistry.all()
+
+
 def test_memory_manager_add_update_delete():
     d = DummyDriver()
     mgr = MemoryManager(d)
@@ -76,6 +103,23 @@ def test_memory_manager_add_update_delete():
     # list returns empty or list
     lst = mgr.list_memories()
     assert isinstance(lst, list)
+
+
+def test_memory_manager_triplet_roundtrip():
+    d = DummyDriver()
+    mgr = MemoryManager(d)
+    triplet = Triplet(
+        subject="s",
+        predicate="RELATES",
+        object="o",
+        namespace="ns",
+        entity_label="Relation",
+    )
+    mgr.add_triplet(triplet)
+    assert d.edges
+    mgr.delete_triplet(triplet.subject, triplet.predicate, triplet.object)
+    assert d.deleted_edges
+    assert mgr.list_triplets() == []
     
 def test_deduplicate_by_embedding_similarity():
     # Two memories with similar embeddings should be deduplicated

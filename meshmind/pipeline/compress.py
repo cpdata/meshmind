@@ -1,13 +1,10 @@
-"""
-Pipeline for token-aware compression/summarization of memories.
-"""
-from typing import List
-from meshmind.core.types import Memory
+"""Token-aware compression helpers for memory metadata."""
+from __future__ import annotations
 
-try:
-    import tiktoken
-except ImportError:
-    tiktoken = None  # type: ignore
+from typing import List
+
+from meshmind.core.types import Memory
+from meshmind.core.utils import get_token_encoder
 
 
 def compress_memories(
@@ -20,7 +17,9 @@ def compress_memories(
     :param max_tokens: Maximum number of tokens allowed per memory.
     :return: List of Memory objects with content possibly shortened.
     """
-    encoder = tiktoken.get_encoding('o200k_base')
+    encoder = get_token_encoder("o200k_base", optional=True)
+    if encoder is None:
+        return memories
     compressed = []
     for mem in memories:
         content = mem.metadata.get('content')

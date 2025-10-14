@@ -43,5 +43,6 @@ class SearchConfig(BaseModel):
     encoder: str = "text-embedding-3-small"
     top_k: int = 20
     rerank_k: int = 10
+    rerank_model: Optional[str] = None
     filters: Optional[dict[str, Any]] = None
     hybrid_weights: Tuple[float, float] = (0.5, 0.5)
