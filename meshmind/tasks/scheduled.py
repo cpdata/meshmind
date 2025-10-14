@@ -1,6 +1,8 @@
 """
 Scheduled Celery tasks for expiry, consolidation, and compression.
 """
+from __future__ import annotations
+
 try:
     from celery.schedules import crontab
     _CELERY_BEAT = True
@@ -17,17 +19,25 @@ from meshmind.api.memory_manager import MemoryManager
 from meshmind.db.memgraph_driver import MemgraphDriver
 from meshmind.core.config import settings
 
-# Initialize database driver and memory manager (fallback if mgclient missing)
-try:
-    driver = MemgraphDriver(
-        settings.MEMGRAPH_URI,
-        settings.MEMGRAPH_USERNAME,
-        settings.MEMGRAPH_PASSWORD,
-    )
-    manager = MemoryManager(driver)
-except Exception:
-    driver = None  # type: ignore
-    manager = None  # type: ignore
+_MANAGER: MemoryManager | None = None
+
+
+def _get_manager() -> MemoryManager | None:
+    global _MANAGER
+    if _MANAGER is not None:
+        return _MANAGER
+
+    try:
+        driver = MemgraphDriver(
+            settings.MEMGRAPH_URI,
+            settings.MEMGRAPH_USERNAME,
+            settings.MEMGRAPH_PASSWORD,
+        )
+    except Exception:
+        return None
+
+    _MANAGER = MemoryManager(driver)
+    return _MANAGER
 
 # Define periodic task schedule if Celery is available
 if _CELERY_BEAT and hasattr(app, 'conf'):
@@ -50,6 +60,7 @@ if _CELERY_BEAT and hasattr(app, 'conf'):
 @app.task(name='meshmind.tasks.scheduled.expire_task')
 def expire_task():
     """Delete expired memories based on TTL."""
+    manager = _get_manager()
     if manager is None:
         return []
     return expire_memories(manager)
@@ -58,6 +69,7 @@ def expire_task():
 @app.task(name='meshmind.tasks.scheduled.consolidate_task')
 def consolidate_task():
     """Merge duplicate memories and summarise."""
+    manager = _get_manager()
     if manager is None:
         return 0
     memories = manager.list_memories()
@@ -70,6 +82,7 @@ def consolidate_task():
 @app.task(name='meshmind.tasks.scheduled.compress_task')
 def compress_task():
     """Compress long memories to respect token limits."""
+    manager = _get_manager()
     if manager is None:
         return 0
     memories = manager.list_memories()

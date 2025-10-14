@@ -1,11 +1,11 @@
-from typing import Any, List, Type
+from typing import Any, List, Sequence, Type
 
 def extract_memories(
     instructions: str,
     namespace: str,
-    entity_types: List[Type[Any]],
+    entity_types: Sequence[Type[Any]],
     embedding_model: str,
-    content: List[str],
+    content: Sequence[str],
     llm_client: Any = None,
 ) -> List[Any]:
     """
@@ -26,6 +26,7 @@ def extract_memories(
         raise RuntimeError("openai package is required for extraction pipeline")
     from meshmind.core.types import Memory
     from meshmind.core.embeddings import EncoderRegistry
+    from meshmind.models.registry import EntityRegistry
 
     # Initialize default LLM client if not provided
     if llm_client is None:
@@ -46,6 +47,9 @@ def extract_memories(
     }
 
     # Build system prompt using a default template and user instructions
+    entity_types = list(entity_types) or [Memory]
+    for model in entity_types:
+        EntityRegistry.register(model)
     allowed_labels = [cls.__name__ for cls in entity_types]
     default_prompt = (
         "You are an agent that extracts structured memories from text segments. "
@@ -58,7 +62,7 @@ def extract_memories(
         prompt += f"\nAllowed entity labels: {', '.join(allowed_labels)}."
     messages = [{"role": "system", "content": prompt}]
     # Add each text segment as a user message
-    messages += [{"role": "user", "content": text} for text in content]
+    messages += [{"role": "user", "content": text} for text in list(content)]
 
     # Call chat completion with function-calling
     response = llm_client.responses.create(
