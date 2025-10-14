@@ -31,3 +31,15 @@ class PredicateRegistry:
     def allowed(cls, label: str) -> bool:
         """Check if a predicate label is allowed."""
         return label in cls._predicates
+
+    @classmethod
+    def all(cls) -> Set[str]:
+        """Return all registered predicate labels."""
+
+        return set(cls._predicates)
+
+    @classmethod
+    def clear(cls) -> None:
+        """Remove all registered predicates (testing helper)."""
+
+        cls._predicates.clear()
