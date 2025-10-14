@@ -5,7 +5,10 @@ Command-line interface for MeshMind.
 import argparse
 import sys
 
+from meshmind.cli.admin import register_admin_subcommands
 from meshmind.cli.ingest import ingest_command
+from meshmind.core.bootstrap import bootstrap_encoders, bootstrap_entities
+from meshmind.core.config import settings
 
 
 def main():
@@ -32,14 +35,31 @@ def main():
     ingest_parser.add_argument(
         "paths", nargs="+", help="Paths to files or directories to ingest"
     )
+    ingest_parser.set_defaults(func=ingest_command)
+
+    register_admin_subcommands(subparsers)
 
     args = parser.parse_args()
 
-    if args.command == "ingest":
-        ingest_command(args)
-    else:
-        parser.print_help()
-        sys.exit(1)
+    # Ensure default encoders and entities are registered before executing commands
+    bootstrap_entities()
+    bootstrap_encoders()
+
+    missing = settings.missing()
+    if missing:
+        for group, keys in missing.items():
+            print(
+                f"Warning: missing configuration for {group}: {', '.join(keys)}",
+                file=sys.stderr,
+            )
+
+    func = getattr(args, "func", None)
+    if callable(func):
+        result = func(args)
+        return result
+
+    parser.print_help()
+    sys.exit(1)
 
 
 if __name__ == "__main__":
