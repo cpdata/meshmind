@@ -1,6 +1,8 @@
 """Abstract base class for graph database drivers."""
+from __future__ import annotations
+
 from abc import ABC, abstractmethod
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 import uuid
 
 
@@ -25,4 +27,16 @@ class GraphDriver(ABC):
     @abstractmethod
     def delete(self, uuid: uuid.UUID) -> None:
         """Delete a node or relationship by UUID."""
+        raise NotImplementedError
+
+    @abstractmethod
+    def delete_triplet(self, subj: str, pred: str, obj: str) -> None:
+        """Delete a relationship identified by subject/predicate/object."""
+
+        raise NotImplementedError
+
+    @abstractmethod
+    def list_triplets(self, namespace: Optional[str] = None) -> List[Dict[str, Any]]:
+        """Return stored triplets, optionally filtered by namespace."""
+
         raise NotImplementedError

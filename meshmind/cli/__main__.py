@@ -6,6 +6,8 @@ import argparse
 import sys
 
 from meshmind.cli.ingest import ingest_command
+from meshmind.core.bootstrap import bootstrap_encoders, bootstrap_entities
+from meshmind.core.config import settings
 
 
 def main():
@@ -34,6 +36,18 @@ def main():
     )
 
     args = parser.parse_args()
+
+    # Ensure default encoders and entities are registered before executing commands
+    bootstrap_entities()
+    bootstrap_encoders()
+
+    missing = settings.missing()
+    if missing:
+        for group, keys in missing.items():
+            print(
+                f"Warning: missing configuration for {group}: {', '.join(keys)}",
+                file=sys.stderr,
+            )
 
     if args.command == "ingest":
         ingest_command(args)
