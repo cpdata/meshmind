@@ -20,6 +20,12 @@ class Settings:
     OPENAI_API_KEY: str = os.getenv("OPENAI_API_KEY", "")
     EMBEDDING_MODEL: str = os.getenv("EMBEDDING_MODEL", "text-embedding-3-small")
 
+    REQUIRED_GROUPS = {
+        "graph": ("MEMGRAPH_URI",),
+        "openai": ("OPENAI_API_KEY",),
+        "redis": ("REDIS_URL",),
+    }
+
     def __repr__(self) -> str:
         return (
             f"Settings(MEMGRAPH_URI={self.MEMGRAPH_URI}, "
@@ -27,6 +33,36 @@ class Settings:
             f"REDIS_URL={self.REDIS_URL}, "
             f"EMBEDDING_MODEL={self.EMBEDDING_MODEL})"
         )
+
+    @staticmethod
+    def _mask(value: str) -> str:
+        if not value:
+            return ""
+        if len(value) <= 4:
+            return "*" * len(value)
+        return f"{value[:2]}***{value[-2:]}"
+
+    def missing(self) -> dict[str, list[str]]:
+        """Return missing environment variables grouped by capability."""
+
+        missing: dict[str, list[str]] = {}
+        for group, keys in self.REQUIRED_GROUPS.items():
+            absent = [key for key in keys if not getattr(self, key)]
+            if absent:
+                missing[group] = absent
+        return missing
+
+    def summary(self) -> dict[str, str]:
+        """Return a sanitized summary of active configuration values."""
+
+        return {
+            "MEMGRAPH_URI": self.MEMGRAPH_URI,
+            "MEMGRAPH_USERNAME": self.MEMGRAPH_USERNAME,
+            "MEMGRAPH_PASSWORD": self._mask(self.MEMGRAPH_PASSWORD),
+            "REDIS_URL": self.REDIS_URL,
+            "OPENAI_API_KEY": self._mask(self.OPENAI_API_KEY),
+            "EMBEDDING_MODEL": self.EMBEDDING_MODEL,
+        }
 
 
 settings = Settings()

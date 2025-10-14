@@ -55,6 +55,21 @@ def test_memgraph_driver_connect_and_basic_operations(monkeypatch):
     # Test upsert_edge does not raise
     edge_props = {'rel': 'value'}
     driver.upsert_edge('id1', 'REL', 'id2', edge_props)
+    # Test delete_triplet uses predicate sanitisation
+    driver.delete_triplet('id1', 'REL', 'id2')
+    assert 'DELETE r' in driver._cursor._last_query
+    # Test list_triplets returns parsed dicts
+    driver._cursor.description = [
+        ('subject',),
+        ('predicate',),
+        ('object',),
+        ('namespace',),
+        ('metadata',),
+        ('reference_time',),
+    ]
+    driver._cursor._rows = [(('s',), ('p',), ('o',), ('ns',), ({'k': 'v'},), (None,))]
+    triplets = driver.list_triplets()
+    assert triplets and triplets[0]['subject'] == ('s',)
     # Test vector_search returns list
     # Use dummy record
     driver._cursor._rows = [([1.0], {'uuid': 'id1'})]
