@@ -1,15 +1,73 @@
-version: "3.8"
+version: "3.9"
+
 services:
   memgraph:
     image: memgraph/memgraph-platform:latest
+    container_name: meshmind-memgraph
+    restart: unless-stopped
     ports:
       - "7687:7687"
+      - "7444:7444"
       - "3000:3000"
+    healthcheck:
+      test: ["CMD", "bash", "-c", "cypher-shell --version || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+    environment:
+      MEMGRAPH_MEMORY_LIMIT: 2GB
+    volumes:
+      - memgraph-data:/var/lib/memgraph
+    networks:
+      - meshmind
+
+  neo4j:
+    image: neo4j:5.26
+    container_name: meshmind-neo4j
+    restart: unless-stopped
+    ports:
+      - "7688:7687"
+      - "7474:7474"
+    environment:
+      NEO4J_AUTH: neo4j/meshminD123
+      NEO4J_PLUGINS: '["apoc"]'
+      NEO4J_apoc_export_file_enabled: "true"
+      NEO4J_apoc_import_file_enabled: "true"
+      NEO4J_dbms_security_procedures_unrestricted: apoc.*
+    healthcheck:
+      test: ["CMD", "cypher-shell", "-u", "neo4j", "-p", "meshminD123", "RETURN 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+    volumes:
+      - neo4j-data:/data
+      - neo4j-logs:/logs
+    networks:
+      - meshmind
+
   redis:
     image: redis:7-alpine
-  worker:
-    build: .
-    command: celery -A meshmind.tasks.celery_app worker -B -l info
-    depends_on:
-      - memgraph
-      - redis
+    container_name: meshmind-redis
+    restart: unless-stopped
+    command: redis-server --save 60 1000 --loglevel warning
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - redis-data:/data
+    networks:
+      - meshmind
+
+networks:
+  meshmind:
+    name: meshmind
+
+volumes:
+  memgraph-data:
+  neo4j-data:
+  neo4j-logs:
+  redis-data:
