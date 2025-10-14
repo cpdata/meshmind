@@ -20,7 +20,8 @@ regex, exact-match, fuzzy, and BM25 scoring with optional LLM reranking.
 ## Requirements
 - Python 3.11 or 3.12 recommended (`pyproject.toml` pins `>=3.11,<3.13` while third-party packages catch up).
 - Configurable graph backend via `GRAPH_BACKEND` (`memory`, `sqlite`, `memgraph`, `neo4j`).
-- Memgraph instance reachable via Bolt and the `mgclient` Python package (when `GRAPH_BACKEND=memgraph`).
+- Memgraph instance reachable via Bolt and the `pymgclient` Python package (which provides the runtime `mgclient` module when
+  `GRAPH_BACKEND=memgraph`).
 - Optional Neo4j instance with the official Python driver (when `GRAPH_BACKEND=neo4j`).
 - OpenAI API key for extraction, embeddings, and optional reranking.
 - Optional: Redis and Celery for scheduled maintenance tasks.
@@ -35,7 +36,7 @@ regex, exact-match, fuzzy, and BM25 scoring with optional LLM reranking.
    ```
 3. Install optional dependencies as needed:
    ```bash
-   pip install mgclient tiktoken sentence-transformers celery[redis] ruff pyright typeguard toml-sort yamllint
+  pip install pymgclient tiktoken sentence-transformers celery[redis] ruff pyright typeguard toml-sort yamllint
    ```
 4. Export required environment variables:
    ```bash

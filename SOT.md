@@ -65,7 +65,7 @@ Supporting assets:
 ## Database Layer (`meshmind/db`)
 - `GraphDriver` defines the persistence contract (entity/relationship upserts, querying, deletions, triplet listing) and now standardises pagination (`offset`, `limit`), server-side search (`search_entities`), and aggregated counts (`count_entities`).
 - `InMemoryGraphDriver` and `SQLiteGraphDriver` power local development/testing without external services while supporting the extended contract.
-- `MemgraphDriver` wraps `mgclient`, handles URI parsing, executes Cypher statements, and exposes Cypher-based filtering,
+- `MemgraphDriver` wraps the `mgclient` module shipped with the `pymgclient` package, handles URI parsing, executes Cypher statements, and exposes Cypher-based filtering,
   pagination, and aggregation helpers alongside the Python-side vector search fallback when database-native similarity is
   unavailable.
 - `Neo4jGraphDriver` mirrors the Memgraph contract using the official driver (optional dependency) and now exposes server-side search and counts.
@@ -122,8 +122,8 @@ Supporting assets:
 - `meshmind/tests`: Pytest suites rely on fixtures (`memory_factory`, `dummy_encoder`, in-memory drivers, service stubs) and
   pure-Python doubles (compatibility BaseModel, fake Memgraph/Redis/embedding drivers), allowing the suite to run without Memgraph, OpenAI, or Redis dependencies.
 
-- Required: `openai`, `pydantic`, `pydantic-settings`, `python-dotenv`. Install `mgclient` when using Memgraph and `neo4j`
-  when targeting Neo4j. Pure-Python fallbacks exist for Pydantic, numpy, scikit-learn, and rapidfuzz but production deployments
+- Required: `openai`, `pydantic`, `pydantic-settings`, `python-dotenv`. Install `pymgclient` (for the runtime `mgclient` module) when using Memgraph and install the `neo4j`
+  driver when targeting Neo4j. Pure-Python fallbacks exist for Pydantic, numpy, scikit-learn, and rapidfuzz but production deployments
   should install the real packages.
 - Optional but supported: `tiktoken`, `sentence-transformers`, `celery[redis]`, `fastapi`, `uvicorn[standard]`, `redis`, `httpx`,
   `pytest-cov`.
@@ -132,8 +132,7 @@ Supporting assets:
 
 ## Operational Notes
 - Graph persistence requires a configured backend: in-memory/SQLite need no services; Memgraph requires a running instance
-  reachable via `settings.MEMGRAPH_URI` and `mgclient`; Neo4j requires the official driver and credentials. Use `meshmind admin
-  graph --backend <name>` to sanity check connectivity or run the compose stacks.
+  reachable via `settings.MEMGRAPH_URI` and the `mgclient` module provided by `pymgclient`; Neo4j requires the official driver and credentials. Use `meshmind admin graph --backend <name>` to sanity check connectivity or run the compose stacks.
 - Encoder registration occurs during bootstrap; ensure at least one embedding encoder is available before extraction/search.
 - LLM reranking uses the OpenAI Responses API. Provide `OPENAI_API_KEY` and confirm the selected `SearchConfig.rerank_model` is
   deployed to your account.

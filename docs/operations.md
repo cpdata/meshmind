@@ -43,6 +43,6 @@ This guide covers operational tasks for MeshMind deployments.
 ## Deployment Considerations
 
 - Provision graph databases externally (Docker, managed service) and expose Bolt endpoints reachable from the runtime.
-- Ensure optional dependencies (`neo4j`, `mgclient`, `redis`, `celery`, `fastapi`, `uvicorn`, `tiktoken`) are installed where required (or install `.[dev,docs,testing]`).
+- Ensure optional dependencies (`neo4j`, `pymgclient`, `redis`, `celery`, `fastapi`, `uvicorn`, `tiktoken`) are installed where required (or install `.[dev,docs,testing]`).
 - Configure logging/metrics sinks to capture telemetry emitted by pipeline stages.
 - Use `docker-compose.yml` as a reference for local orchestration (Memgraph, Neo4j, Redis) and the targeted stacks in `meshmind/tests/docker/` for integration testing.

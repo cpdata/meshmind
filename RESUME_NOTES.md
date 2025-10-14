@@ -4,7 +4,7 @@
 
 - Branch: `work`.
 - Optional dependencies remain enumerated in `pyproject.toml` with extras that cover REST (`fastapi`, `uvicorn`), graph drivers
-  (`neo4j`, `mgclient`, `redis`), and developer tooling (`ruff`, `pyright`, docs toolchain). `Makefile install` still targets
+  (`neo4j`, `pymgclient`, `redis`), and developer tooling (`ruff`, `pyright`, docs toolchain). `Makefile install` still targets
   `.[dev,docs,testing]`.
 - Docker orchestration (root `docker-compose.yml` plus `meshmind/tests/docker/*.yml`) provisions Memgraph, Neo4j, Redis, and
   optional Celery workers. The `Dockerfile` supports bespoke worker images.
@@ -22,14 +22,17 @@
   surfaces.
 - Documented outstanding work in `ISSUES.md` (LLM client refactor, consolidation validation) so blockers remain visible once
   infrastructure is available.
+- Confirmed outbound network access, installed optional dependencies (`neo4j`, `pymgclient`, `redis`, REST/LLM tooling) via `uv pip install`,
+  and updated documentation plus dependency metadata (`pyproject.toml`, environment guides) to reference `pymgclient` as the Memgraph driver package.
+- Ran `pytest` successfully with the expanded dependency set to confirm optional installations keep the suite green.
 
 ## Environment State
 
 - External services (Neo4j, Memgraph, Redis) remain unavailable; tests rely on fakes and SQLite/in-memory drivers.
-- Outbound package downloads are currently blocked (proxy returns HTTP 403), preventing regeneration of `uv.lock`; request for
-  PyPI access persists in `ENVIRONMENT_NEEDS.md`.
-- Optional packages (`neo4j`, `mgclient`, `redis`, `celery`, `tiktoken`, `sentence-transformers`) are not installed in this
-  sandbox; new automation scripts will install them automatically once network access is granted.
+- Outbound package downloads now succeed (confirmed via `uv pip install` for optional dependencies); keep the network channel
+  open so `uv lock` regeneration can proceed next session.
+- Optional packages (`neo4j`, `pymgclient`, `redis`, `celery`, `tiktoken`, `sentence-transformers`) are installed in this
+  sandbox via `uv pip install`; rerun the `run/` scripts to keep cached images current and apply updates during maintenance.
 
 ## Next Session Starting Points
 

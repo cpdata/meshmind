@@ -55,7 +55,7 @@
 - Compatibility shims provide minimal validation and should be replaced with real Pydantic models in production builds.
 
 ## External Services & Dependencies
-- **Graph backend**: Choose via `GRAPH_BACKEND`. In-memory and SQLite require no external services. Memgraph needs `mgclient`;
+- **Graph backend**: Choose via `GRAPH_BACKEND`. In-memory and SQLite require no external services. Memgraph needs the `pymgclient` package (which exposes the `mgclient` module);
   Neo4j requires the official driver and a live instance.
 - **OpenAI SDK**: Required for extraction, embeddings, and LLM reranking; configure `OPENAI_API_KEY`.
 - **tiktoken**: Optional but necessary for compression/token budgeting.

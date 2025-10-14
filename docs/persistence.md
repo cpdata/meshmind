@@ -11,7 +11,7 @@ MeshMind persists memories and triplets through interchangeable graph drivers. E
 | In-memory | `meshmind.db.in_memory_driver.InMemoryGraphDriver` | Tests and demos | Stores nodes/edges in Python dicts with UUID auto-generation helpers, plus in-process search/pagination implementations. |
 | SQLite | `meshmind.db.sqlite_driver.SQLiteGraphDriver` | Lightweight persistence without external services | Uses two tables (`entities`, `triplets`) with JSON columns; supports namespace + label filtering, pagination, and SQL-based search. |
 | Neo4j | `meshmind.db.neo4j_driver.Neo4jGraphDriver` | Production Bolt cluster | Requires the `neo4j` Python driver and connectivity to a running instance. Provides `verify_connectivity()` for health checks, server-side search, and aggregated counts. |
-| Memgraph | `meshmind.db.memgraph_driver.MemgraphDriver` | Memgraph (Bolt-compatible) | Requires `mgclient`. Filters results using Cypher with optional namespace/label predicates, driver-side search, and count aggregation. |
+| Memgraph | `meshmind.db.memgraph_driver.MemgraphDriver` | Memgraph (Bolt-compatible) | Requires the `pymgclient` package (provides the `mgclient` module). Filters results using Cypher with optional namespace/label predicates, driver-side search, and count aggregation. |
 | Fake drivers | `meshmind.testing.fakes` | Offline testing | Provide stubbed implementations for Redis, embedding models, and Memgraph. |
 
 ## Driver Factory

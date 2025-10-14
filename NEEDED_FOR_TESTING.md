@@ -3,7 +3,7 @@
 > **Note:** `ENVIRONMENT_NEEDS.md` lists infrastructure and package requests for the human project manager. Use this document for developer-side setup details.
 
 ## Python Runtime
-- Python 3.11 or 3.12 is recommended; project metadata now pins `>=3.11,<3.13` because several dependencies (`mgclient`,
+- Python 3.11 or 3.12 is recommended; project metadata now pins `>=3.11,<3.13` because several dependencies (`pymgclient` (exposes the `mgclient` module),
   `sentence-transformers`) do not yet publish wheels for 3.13.
 - Use a virtual environment (`uv`, `venv`, or `conda`) to isolate dependencies.
 
@@ -14,7 +14,7 @@
   (`meshmind/_compat/pydantic.py`) that unlocks tests when Pydantic is unavailable.
 - Optional packages improve specific workflows (most now included via the extras above):
   - `numpy`, `scikit-learn`, and `rapidfuzz` accelerate similarity and lexical search (pure-Python fallbacks are bundled).
-  - `sentence-transformers`, `tiktoken`, and `mgclient` enable local embeddings, compression, and Memgraph connectivity.
+  - `sentence-transformers`, `tiktoken`, and `pymgclient` enable local embeddings, compression, and Memgraph connectivity.
   - `celery[redis]` activates scheduled maintenance with a Redis broker.
   - `fastapi` + `uvicorn[standard]` power the REST adapter when exercising HTTP APIs.
 - Optional drivers: install `neo4j` if exercising the Neo4j backend; SQLite support ships with the standard library.

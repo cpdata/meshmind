@@ -1,18 +1,13 @@
 # Tasks for Human Project Manager
 
-- Install Python packages required for full optional coverage across CI images and the
-  shared development environment:
-  - `neo4j` (official Bolt driver).
-  - `mgclient` (Memgraph driver).
-  - `redis` / `redis-py` for caching tasks.
-  - `celery[redis]` for scheduled/async maintenance workers.
-  - `fastapi` and `uvicorn[standard]` to exercise the REST API.
-  - `tiktoken`, `sentence-transformers`, and `openai` for embedding/compression workflows.
-  - `uv` CLI for reproducible dependency management (used in CI).
-  - Developer tooling referenced by automation: `ruff`, `pyright`, `typeguard`,
-    `toml-sort`, `yamllint`, `pytest-cov`, `httpx`, `mkdocs`, `mkdocs-material`.
+- Keep the Python package layer aligned with the project extras during base image
+  refreshes. The `run/install_setup.sh` and `run/maintenance_setup.sh` scripts now
+  install the full optional stack (neo4j driver, `pymgclient`, Redis, Celery extras,
+  FastAPI/Uvicorn, LLM tooling, and developer linters/testers). Ensure cached
+  environments either run the maintenance script or bake these dependencies into the
+  image so cold starts do not regress coverage.
 - Provide system-level build dependencies for the graph drivers (e.g., `build-essential`,
-  `cmake`, `libssl-dev`, `libkrb5-dev`) so `mgclient` installs cleanly.
+  `cmake`, `libssl-dev`, `libkrb5-dev`) so `pymgclient` (and its `mgclient` module) install cleanly.
 - Provision external services and credentials (compose files now exist under the project
   root and `meshmind/tests/docker/`):
   - Neo4j instance reachable from the execution environment with `NEO4J_URI`,
@@ -24,7 +19,10 @@
     integration testing).
 - Supply datasets/fixtures (future request) representing large knowledge graphs to
   stress-test consolidation heuristics and pagination under load.
-- Allow outbound package downloads to PyPI (current proxy returns HTTP 403, blocking `uv`/dependency lock generation).
+- Maintain outbound package download access to PyPI and vendor repositories; this
+  session confirmed package installation works when the network is open, and future
+  sessions need the same capability to refresh locks or install new optional
+  integrations.
 - Enable Docker or container runtime access (future request) so the provided
   `docker-compose.yml` files can run inside this environment; alternatively, provision
   remote services accessible to CI.

@@ -2,7 +2,7 @@
 
 ## Completed
 
-- [x] Implement dependency guards and lazy imports for optional packages (`mgclient`, `tiktoken`, `celery`, `sentence-transformers`).
+- [x] Implement dependency guards and lazy imports for optional packages (`pymgclient`, `tiktoken`, `celery`, `sentence-transformers`).
 - [x] Add bootstrap helper for default encoder registration and call it from the CLI.
 - [x] Update OpenAI encoder implementation to align with latest SDK responses and retry semantics.
 - [x] Improve configuration guidance and automation for environment variables and service setup.
@@ -45,7 +45,9 @@
 - [ ] Extend configuration models to support per-operation LLM endpoint and model overrides with a default of `gpt-5-nano`.
 - [ ] Add CLI flags and API payload fields that override LLM endpoint/model settings when provided.
 - [ ] Document the cascading LLM override behaviour across README and SETUP guides.
-- [ ] Regenerate `uv.lock` to align with the updated dependency set (`fastapi`, `uvicorn`, `neo4j`, `mgclient`, extras) once package downloads are possible (blocked: pip cannot access PyPI from this environment).
+- [ ] Replace `datetime.utcnow()` usage in `meshmind/_compat/pydantic.py` with timezone-aware alternatives and update any tests relying on naive timestamps.
+- [ ] Add a smoke test or script check that `run/install_setup.sh` and `run/maintenance_setup.sh` install key optional packages (`neo4j`, `pymgclient`, `fastapi`) when internet access is present, documenting skip behaviour when offline.
+- [ ] Regenerate `uv.lock` to align with the updated dependency set (`fastapi`, `uvicorn`, `neo4j`, `pymgclient`, extras) once package downloads are possible (blocked: pip cannot access PyPI from this environment).
 - [ ] Validate Neo4j driver requirements and connectivity against a live cluster (exercise CLI admin checks end-to-end).
 - [ ] Validate consolidation heuristics on larger datasets to confirm accuracy and stability under load.
 - [ ] Define and document conflict-resolution/backoff strategies for maintenance writes after heuristics are validated.
@@ -60,6 +62,6 @@
 ## Recommended Waiting for Approval Tasks
 
 - [ ] Provision Neo4j, Memgraph, and Redis instances accessible from the development environment to unblock live integration tests (requires infrastructure approval).
-- [ ] Approve installation of optional dependencies (`neo4j`, `mgclient`, `redis`, `celery`, `tiktoken`, `sentence-transformers`) across CI and developer machines to exercise full workflows.
+- [ ] Approve installation of optional dependencies (`neo4j`, `pymgclient`, `redis`, `celery`, `tiktoken`, `sentence-transformers`) across CI and developer machines to exercise full workflows.
 - [ ] Source or generate large synthetic datasets for consolidation and retrieval benchmarking to validate heuristics under load.
 - [ ] Define a policy for reintroducing Pydantic models (version targets, rollout timeline) so compatibility shims can be retired once approved.

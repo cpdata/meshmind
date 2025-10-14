@@ -20,7 +20,7 @@ dependencies = [
     "fastapi>=0.115.6",
     "uvicorn[standard]>=0.34.0",
     "neo4j>=5.26.0",
-    "mgclient>=1.4.0",
+    "pymgclient>=1.4.0",
     "redis>=5.0.0",
 ]
 

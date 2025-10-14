@@ -6,9 +6,9 @@
 - Documentation artifacts (`README.md`, `SOT.md`, `ENVIRONMENT_NEEDS.md`, `docs/`) stay current when updated with each iteration; the legacy README has been archived as `README_OLD.md`. A docs-guard script now enforces synchronized updates during CI.
 
 ## Dependency & Environment Notes
-- `MeshMind` defers driver creation until persistence is required, enabling workflows without `mgclient` and selecting between
-- Package management via `uv` is currently blocked by proxy restrictions (pip returns HTTP 403), so dependency locks cannot be regenerated until outbound access is granted.
+- `MeshMind` defers driver creation until persistence is required, enabling workflows without the `mgclient` module (install `pymgclient` to obtain it) and selecting between
   in-memory, SQLite, Memgraph, or Neo4j backends. CLI helpers (`meshmind admin graph`) now expose connectivity sanity checks.
+- Package management via `uv` now succeeds (optional dependencies installed via `uv pip install` this session); keep network access available so `uv.lock` regeneration can proceed when prioritized.
 - Project metadata now advertises Python `>=3.11,<3.13`, aligning with available wheels for optional dependencies.
 - Encoder registration occurs during bootstrap, but custom deployments must ensure compatible models are registered before
   extraction or hybrid search.

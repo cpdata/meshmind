@@ -10,7 +10,7 @@ execution and automated testing.
 - **Python**: CPython 3.11.x (the project currently supports 3.11 and 3.12).
 - **System packages** (only required if you intend to install optional graph drivers):
   - Build tooling: `build-essential`, `cmake`, `git`.
-  - Crypto/Kerberos headers: `libssl-dev`, `libkrb5-dev` (for `mgclient`).
+- Crypto/Kerberos headers: `libssl-dev`, `libkrb5-dev` (needed to compile `pymgclient`, which provides the `mgclient` module).
   - Optional: `libopenblas-dev` for faster `numpy`/`scikit-learn` builds on Debian/Ubuntu.
 - **Automation scripts**: `run/install_setup.sh` bootstraps a fresh environment; `run/maintenance_setup.sh` refreshes a cached
   workspace. Both require sudo/root access and outbound internet connectivity.
@@ -33,7 +33,7 @@ execution and automated testing.
    ```
 
    The editable install pulls in the optional dependencies used by the REST service
-   (`fastapi`, `uvicorn`), the graph drivers (`neo4j`, `mgclient`, `redis`), LLM tooling
+  (`fastapi`, `uvicorn`), the graph drivers (`neo4j`, `pymgclient`, `redis`), LLM tooling
    (`openai`, `tiktoken`, `sentence-transformers`), and developer utilities (ruff,
    pyright, typeguard, docs tooling, pytest plugins).
 

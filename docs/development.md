@@ -7,7 +7,7 @@ This guide summarizes expectations when contributing to MeshMind.
 - Python 3.11 or 3.12 is recommended (see `pyproject.toml`).
 - Install dependencies with `pip install -e .[dev,docs,testing]` (or `uv pip install --system -e .[dev,docs,testing]`; drop
   `--system` when using an activated virtualenv).
-- Optional extras: none—`.[dev,docs,testing]` pulls in REST tooling (`fastapi`, `uvicorn`), graph drivers (`neo4j`, `mgclient`,
+- Optional extras: none—`.[dev,docs,testing]` pulls in REST tooling (`fastapi`, `uvicorn`), graph drivers (`neo4j`, `pymgclient`,
   `redis`), LLM tooling (`openai`, `tiktoken`, `sentence-transformers`), and developer utilities. Refer to `SETUP.md` for
   service provisioning steps.
 

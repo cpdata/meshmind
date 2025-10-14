@@ -22,7 +22,8 @@ regex, exact-match, fuzzy, and BM25 scoring with optional LLM reranking.
 ## Requirements
 - Python 3.11 or 3.12 recommended (`pyproject.toml` pins `>=3.11,<3.13` while third-party packages catch up).
 - Configurable graph backend via `GRAPH_BACKEND` (`memory`, `sqlite`, `memgraph`, `neo4j`).
-- Memgraph instance reachable via Bolt and the `mgclient` Python package (when `GRAPH_BACKEND=memgraph`).
+- Memgraph instance reachable via Bolt and the `pymgclient` Python package (which exposes the `mgclient` module for
+  `GRAPH_BACKEND=memgraph`).
 - Optional Neo4j instance with the official Python driver (when `GRAPH_BACKEND=neo4j`).
 - OpenAI API key for extraction, embeddings, and optional reranking.
 - Optional: Redis and Celery for scheduled maintenance tasks.

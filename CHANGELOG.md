@@ -1,6 +1,16 @@
 # Changelog
 
-## [2025-10-14T19:53:42Z]
+## [2025-10-14T16:46:48-04:00 (America/New_York)]
+### Changed
+- Swapped the Memgraph dependency in `pyproject.toml` from `mgclient` to `pymgclient` and confirmed optional packages install
+  cleanly with the refreshed network access (`uv pip install`).
+- Updated environment references—`ENVIRONMENT_NEEDS.md`, `NEEDED_FOR_TESTING.md`, `SETUP.md`, `README.md`, `README_OLD.md`, `SOT.md`, `PROJECT.md`,
+  `FINDINGS.md`, `ISSUES.md`, `TODO.md`, `docs/` wiki pages—to describe `pymgclient` as the Memgraph package while preserving
+  the runtime `mgclient` module references.
+- Revised `AGENTS.md` to require Eastern Time timestamps with timezone codes for every changelog entry and aligned `RESUME_NOTES.md`
+  with the newly installed optional dependencies and confirmed internet availability.
+
+## [2025-10-14T15:53:42-04:00 (America/New_York)]
 ### Added
 - Authored `run/install_setup.sh` and `run/maintenance_setup.sh` bash scripts that install system packages (`build-essential`,
   `cmake`, `libssl-dev`, `libopenblas-dev`, etc.) and synchronize Python dependencies via `uv pip sync` so fresh and cached
