@@ -1,15 +1,43 @@
 version: "3.8"
+
 services:
   memgraph:
     image: memgraph/memgraph-platform:latest
+    container_name: meshmind-memgraph
     ports:
       - "7687:7687"
       - "3000:3000"
+    healthcheck:
+      test: ["CMD", "bash", "-c", "cypher-shell --version || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - memgraph-data:/var/lib/memgraph
+
   redis:
     image: redis:7-alpine
+    container_name: meshmind-redis
+    ports:
+      - "6379:6379"
+    command: redis-server --save 60 1000 --loglevel warning
+    volumes:
+      - redis-data:/data
+
   worker:
     build: .
     command: celery -A meshmind.tasks.celery_app worker -B -l info
     depends_on:
-      - memgraph
-      - redis
+      memgraph:
+        condition: service_started
+      redis:
+        condition: service_started
+    environment:
+      MEMGRAPH_URI: bolt://memgraph:7687
+      REDIS_URL: redis://redis:6379/0
+    volumes:
+      - .:/app
+
+volumes:
+  memgraph-data:
+  redis-data:
