@@ -1,8 +1,14 @@
-"""
-Fuzzy string matching retrieval using rapidfuzz.
-"""
-from typing import List, Tuple
-from rapidfuzz import process, fuzz
+"""Fuzzy string matching retrieval with optional ``rapidfuzz`` acceleration."""
+from __future__ import annotations
+
+from difflib import SequenceMatcher
+from typing import Callable, List, Tuple
+
+try:  # pragma: no cover - optional dependency
+    from rapidfuzz import fuzz, process
+except ImportError:  # pragma: no cover - fallback for environments without rapidfuzz
+    fuzz = None  # type: ignore
+    process = None  # type: ignore
 
 from meshmind.core.types import Memory
 
@@ -22,19 +28,31 @@ def fuzzy_search(
     :param score_cutoff: Minimum score (0-1) to include in results.
     :return: List of (Memory, normalized_score) tuples.
     """
-    # Build choices mapping
     choices = [mem.name for mem in memories]
-    # rapidfuzz returns scores in 0-100 range
-    raw_results = process.extract(
-        query,
-        choices,
-        scorer=fuzz.WRatio,
-        limit=top_k,
-        score_cutoff=score_cutoff * 100,
-    )
+
+    if process is not None and fuzz is not None:
+        raw_results = process.extract(
+            query,
+            choices,
+            scorer=fuzz.WRatio,
+            limit=top_k,
+            score_cutoff=score_cutoff * 100,
+        )
+        results: List[Tuple[Memory, float]] = []
+        for match, score, idx in raw_results:
+            results.append((memories[idx], score / 100.0))
+        return results
+
+    scorer: Callable[[str, str], float] = _sequence_ratio
     results: List[Tuple[Memory, float]] = []
-    for match, score, idx in raw_results:
-        # Normalize score to [0,1]
-        norm = score / 100.0
-        results.append((memories[idx], norm))
-    return results
+    for idx, name in enumerate(choices):
+        score = scorer(query, name)
+        if score < score_cutoff:
+            continue
+        results.append((memories[idx], score))
+    results.sort(key=lambda item: item[1], reverse=True)
+    return results[:top_k]
+
+
+def _sequence_ratio(a: str, b: str) -> float:
+    return SequenceMatcher(None, a.lower(), b.lower()).ratio()
