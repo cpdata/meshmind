@@ -22,6 +22,10 @@
 - Extended `DUMMIES.md` and `docs/testing.md` to capture the `FakeLLMClient` behaviour and the setup script smoke-test
   coverage; updated `ENVIRONMENT_NEEDS.md` and `NEEDED_FOR_TESTING.md` to acknowledge that optional packages now install with
   network access.
+- Authored competitor-aligned planning collateral (`GOALS.md`, `PLANNING_THOUGHTS.md`, `ROADMAP.md`) and refreshed planning
+  artifacts (`PLAN.md`, `SOT.md`, `RECOMMENDATIONS.md`, `TODO.md`, `ISSUES.md`) to surface roadmap-aligned follow-up work.
+- Expanded `ROADMAP_TASKS.md` to cover MCP search/graph parity, chat-store compatibility, crew/shared scopes, conversation
+  summaries, and multi-embedder routing; mirrored the updates across planning/backlog documents.
 
 ## Environment State
 
@@ -34,12 +38,14 @@
 
 ## Next Session Starting Points
 
-1. Work through the remaining `TODO.md` priority items that are unblocked by missing infrastructure (e.g., research tasks may
+1. Convert new `ROADMAP_TASKS.md` subtasks (MCP search parity, chat-store API, crew scopes, conversation summaries, embedder
+   routing) into detailed design docs and engineering tickets.
+2. Work through the remaining `TODO.md` priority items that are unblocked by missing infrastructure (e.g., research tasks may
    remain pending until live services exist).
-2. Validate Neo4j connectivity end-to-end once a reachable instance is available, using `meshmind admin graph --backend neo4j`.
-3. Plan integration tests for the LLM override payloads against a real provider when credentials are provisioned; update
+3. Validate Neo4j connectivity end-to-end once a reachable instance is available, using `meshmind admin graph --backend neo4j`.
+4. Plan integration tests for the LLM override payloads against a real provider when credentials are provisioned; update
    `docs/testing.md` accordingly.
-4. Continue chipping away at shim retirements documented in `DUMMIES.md`, starting with replacing the Pydantic compatibility
+5. Continue chipping away at shim retirements documented in `DUMMIES.md`, starting with replacing the Pydantic compatibility
    layer when production targets allow the real dependency.
 
 ## Helpful References

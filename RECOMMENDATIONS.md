@@ -14,6 +14,8 @@
 - Introduce evaluation loops for the new importance heuristic (e.g., LLM-assisted ranking or analytics-driven weights) to tune thresholds over time, leveraging the telemetry stats now emitted.
 - Exercise the new `llm_client` overrides via REST/gRPC integration smoke tests (once credentials are available) to confirm per-request models/endpoints behave consistently outside unit tests.
 - Expand predicate/registry management APIs beyond the CLI helper so services can manage vocabularies programmatically.
+- Align roadmap execution artifacts with competitor features by scheduling MCP search/graph endpoints, chat-store persistence,
+  shared crew scopes, conversation summarization, and multi-embedder routing work from the refreshed `ROADMAP_TASKS.md` list.
 - Plan for reintroducing full Pydantic models once packaging support is aligned with target Python versions.
 
 ## Improve Developer Experience
@@ -31,6 +33,8 @@
   the Makefile and expand it as new developer utilities are introduced. Keep `SETUP.md` synchronized when dependencies change.
 - Provide walkthroughs for configuring LLM reranking, including sample prompts and response expectations.
 - Add onboarding notes for the REST/gRPC service layers with sample payloads and curl/grpcurl snippets.
+- Keep `GOALS.md`, `PLANNING_THOUGHTS.md`, and `ROADMAP.md` refreshed each planning cycle so contributors have a single
+  reference for competitive priorities, sequencing strategies, and upcoming feature commitments.
 
 ## Future Enhancements
 - Export telemetry to Prometheus/OpenTelemetry and wire alerts/dashboards around ingestion and maintenance.

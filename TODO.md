@@ -65,6 +65,13 @@
 - [ ] Add gRPC proto definitions and generated clients so the Python stubs align with production servers (including `MemoryCounts`).
 - [ ] Benchmark driver-side pagination/filtering on large datasets to tune default candidate limits and document recommended overrides.
 - [ ] Implement backend-native vector similarity queries for Memgraph/Neo4j to eliminate Python-side scoring when embeddings are present.
+- [ ] Draft a detailed MCP server specification (tools, auth, tenancy flows) aligned with `GOALS.md` and the roadmap for engineering breakdown.
+- [ ] Design the multi-level scoping data model (user/agent/session/run) and persistence changes required for roadmap parity before implementation begins.
+- [ ] Author API designs for MCP search, episode lifecycle, clear-graph, and explain-path endpoints so development tickets map to `ROADMAP_TASKS.md` subtasks.
+- [ ] Outline chat-store persistence requirements (session CRUD, transcript export) and integration notes for LangChain/Zep adapters.
+- [ ] Produce schema proposal for crew/shared scope identifiers and access controls ahead of implementation.
+- [ ] Draft architecture for conversation summarizer job and retrieval integration, including evaluation metrics.
+- [ ] Specify embedder provider abstraction and routing telemetry needed for multi-embedder cost controls.
 
 ## Recommended Waiting for Approval Tasks
 

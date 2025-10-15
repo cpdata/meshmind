@@ -1,5 +1,19 @@
 # Changelog
 
+## [2025-10-15T17:30:19-04:00 (America/New_York)]
+### Updated
+- Expanded `ROADMAP_TASKS.md` with MCP search/graph tooling, chat-store compatibility, shared crew scopes, conversation summary
+  memory, and multi-embedder routing tasks derived from competitor research so feature coverage matches the prioritized roadmap.
+
+## [2025-10-15T01:13:29-04:00 (America/New_York)]
+### Added
+- Authored `GOALS.md`, `PLANNING_THOUGHTS.md`, and `ROADMAP.md` to capture competitor-informed strategic goals, planning
+  options, and a prioritized feature roadmap aligning MeshMind with Mem0, Graphiti, and Zep capabilities.
+
+### Updated
+- Refreshed planning collateral (`PLAN.md`, `SOT.md`, `RECOMMENDATIONS.md`, `TODO.md`, `ISSUES.md`, `RESUME_NOTES.md`) to
+  reference the new strategic documents and surface roadmap-aligned backlog items.
+
 ## [2025-10-14T22:51:20-04:00 (America/New_York)]
 ### Changed
 - Documented LLM override precedence in `README.md`, expanded service documentation in `docs/api.md` and
