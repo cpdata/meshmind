@@ -43,3 +43,8 @@
 2. **Operational Observability** – Export telemetry to Prometheus/OpenTelemetry and surface dashboards/alerts.
 3. **Celery Hardening** – Stress test consolidation/compression heuristics at scale and codify retry/backoff policies.
 4. **Model Fidelity** – Replace compatibility shims with production-ready Pydantic models once dependency support catches up.
+
+## Phase 6 – Competitive Roadmap Alignment (New)
+1. **Strategic Goals** – Track `GOALS.md` as the repository for parity, governance, and differentiation targets derived from the latest competitor analyses.
+2. **Planning Options** – Reference `PLANNING_THOUGHTS.md` during iteration reviews to select the sequencing strategy (parity-first, reliability-first, differentiator-led) that matches current constraints and staffing.
+3. **Execution Roadmap** – Groom tasks against `ROADMAP.md`, prioritizing MCP parity, multi-level scoping, bi-temporal edges, advanced rerankers, and governance items before lower-impact enhancements.

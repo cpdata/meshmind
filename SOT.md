@@ -31,6 +31,8 @@ Supporting assets:
 - Documentation (`PROJECT.md`, `PLAN.md`, `SOT.md`, `README.md`, etc.) describing the system and roadmap.
 - `DUMMIES.md`: Catalog of temporary shims (Pydantic fallback, REST/gRPC stubs, Celery dummies, fake drivers) with removal
   guidance now that dependencies can be installed.
+- `GOALS.md`, `PLANNING_THOUGHTS.md`, `ROADMAP.md`: Strategic planning artifacts aligning MeshMind workstreams with
+  competitor-informed goals, sequencing options, and prioritized delivery order.
 
 ## Configuration (`meshmind/core/config.py`)
 - Loads environment variables for the active graph backend (`GRAPH_BACKEND`), Memgraph (`MEMGRAPH_URI`, `MEMGRAPH_USERNAME`,

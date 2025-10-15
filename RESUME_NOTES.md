@@ -22,6 +22,8 @@
 - Extended `DUMMIES.md` and `docs/testing.md` to capture the `FakeLLMClient` behaviour and the setup script smoke-test
   coverage; updated `ENVIRONMENT_NEEDS.md` and `NEEDED_FOR_TESTING.md` to acknowledge that optional packages now install with
   network access.
+- Authored competitor-aligned planning collateral (`GOALS.md`, `PLANNING_THOUGHTS.md`, `ROADMAP.md`) and refreshed planning
+  artifacts (`PLAN.md`, `SOT.md`, `RECOMMENDATIONS.md`, `TODO.md`, `ISSUES.md`) to surface roadmap-aligned follow-up work.
 
 ## Environment State
 
@@ -34,12 +36,14 @@
 
 ## Next Session Starting Points
 
-1. Work through the remaining `TODO.md` priority items that are unblocked by missing infrastructure (e.g., research tasks may
+1. Break down roadmap initiatives (MCP parity, multi-level scoping, bi-temporal edges, advanced rerankers, governance) into
+   executable specs and tickets referencing `GOALS.md`, `ROADMAP.md`, and the new `TODO.md` items.
+2. Work through the remaining `TODO.md` priority items that are unblocked by missing infrastructure (e.g., research tasks may
    remain pending until live services exist).
-2. Validate Neo4j connectivity end-to-end once a reachable instance is available, using `meshmind admin graph --backend neo4j`.
-3. Plan integration tests for the LLM override payloads against a real provider when credentials are provisioned; update
+3. Validate Neo4j connectivity end-to-end once a reachable instance is available, using `meshmind admin graph --backend neo4j`.
+4. Plan integration tests for the LLM override payloads against a real provider when credentials are provisioned; update
    `docs/testing.md` accordingly.
-4. Continue chipping away at shim retirements documented in `DUMMIES.md`, starting with replacing the Pydantic compatibility
+5. Continue chipping away at shim retirements documented in `DUMMIES.md`, starting with replacing the Pydantic compatibility
    layer when production targets allow the real dependency.
 
 ## Helpful References
