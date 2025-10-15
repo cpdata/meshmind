@@ -17,6 +17,7 @@
 - [ ] Document Neo4j driver requirements and verify connectivity against a live cluster (CLI connectivity checks exist but still need validation against a real instance).
 - [ ] Exercise the new namespace/entity-label filtering against live Memgraph/Neo4j datasets to confirm Cypher predicates behave as expected.
 - [ ] Regenerate `uv.lock` to reflect the updated dependency set (`pymgclient`, `fastapi`, `uvicorn`, extras) so CI tooling stays in sync.
+- [ ] Break down the competitive roadmap (MCP parity, multi-level scoping, bi-temporal edges, advanced rerankers, governance) into executable epics with owners and timelines referencing `GOALS.md`/`ROADMAP.md`.
 ## Medium Priority
 - [x] Persist results from consolidation and compression tasks back to the database (currently in-memory only).
 - [x] Refine `Memory.importance` scoring to reflect actual ranking heuristics instead of a constant.
