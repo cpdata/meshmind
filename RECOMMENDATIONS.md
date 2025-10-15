@@ -31,6 +31,8 @@
   the Makefile and expand it as new developer utilities are introduced. Keep `SETUP.md` synchronized when dependencies change.
 - Provide walkthroughs for configuring LLM reranking, including sample prompts and response expectations.
 - Add onboarding notes for the REST/gRPC service layers with sample payloads and curl/grpcurl snippets.
+- Keep `GOALS.md`, `PLANNING_THOUGHTS.md`, and `ROADMAP.md` refreshed each planning cycle so contributors have a single
+  reference for competitive priorities, sequencing strategies, and upcoming feature commitments.
 
 ## Future Enhancements
 - Export telemetry to Prometheus/OpenTelemetry and wire alerts/dashboards around ingestion and maintenance.
