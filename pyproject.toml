@@ -3,7 +3,7 @@ name = "meshmind"
 version = "0.1.0"
 description = "AI Agent Memory management system using LLMs and graph databases"
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.11,<3.13"
 dependencies = [
     "openai>=1.78.0",
     "pydantic>=2.11.4",
@@ -17,8 +17,33 @@ dependencies = [
     "sentence-transformers>=4.1.0",
     "typing-extensions>=4.13.2",
     "tiktoken>=0.9.0",
+    "fastapi>=0.115.6",
+    "uvicorn[standard]>=0.34.0",
+    "neo4j>=5.26.0",
     "pymgclient>=1.4.0",
+    "redis>=5.0.0",
 ]
 
 [project.scripts]
 meshmind = "meshmind.cli.__main__:main"
+
+[project.optional-dependencies]
+dev = [
+    "ruff>=0.7.3",
+    "pyright>=1.1.386",
+    "typeguard>=4.3.0",
+    "toml-sort>=0.23.1",
+    "yamllint>=1.35.1",
+]
+docs = [
+    "mkdocs>=1.6.1",
+    "mkdocs-material>=9.5.39",
+]
+testing = [
+    "pytest-cov>=5.0.0",
+    "httpx>=0.28.1",
+    "fastapi>=0.115.0",
+    "uvicorn>=0.32.0",
+    "neo4j>=5.25.0",
+    "pymgclient>=1.5.1",
+]
