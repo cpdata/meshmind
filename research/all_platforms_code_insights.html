@@ -1,0 +1,437 @@
+<!doctype html><meta charset='utf-8'><title>AI Agent Memory — Codebase Insights</title>
+<style>body{font-family:system-ui,Segoe UI,Arial,sans-serif;margin:32px} table{border-collapse:collapse;width:100%} th,td{border:1px solid #ddd;padding:8px;vertical-align:top} th{background:#f7f7f7}</style>
+<h1>AI Agent Memory — Codebase Insights</h1>
+<p>Generated: 2025-10-15T03:23:53.470605Z</p>
+<h2>Mem0</h2>
+<ul><li>FastAPI server exposes /api/v1/memories/ with payload field now 'text' (not 'memory').</li><li>SDK methods: Memory.add/search/update/delete; consolidation planner drives ADD/UPDATE/DELETE.</li><li>Supports multiple vector stores (e.g., Qdrant/Chroma/Azure AI Search); optional Neo4j graph.</li><li>OpenMemory MCP integrates with tools; hosted cloud at api.mem0.ai.</li></ul>
+<h2>Graphiti</h2>
+<ul><li>MCP server exposes tools (add_memory, search_facts, search_nodes, get_episodes, delete_episode, clear_graph).</li><li>Bi-temporal KG; search recipes include BM25 + semantic + traversal; RRF/MMR/cross-encoder; node-distance rerank.</li><li>CRUD classes EntityNode/EpisodicNode + EntityEdge/EpisodicEdge with save/delete/get_by_uuid.</li></ul>
+<h2>Zep</h2>
+<ul><li>Zep Cloud builds on Graphiti’s temporal KG; SDKs in Python/TS/Go.</li><li>README emphasizes valid_at/invalid_at and continuous learning; zepcli manages service.</li></ul>
+<h2>LangChain</h2>
+<ul><li>Provides memory modules (ConversationBuffer/Summary, VectorStoreRetrieverMemory, ConversationKGMemory).</li><li>Library-level; no canonical REST; persistence via user-provided stores.</li></ul>
+<h2>LangGraph</h2>
+<ul><li>Long-term memory via namespaces; thread stores for short-term memory.</li><li>Separates checkpointing vs memory; long-term memory stored as JSON docs.</li></ul>
+<h2>LlamaIndex</h2>
+<ul><li>ChatSummaryMemoryBuffer & Memory class; chat_store persistence; KnowledgeGraphIndex for relations.</li><li>Retriever ecosystem with rerankers; backend-dependent BM25; no bi-temporal KG.</li></ul>
+<h2>AutoGen</h2>
+<ul><li>AgentChat Memory protocol; RAG + Memory docs for persistent stores.</li><li>Multi-agent memory patterns; app provides actual storage engines.</li></ul>
+<h2>MemGPT</h2>
+<ul><li>Tiered memory architecture (short-term vs long-term vector store) to extend context.</li><li>Policies to move facts between tiers; summarization for context control.</li></ul>
+<h2>CrewAI</h2>
+<ul><li>Memory=True enables short-term, long-term, and entity memory; defaults to local Chroma/SQLite.</li><li>Community requests for custom memory stores; vector backends like Qdrant supported; Couchbase tutorial exists.</li></ul>
+<h2>Haystack</h2>
+<ul><li>Agent memory frequently modeled as list + RAG; BM25 retriever and rerankers available.</li></ul>
+<h2>Compact Feature Matrix (Support levels)</h2>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Project</th>
+      <th>AutoGen</th>
+      <th>CrewAI</th>
+      <th>Graphiti</th>
+      <th>Haystack</th>
+      <th>LangChain</th>
+      <th>LangGraph</th>
+      <th>LlamaIndex</th>
+      <th>Mem0</th>
+      <th>MemGPT</th>
+      <th>MeshMind</th>
+      <th>Zep</th>
+    </tr>
+    <tr>
+      <th>Feature</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Auth &amp; tenancy (API keys/JWT, multi-tenant)</th>
+      <td>No</td>
+      <td>No</td>
+      <td>Partial</td>
+      <td>No</td>
+      <td>No</td>
+      <td>No</td>
+      <td>No</td>
+      <td>Partial</td>
+      <td>No</td>
+      <td>Partial</td>
+      <td>Yes</td>
+    </tr>
+    <tr>
+      <th>Benchmarks / evaluation harness</th>
+      <td>Partial</td>
+      <td>No</td>
+      <td>Partial</td>
+      <td>Partial</td>
+      <td>Partial</td>
+      <td>Partial</td>
+      <td>Partial</td>
+      <td>Partial</td>
+      <td>Partial</td>
+      <td>Partial</td>
+      <td>Partial</td>
+    </tr>
+    <tr>
+      <th>Browser/extension ingestion for memories</th>
+      <td>No</td>
+      <td>No</td>
+      <td>No</td>
+      <td>No</td>
+      <td>Partial</td>
+      <td>Partial</td>
+      <td>Partial</td>
+      <td>Partial</td>
+      <td>No</td>
+      <td>No</td>
+      <td>Partial</td>
+    </tr>
+    <tr>
+      <th>CLI commands / server runner</th>
+      <td>No</td>
+      <td>No</td>
+      <td>Partial</td>
+      <td>No</td>
+      <td>No</td>
+      <td>No</td>
+      <td>No</td>
+      <td>Partial</td>
+      <td>Partial</td>
+      <td>Yes</td>
+      <td>Yes</td>
+    </tr>
+    <tr>
+      <th>Chat history persistence / chat store interface</th>
+      <td>Yes</td>
+      <td>Partial</td>
+      <td>Partial</td>
+      <td>Partial</td>
+      <td>Partial</td>
+      <td>Yes</td>
+      <td>Yes</td>
+      <td>Yes</td>
+      <td>Yes</td>
+      <td>Partial</td>
+      <td>Yes</td>
+    </tr>
+    <tr>
+      <th>Consolidation planner (ADD/UPDATE/DELETE logic)</th>
+      <td>No</td>
+      <td>No</td>
+      <td>Partial</td>
+      <td>No</td>
+      <td>No</td>
+      <td>No</td>
+      <td>No</td>
+      <td>Yes</td>
+      <td>Partial</td>
+      <td>Partial</td>
+      <td>Partial</td>
+    </tr>
+    <tr>
+      <th>Conversation summary memory / digesting long context</th>
+      <td>Partial</td>
+      <td>Partial</td>
+      <td>Partial</td>
+      <td>Partial</td>
+      <td>Yes</td>
+      <td>Partial</td>
+      <td>Yes</td>
+      <td>Partial</td>
+      <td>Yes</td>
+      <td>Partial</td>
+      <td>Yes</td>
+    </tr>
+    <tr>
+      <th>Graph traversal retrieval (BFS, path search)</th>
+      <td>No</td>
+      <td>No</td>
+      <td>Yes</td>
+      <td>No</td>
+      <td>Partial</td>
+      <td>No</td>
+      <td>Partial</td>
+      <td>Partial</td>
+      <td>No</td>
+      <td>Yes</td>
+      <td>Yes</td>
+    </tr>
+    <tr>
+      <th>Graph-native data model (nodes/edges, triplets)</th>
+      <td>No</td>
+      <td>No</td>
+      <td>Yes</td>
+      <td>No</td>
+      <td>Partial</td>
+      <td>No</td>
+      <td>Partial</td>
+      <td>Partial</td>
+      <td>No</td>
+      <td>Yes</td>
+      <td>Yes</td>
+    </tr>
+    <tr>
+      <th>Hosted cloud service available</th>
+      <td>No</td>
+      <td>No</td>
+      <td>No</td>
+      <td>No</td>
+      <td>No</td>
+      <td>No</td>
+      <td>No</td>
+      <td>Yes</td>
+      <td>No</td>
+      <td>No</td>
+      <td>Yes</td>
+    </tr>
+    <tr>
+      <th>Keyword/BM25 retrieval</th>
+      <td>Partial</td>
+      <td>No</td>
+      <td>Yes</td>
+      <td>Yes</td>
+      <td>Partial</td>
+      <td>Partial</td>
+      <td>Partial</td>
+      <td>Partial</td>
+      <td>No</td>
+      <td>Yes</td>
+      <td>Partial</td>
+    </tr>
+    <tr>
+      <th>LLM-based extraction on ingest</th>
+      <td>Partial</td>
+      <td>Partial</td>
+      <td>Yes</td>
+      <td>Partial</td>
+      <td>Partial</td>
+      <td>Partial</td>
+      <td>Yes</td>
+      <td>Yes</td>
+      <td>Partial</td>
+      <td>Yes</td>
+      <td>Yes</td>
+    </tr>
+    <tr>
+      <th>MCP server / tools interface</th>
+      <td>No</td>
+      <td>No</td>
+      <td>Yes</td>
+      <td>No</td>
+      <td>No</td>
+      <td>No</td>
+      <td>No</td>
+      <td>Yes</td>
+      <td>No</td>
+      <td>No</td>
+      <td>Yes</td>
+    </tr>
+    <tr>
+      <th>Multi-agent shared memory / crew memory</th>
+      <td>Yes</td>
+      <td>Yes</td>
+      <td>Partial</td>
+      <td>Partial</td>
+      <td>Partial</td>
+      <td>Partial</td>
+      <td>Partial</td>
+      <td>Yes</td>
+      <td>Partial</td>
+      <td>Partial</td>
+      <td>Yes</td>
+    </tr>
+    <tr>
+      <th>Multi-level scoping (user/agent/session/run)</th>
+      <td>Partial</td>
+      <td>Partial</td>
+      <td>Partial</td>
+      <td>Partial</td>
+      <td>Partial</td>
+      <td>Yes</td>
+      <td>Partial</td>
+      <td>Yes</td>
+      <td>Partial</td>
+      <td>Partial</td>
+      <td>Yes</td>
+    </tr>
+    <tr>
+      <th>Observability (OpenTelemetry and metrics)</th>
+      <td>No</td>
+      <td>No</td>
+      <td>Yes</td>
+      <td>No</td>
+      <td>Partial</td>
+      <td>Partial</td>
+      <td>No</td>
+      <td>No</td>
+      <td>No</td>
+      <td>Partial</td>
+      <td>Partial</td>
+    </tr>
+    <tr>
+      <th>PII scrubbing / dialog classification / structured extraction</th>
+      <td>No</td>
+      <td>No</td>
+      <td>Partial</td>
+      <td>No</td>
+      <td>No</td>
+      <td>No</td>
+      <td>No</td>
+      <td>Partial</td>
+      <td>No</td>
+      <td>No</td>
+      <td>Yes</td>
+    </tr>
+    <tr>
+      <th>Pluggable graph backends (Neo4j/Memgraph/FalkorDB/Neptune)</th>
+      <td>No</td>
+      <td>No</td>
+      <td>Yes</td>
+      <td>No</td>
+      <td>Partial</td>
+      <td>No</td>
+      <td>Partial</td>
+      <td>Partial</td>
+      <td>No</td>
+      <td>Yes</td>
+      <td>Yes</td>
+    </tr>
+    <tr>
+      <th>Pluggable vector backends (Qdrant/Chroma/Azure AI Search/etc.)</th>
+      <td>Yes</td>
+      <td>Yes</td>
+      <td>Partial</td>
+      <td>Yes</td>
+      <td>Yes</td>
+      <td>Yes</td>
+      <td>Yes</td>
+      <td>Yes</td>
+      <td>Yes</td>
+      <td>Partial</td>
+      <td>Partial</td>
+    </tr>
+    <tr>
+      <th>REST API official / self-hostable</th>
+      <td>No</td>
+      <td>No</td>
+      <td>No</td>
+      <td>No</td>
+      <td>No</td>
+      <td>No</td>
+      <td>No</td>
+      <td>Yes</td>
+      <td>Partial</td>
+      <td>Yes</td>
+      <td>Yes</td>
+    </tr>
+    <tr>
+      <th>Reranking: RRF/MMR/Cross-Encoder</th>
+      <td>Partial</td>
+      <td>Partial</td>
+      <td>Yes</td>
+      <td>Partial</td>
+      <td>Partial</td>
+      <td>Partial</td>
+      <td>Partial</td>
+      <td>Partial</td>
+      <td>Partial</td>
+      <td>Partial</td>
+      <td>Partial</td>
+    </tr>
+    <tr>
+      <th>Reranking: node-distance around focal entity</th>
+      <td>No</td>
+      <td>No</td>
+      <td>Yes</td>
+      <td>No</td>
+      <td>No</td>
+      <td>No</td>
+      <td>No</td>
+      <td>No</td>
+      <td>No</td>
+      <td>No</td>
+      <td>Partial</td>
+    </tr>
+    <tr>
+      <th>SDKs in multiple languages</th>
+      <td>Yes</td>
+      <td>Yes</td>
+      <td>Yes</td>
+      <td>Yes</td>
+      <td>Yes</td>
+      <td>Yes</td>
+      <td>Yes</td>
+      <td>Yes</td>
+      <td>No</td>
+      <td>Partial</td>
+      <td>Yes</td>
+    </tr>
+    <tr>
+      <th>TTL/expiry &amp; archival policies</th>
+      <td>Partial</td>
+      <td>Partial</td>
+      <td>Yes</td>
+      <td>Partial</td>
+      <td>Partial</td>
+      <td>Partial</td>
+      <td>Partial</td>
+      <td>Yes</td>
+      <td>Partial</td>
+      <td>Yes</td>
+      <td>Yes</td>
+    </tr>
+    <tr>
+      <th>Temporal knowledge graph (bi-temporal / valid_from/valid_to + tx time)</th>
+      <td>No</td>
+      <td>No</td>
+      <td>Yes</td>
+      <td>No</td>
+      <td>No</td>
+      <td>No</td>
+      <td>No</td>
+      <td>No</td>
+      <td>No</td>
+      <td>No</td>
+      <td>Yes</td>
+    </tr>
+    <tr>
+      <th>Vector similarity search</th>
+      <td>Partial</td>
+      <td>Yes</td>
+      <td>Yes</td>
+      <td>Yes</td>
+      <td>Yes</td>
+      <td>Partial</td>
+      <td>Yes</td>
+      <td>Yes</td>
+      <td>Yes</td>
+      <td>Yes</td>
+      <td>Yes</td>
+    </tr>
+    <tr>
+      <th>gRPC API</th>
+      <td>No</td>
+      <td>No</td>
+      <td>No</td>
+      <td>No</td>
+      <td>No</td>
+      <td>No</td>
+      <td>No</td>
+      <td>No</td>
+      <td>No</td>
+      <td>Yes</td>
+      <td>No</td>
+    </tr>
+  </tbody>
+</table>

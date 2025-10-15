@@ -1,0 +1,9 @@
+Project,Type,Name,Path/Signature,Notes
+Mem0 (OSS FastAPI),HTTP,Create Memory,POST /api/v1/memories/,Field is 'text' (not 'memory') per recent change
+Mem0 (Hosted),HTTP,Memories (CRUD),https://api.mem0.ai (SDK-wrapped),See MemoryClient/TS Client
+Graphiti MCP,MCP Tool,add_memory,mcp: add_memory,Add episode(s) to graph
+Graphiti MCP,MCP Tool,search_facts,mcp: search_facts,Hybrid search over edges
+Graphiti MCP,MCP Tool,search_nodes,mcp: search_nodes,Hybrid search over nodes; optional focal node uuid
+Graphiti MCP,MCP Tool,get_episodes,mcp: get_episodes,List recent episodes
+Graphiti MCP,MCP Tool,delete_episode,mcp: delete_episode,Remove episode
+Graphiti MCP,MCP Tool,clear_graph,mcp: clear_graph,Reset graph

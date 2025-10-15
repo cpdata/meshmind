@@ -1,0 +1,26 @@
+Feature,MeshMind Support,Mem0 Support,Graphiti Support,MeshMind Notes,Mem0 Notes,Graphiti Notes
+Primary Purpose,Yes,Yes,Yes,LLM+Graph memory; extract→preprocess→store; hybrid retrieval.,Universal memory layer for agents (SDKs + REST + MCP/OpenMemory).,Temporally-aware knowledge graph for agent memory & RAG.
+Core Data Model,Yes,Yes,Yes,Triplets (subject–predicate–object) + entity registry.,Memory records (text+metadata) scoped by user/agent/run.,"Nodes/Edges (Episodic, Entity, Communities); facts as edges."
+Triplet/Graph CRUD,Yes,No,Yes,Upsert/list/delete triplets; predicate registry.,Not graph-native; record-centric.,First-class graph nodes/edges.
+Temporal Modeling (Bi-temporal),No,No,Yes,Timestamps/TTL only; no dual timelines yet.,Timestamps; no bi-temporal model published in OSS.,Bi-temporal (occurred vs ingested) with time-travel queries.
+Namespaces / Scoping,Yes,Yes,Yes,Namespaces + entity_labels filters.,"Scopes: user_id, session_id, agent_id, run/project.",group_id / graph namespacing.
+Multi-level Personas (user/agent/session/run),Partial,Yes,Partial,Namespaces present; personas proposed.,First-class across SDK/REST and platform.,group_id & recipes; not identical to Mem0 personas.
+Extraction (LLM),Yes,Yes,Yes,extract→dedupe→score→compress→store pipeline.,Memory.add(messages|text).,Episode ingestion with LLM-assisted parsing.
+Deduplication / Consolidation,Yes,Partial,Yes,Dedup + consolidate in pipeline.,Update/merge flows via SDK; backend-dependent.,Temporal invalidation + consolidation.
+Importance Scoring,Yes,Partial,Yes,Importance ranking built into pipeline.,Via metadata/conventions; not a separate pipeline.,Recipes & rerankers capture importance.
+Vector Retrieval,Yes,Yes,Yes,Embedding encoder pluggable.,Common vector backends (FAISS/PGVector/etc.).,Embeddings integrated with graph/keyword.
+Keyword/BM25 Retrieval,Yes,Yes,Yes,BM25 module.,Backend dependent; commonly supported.,Hybrid keyword + semantic.
+Graph Traversal Retrieval,Yes,No,Yes,Graph traversal candidate hydration.,Record list search; not graph-native.,Traversal central to retrieval.
+Reranking (LLM / RRF / Node Distance),Partial,Partial,Yes,LLM reranker available; node-distance proposed.,Primarily top-k semantic; rerank not prominent.,RRF/MMR/Cross-Encoder + node-distance.
+REST API (OSS),Yes,Yes,No,"FastAPI app/stub; endpoints for memories, triplets, search, predicates.",FastAPI server; OpenAPI docs (hosted).,Library-first; no standard REST in core.
+gRPC API,Yes,No,No,Stubs included.,SDK/REST focus; no gRPC in OSS docs.,"MCP/library focus, not gRPC."
+MCP Integration,No,Yes,Yes,Proposed server skeleton provided.,OpenMemory MCP projects available.,Graphiti MCP server provided.
+CLI,Yes,No,Partial,`meshmind ingest` + admin maintenance.,SDK & REST/cURL; no general multi-command CLI.,MCP server runner scripts.
+Observability (OTel),Partial,Partial,Yes,Scaffolding/guides; draft OTel code provided.,Hosted analytics; OSS basic logs.,OTel supported in releases.
+Auth & Tenancy,Partial,Yes,Partial,Namespaces; API-key middleware provided in draft.,API keys and project/org scoping.,group_id isolation; auth left to host.
+Backends (Graph/Vector/Full-text),Yes,Yes,Yes,Memgraph/Neo4j/SQLite; vector+BM25 modules.,Common vector stores; platform-managed infra.,Neo4j/FalkorDB/Kuzu/Neptune + OpenSearch.
+Predicate Registry,Yes,No,Partial,Admin CLI to list/add/remove predicates.,Not applicable.,Edge types defined in schemas; registry not a separate feature.
+Counts/Aggregations,Yes,Partial,Yes,Counts by namespace/entity_label via API.,Available via search/list filters; depends on backend.,Graph aggregations common in examples.
+Evaluation Harness,Partial,Partial,Partial,"Draft harness provided (Recall@k, MRR, NDCG).",Benchmarks in posts/demos.,Recipes/benchmarks in docs.
+Deployment & Docker,Yes,Yes,Yes,Docker compose/test stacks.,Docker & hosted.,Docker compose; library-first.
+SDKs/Clients,Partial,Yes,Yes,Python client + TS SDK draft provided.,Python & TypeScript SDKs.,Python library client; MCP tools.

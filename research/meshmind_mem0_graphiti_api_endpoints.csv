@@ -1,0 +1,28 @@
+Project,Operation,Method,Path,Notes
+MeshMind,Health - live,GET,/livez,Liveness probe.
+MeshMind,Health - ready,GET,/readyz,Readiness probe.
+MeshMind,Health - health,GET,/healthz,Health probe.
+MeshMind,Extract memories,POST,/v1/extract,LLM extraction from content to memory objects.
+MeshMind,Add memory,POST,/v1/memories,Preprocess + store as triplets.
+MeshMind,Search memories,POST,/v1/memories/search,Hybrid/vector/BM25/fuzzy; filters & rerank.
+MeshMind,Update memory,PATCH,/v1/memories/{uuid},Update entity/metadata/edges.
+MeshMind,Delete memory,DELETE,/v1/memories/{uuid},Hard delete.
+MeshMind,Add triplet,POST,/v1/triplets,Low-level edge creation.
+MeshMind,List predicates,GET,/v1/predicates,Allowed relations.
+MeshMind,Add predicate,POST,/v1/predicates,Register relation label.
+MeshMind,Delete predicate,DELETE,/v1/predicates/{name},Remove relation label.
+Mem0,Create memory,POST,not published in repo; see hosted OpenAPI,Creates memory for user/agent/run.
+Mem0,Search memories,POST,not published in repo; see hosted OpenAPI,Query memories by text/filters.
+Mem0,List memories,GET,not published in repo; see hosted OpenAPI,List by user_id/agent_id/project.
+Mem0,Get memory by id,GET,not published in repo; see hosted OpenAPI,Retrieve a single memory.
+Mem0,Update memory,PATCH,not published in repo; see hosted OpenAPI,Update content/metadata/score.
+Mem0,Delete memory,DELETE,not published in repo; see hosted OpenAPI,Delete by id.
+Mem0,Projects/Orgs,GET/POST,not published in repo; see hosted OpenAPI,"Platform resources (orgs, projects, webhooks)."
+Mem0,MCP (OpenMemory),SSE,"/mcp/... (add_memories, search_memory, list_memories)",Model Context Protocol over SSE.
+Graphiti,MCP SSE endpoint,GET,/sse,SSE transport for MCP.
+Graphiti,MCP Tool: add_memory,MCP tool,N/A,Store episodes into graph.
+Graphiti,MCP Tool: search_facts,MCP tool,N/A,Search edges/facts.
+Graphiti,MCP Tool: search_nodes,MCP tool,N/A,Search entity summaries.
+Graphiti,MCP Tool: get_episodes,MCP tool,N/A,Retrieve recent episodes.
+Graphiti,MCP Tool: delete_episode,MCP tool,N/A,Remove episodes.
+Graphiti,MCP Tool: clear_graph,MCP tool,N/A,Reset the graph.

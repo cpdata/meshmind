@@ -1,0 +1,16 @@
+FeatureID,Feature,MeshMind,ProjectsWithYes,MeshMindNotes
+temporal_bitemporal,Temporal knowledge graph (bi-temporal / valid_from/valid_to + tx time),No,"Graphiti, Zep",Timestamps/TTL only; bi-temporal proposed.
+scoping_personas,Multi-level scoping (user/agent/session/run),Partial,"Mem0, Zep, LangGraph",Namespaces + entity_labels; not user/agent/run.
+consolidation_planner,Consolidation planner (ADD/UPDATE/DELETE logic),Partial,Mem0,Consolidation pipeline planned; dedupe present.
+rerank_rrf_mmr,Reranking: RRF/MMR/Cross-Encoder,Partial,Graphiti,LLM reranker available; RRF/MMR proposed.
+rerank_node_distance,Reranking: node-distance around focal entity,No,Graphiti,Not implemented.
+summary_memory,Conversation summary memory / digesting long context,Partial,"Zep, LangChain, LlamaIndex, MemGPT",Compression/consolidation; no explicit conversation summary memory.
+chat_store_persistence,Chat history persistence / chat store interface,Partial,"Mem0, Zep, LangGraph, LlamaIndex, AutoGen, MemGPT",Persistence via DB drivers; no chat_store API.
+vector_backends,Pluggable vector backends (Qdrant/Chroma/Azure AI Search/etc.),Partial,"Mem0, LangChain, LangGraph, LlamaIndex, AutoGen, MemGPT, CrewAI, Haystack",Pluggable; not officially listing Qdrant/Chroma/AIS yet.
+hosted_cloud,Hosted cloud service available,No,"Mem0, Zep",Self-host only.
+mcp_server,MCP server / tools interface,No,"Mem0, Graphiti, Zep",Not shipped; skeleton drafted.
+sdks_multi,SDKs in multiple languages,Partial,"Mem0, Graphiti, Zep, LangChain, LangGraph, LlamaIndex, AutoGen, CrewAI, Haystack",Python client; TS stub drafted.
+auth_tenancy,"Auth & tenancy (API keys/JWT, multi-tenant)",Partial,Zep,Namespaces; API-key middleware drafted.
+observability_otel,Observability (OpenTelemetry and metrics),Partial,Graphiti,Scaffolding; draft provided.
+multi_agent_shared,Multi-agent shared memory / crew memory,Partial,"Mem0, Zep, AutoGen, CrewAI",Usable with frameworks; not first-class.
+pii_classification,PII scrubbing / dialog classification / structured extraction,No,Zep,Not built-in.

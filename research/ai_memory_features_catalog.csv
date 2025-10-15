@@ -1,0 +1,298 @@
+Project,FeatureID,Feature,Support,Notes
+MeshMind,data_model_graph,"Graph-native data model (nodes/edges, triplets)",Yes,Triplets + entity registry; CRUD on nodes/edges.
+MeshMind,temporal_bitemporal,Temporal knowledge graph (bi-temporal / valid_from/valid_to + tx time),No,Timestamps/TTL only; bi-temporal proposed.
+MeshMind,scoping_personas,Multi-level scoping (user/agent/session/run),Partial,Namespaces + entity_labels; not user/agent/run.
+MeshMind,extraction_llm,LLM-based extraction on ingest,Yes,extract→dedupe→score→compress→store.
+MeshMind,consolidation_planner,Consolidation planner (ADD/UPDATE/DELETE logic),Partial,Consolidation pipeline planned; dedupe present.
+MeshMind,vector_search,Vector similarity search,Yes,Embedding retriever.
+MeshMind,bm25_keyword,Keyword/BM25 retrieval,Yes,BM25 module.
+MeshMind,graph_traversal,"Graph traversal retrieval (BFS, path search)",Yes,Graph traversal candidate hydration.
+MeshMind,rerank_rrf_mmr,Reranking: RRF/MMR/Cross-Encoder,Partial,LLM reranker available; RRF/MMR proposed.
+MeshMind,rerank_node_distance,Reranking: node-distance around focal entity,No,Not implemented.
+MeshMind,summary_memory,Conversation summary memory / digesting long context,Partial,Compression/consolidation; no explicit conversation summary memory.
+MeshMind,chat_store_persistence,Chat history persistence / chat store interface,Partial,Persistence via DB drivers; no chat_store API.
+MeshMind,vector_backends,Pluggable vector backends (Qdrant/Chroma/Azure AI Search/etc.),Partial,Pluggable; not officially listing Qdrant/Chroma/AIS yet.
+MeshMind,graph_backends,Pluggable graph backends (Neo4j/Memgraph/FalkorDB/Neptune),Yes,Neo4j/Memgraph/SQLite drivers.
+MeshMind,hosted_cloud,Hosted cloud service available,No,Self-host only.
+MeshMind,mcp_server,MCP server / tools interface,No,Not shipped; skeleton drafted.
+MeshMind,rest_api,REST API official / self-hostable,Yes,FastAPI app/stub w/ endpoints.
+MeshMind,grpc_api,gRPC API,Yes,gRPC stub types in repo.
+MeshMind,sdks_multi,SDKs in multiple languages,Partial,Python client; TS stub drafted.
+MeshMind,cli_tooling,CLI commands / server runner,Yes,meshmind ingest/admin.
+MeshMind,auth_tenancy,"Auth & tenancy (API keys/JWT, multi-tenant)",Partial,Namespaces; API-key middleware drafted.
+MeshMind,observability_otel,Observability (OpenTelemetry and metrics),Partial,Scaffolding; draft provided.
+MeshMind,benchmarks_eval,Benchmarks / evaluation harness,Partial,Harness outline; not published.
+MeshMind,browser_ingest,Browser/extension ingestion for memories,No,Not included.
+MeshMind,multi_agent_shared,Multi-agent shared memory / crew memory,Partial,Usable with frameworks; not first-class.
+MeshMind,pii_classification,PII scrubbing / dialog classification / structured extraction,No,Not built-in.
+MeshMind,ttl_expiry,TTL/expiry & archival policies,Yes,TTL field supported.
+Mem0,data_model_graph,"Graph-native data model (nodes/edges, triplets)",Partial,Record-centric; optional Neo4j graph in self-host.
+Mem0,temporal_bitemporal,Temporal knowledge graph (bi-temporal / valid_from/valid_to + tx time),No,No bi-temporal model published.
+Mem0,scoping_personas,Multi-level scoping (user/agent/session/run),Yes,user_id/agent_id/run_id in SDK & server.
+Mem0,extraction_llm,LLM-based extraction on ingest,Yes,Memory.add with infer=True.
+Mem0,consolidation_planner,Consolidation planner (ADD/UPDATE/DELETE logic),Yes,ADD/UPDATE/DELETE planner during ingest.
+Mem0,vector_search,Vector similarity search,Yes,Vector search; pluggable.
+Mem0,bm25_keyword,Keyword/BM25 retrieval,Partial,Backend-dependent.
+Mem0,graph_traversal,"Graph traversal retrieval (BFS, path search)",Partial,If Neo4j enabled.
+Mem0,rerank_rrf_mmr,Reranking: RRF/MMR/Cross-Encoder,Partial,Primarily top-k; rerank not prominent.
+Mem0,rerank_node_distance,Reranking: node-distance around focal entity,No,Not documented.
+Mem0,summary_memory,Conversation summary memory / digesting long context,Partial,Summaries present in examples; not a dedicated module.
+Mem0,chat_store_persistence,Chat history persistence / chat store interface,Yes,Cloud & server maintain histories.
+Mem0,vector_backends,Pluggable vector backends (Qdrant/Chroma/Azure AI Search/etc.),Yes,Chroma/Qdrant/Azure AI Search supported in guides.
+Mem0,graph_backends,Pluggable graph backends (Neo4j/Memgraph/FalkorDB/Neptune),Partial,Neo4j optional.
+Mem0,hosted_cloud,Hosted cloud service available,Yes,api.mem0.ai.
+Mem0,mcp_server,MCP server / tools interface,Yes,OpenMemory MCP repo/examples.
+Mem0,rest_api,REST API official / self-hostable,Yes,FastAPI server with OpenAPI /docs.
+Mem0,grpc_api,gRPC API,No,Not documented.
+Mem0,sdks_multi,SDKs in multiple languages,Yes,Python + TypeScript clients.
+Mem0,cli_tooling,CLI commands / server runner,Partial,Server run scripts; no general CLI.
+Mem0,auth_tenancy,"Auth & tenancy (API keys/JWT, multi-tenant)",Partial,Cloud keys; OSS auth evolving.
+Mem0,observability_otel,Observability (OpenTelemetry and metrics),No,Not documented in OSS.
+Mem0,benchmarks_eval,Benchmarks / evaluation harness,Partial,Blog posts/demos; not formal OSS harness.
+Mem0,browser_ingest,Browser/extension ingestion for memories,Partial,Examples; no official extension.
+Mem0,multi_agent_shared,Multi-agent shared memory / crew memory,Yes,Ecosystem integrations (LangChain/CrewAI)
+Mem0,pii_classification,PII scrubbing / dialog classification / structured extraction,Partial,Depends on pipeline; not built-in.
+Mem0,ttl_expiry,TTL/expiry & archival policies,Yes,TTL supported.
+Graphiti,data_model_graph,"Graph-native data model (nodes/edges, triplets)",Yes,Knowledge graph with episodic/entities/communities.
+Graphiti,temporal_bitemporal,Temporal knowledge graph (bi-temporal / valid_from/valid_to + tx time),Yes,"Bi-temporal model (valid/invalid, tx time)."
+Graphiti,scoping_personas,Multi-level scoping (user/agent/session/run),Partial,group_id / project; not user/agent/run.
+Graphiti,extraction_llm,LLM-based extraction on ingest,Yes,Episode ingestion extracts entities/relations.
+Graphiti,consolidation_planner,Consolidation planner (ADD/UPDATE/DELETE logic),Partial,Invalidation/overwrite patterns; no dedicated planner.
+Graphiti,vector_search,Vector similarity search,Yes,Semantic retrievers.
+Graphiti,bm25_keyword,Keyword/BM25 retrieval,Yes,Hybrid BM25 + semantic.
+Graphiti,graph_traversal,"Graph traversal retrieval (BFS, path search)",Yes,Traversal as part of recipes.
+Graphiti,rerank_rrf_mmr,Reranking: RRF/MMR/Cross-Encoder,Yes,Recipes include RRF/MMR/Cross-Encoder.
+Graphiti,rerank_node_distance,Reranking: node-distance around focal entity,Yes,Focal node distance boost.
+Graphiti,summary_memory,Conversation summary memory / digesting long context,Partial,Summaries via nodes; not a separate module.
+Graphiti,chat_store_persistence,Chat history persistence / chat store interface,Partial,Via app layer; not built-in chat store.
+Graphiti,vector_backends,Pluggable vector backends (Qdrant/Chroma/Azure AI Search/etc.),Partial,Pluggable retrievers; not focused on standalone vector DBs.
+Graphiti,graph_backends,Pluggable graph backends (Neo4j/Memgraph/FalkorDB/Neptune),Yes,Neo4j/FalkorDB/Kuzu/Neptune.
+Graphiti,hosted_cloud,Hosted cloud service available,No,Library + MCP; no SaaS.
+Graphiti,mcp_server,MCP server / tools interface,Yes,Official Graphiti MCP server.
+Graphiti,rest_api,REST API official / self-hostable,No,No standard REST in core.
+Graphiti,grpc_api,gRPC API,No,N/A
+Graphiti,sdks_multi,SDKs in multiple languages,Yes,Python; MCP for clients.
+Graphiti,cli_tooling,CLI commands / server runner,Partial,MCP server runner; docker compose.
+Graphiti,auth_tenancy,"Auth & tenancy (API keys/JWT, multi-tenant)",Partial,group_id scoping; auth left to host.
+Graphiti,observability_otel,Observability (OpenTelemetry and metrics),Yes,OTel support in releases.
+Graphiti,benchmarks_eval,Benchmarks / evaluation harness,Partial,Examples/recipes; not formal harness.
+Graphiti,browser_ingest,Browser/extension ingestion for memories,No,Not built-in.
+Graphiti,multi_agent_shared,Multi-agent shared memory / crew memory,Partial,Via app frameworks; not first-class.
+Graphiti,pii_classification,PII scrubbing / dialog classification / structured extraction,Partial,Depends on pipelines.
+Graphiti,ttl_expiry,TTL/expiry & archival policies,Yes,Temporal validity supports expiry.
+Zep,data_model_graph,"Graph-native data model (nodes/edges, triplets)",Yes,Temporal knowledge graph via Graphiti under the hood.
+Zep,temporal_bitemporal,Temporal knowledge graph (bi-temporal / valid_from/valid_to + tx time),Yes,valid_at/invalid_at per README.
+Zep,scoping_personas,Multi-level scoping (user/agent/session/run),Yes,User/Project concepts in SDK/cloud.
+Zep,extraction_llm,LLM-based extraction on ingest,Yes,Structured extraction & dialog classification.
+Zep,consolidation_planner,Consolidation planner (ADD/UPDATE/DELETE logic),Partial,Autonomous graph updates; planner unspecified.
+Zep,vector_search,Vector similarity search,Yes,Semantic search backed by cloud.
+Zep,bm25_keyword,Keyword/BM25 retrieval,Partial,"Hybrid in Graphiti, but Zep focuses on KG."
+Zep,graph_traversal,"Graph traversal retrieval (BFS, path search)",Yes,Graph queries via SDK.
+Zep,rerank_rrf_mmr,Reranking: RRF/MMR/Cross-Encoder,Partial,Inherited from Graphiti; details abstracted.
+Zep,rerank_node_distance,Reranking: node-distance around focal entity,Partial,Available via Graphiti layer.
+Zep,summary_memory,Conversation summary memory / digesting long context,Yes,Summaries/temporal KG; productized.
+Zep,chat_store_persistence,Chat history persistence / chat store interface,Yes,Cloud service retains histories.
+Zep,vector_backends,Pluggable vector backends (Qdrant/Chroma/Azure AI Search/etc.),Partial,Cloud-managed.
+Zep,graph_backends,Pluggable graph backends (Neo4j/Memgraph/FalkorDB/Neptune),Yes,Graphiti backends under the hood.
+Zep,hosted_cloud,Hosted cloud service available,Yes,Zep Cloud.
+Zep,mcp_server,MCP server / tools interface,Yes,Via Graphiti MCP or Zep integrations.
+Zep,rest_api,REST API official / self-hostable,Yes,Cloud APIs & SDKs.
+Zep,grpc_api,gRPC API,No,Not public.
+Zep,sdks_multi,SDKs in multiple languages,Yes,"Python, TypeScript, Go."
+Zep,cli_tooling,CLI commands / server runner,Yes,zepcli for managing service.
+Zep,auth_tenancy,"Auth & tenancy (API keys/JWT, multi-tenant)",Yes,Cloud auth/org models.
+Zep,observability_otel,Observability (OpenTelemetry and metrics),Partial,Cloud-managed metrics.
+Zep,benchmarks_eval,Benchmarks / evaluation harness,Partial,Published demos; not OSS harness.
+Zep,browser_ingest,Browser/extension ingestion for memories,Partial,Integrations/examples.
+Zep,multi_agent_shared,Multi-agent shared memory / crew memory,Yes,Designed for agents & apps.
+Zep,pii_classification,PII scrubbing / dialog classification / structured extraction,Yes,Dialog classification & structured extraction.
+Zep,ttl_expiry,TTL/expiry & archival policies,Yes,Temporal KG + policies.
+LangChain,data_model_graph,"Graph-native data model (nodes/edges, triplets)",Partial,ConversationKGMemory exists; typically record lists.
+LangChain,temporal_bitemporal,Temporal knowledge graph (bi-temporal / valid_from/valid_to + tx time),No,No bi-temporal KG.
+LangChain,scoping_personas,Multi-level scoping (user/agent/session/run),Partial,Memory per session/thread; user scoping up to app.
+LangChain,extraction_llm,LLM-based extraction on ingest,Partial,Examples for named entity extraction; not default.
+LangChain,consolidation_planner,Consolidation planner (ADD/UPDATE/DELETE logic),No,Not built-in; users implement.
+LangChain,vector_search,Vector similarity search,Yes,VectorStoreRetrieverMemory.
+LangChain,bm25_keyword,Keyword/BM25 retrieval,Partial,Depends on retriever backend.
+LangChain,graph_traversal,"Graph traversal retrieval (BFS, path search)",Partial,KG memory limited.
+LangChain,rerank_rrf_mmr,Reranking: RRF/MMR/Cross-Encoder,Partial,Some retrievers support MMR.
+LangChain,rerank_node_distance,Reranking: node-distance around focal entity,No,Not a standard feature.
+LangChain,summary_memory,Conversation summary memory / digesting long context,Yes,ConversationSummaryMemory/Buffer.
+LangChain,chat_store_persistence,Chat history persistence / chat store interface,Partial,Custom persistence via stores.
+LangChain,vector_backends,Pluggable vector backends (Qdrant/Chroma/Azure AI Search/etc.),Yes,Many vector stores supported.
+LangChain,graph_backends,Pluggable graph backends (Neo4j/Memgraph/FalkorDB/Neptune),Partial,Optional KG; not first-class.
+LangChain,hosted_cloud,Hosted cloud service available,No,Library.
+LangChain,mcp_server,MCP server / tools interface,No,Library; integrations via others.
+LangChain,rest_api,REST API official / self-hostable,No,Library; users build APIs.
+LangChain,grpc_api,gRPC API,No,N/A
+LangChain,sdks_multi,SDKs in multiple languages,Yes,Python/JS libraries.
+LangChain,cli_tooling,CLI commands / server runner,No,N/A
+LangChain,auth_tenancy,"Auth & tenancy (API keys/JWT, multi-tenant)",No,App responsibility.
+LangChain,observability_otel,Observability (OpenTelemetry and metrics),Partial,Telemetry via LangSmith; not OTel by default.
+LangChain,benchmarks_eval,Benchmarks / evaluation harness,Partial,Community examples; not unified.
+LangChain,browser_ingest,Browser/extension ingestion for memories,Partial,Via tools/integrations.
+LangChain,multi_agent_shared,Multi-agent shared memory / crew memory,Partial,Agent memory examples; not centralized.
+LangChain,pii_classification,PII scrubbing / dialog classification / structured extraction,No,User-implemented.
+LangChain,ttl_expiry,TTL/expiry & archival policies,Partial,Custom logic.
+LangGraph,data_model_graph,"Graph-native data model (nodes/edges, triplets)",No,Focus on state graphs & stores; not KG.
+LangGraph,temporal_bitemporal,Temporal knowledge graph (bi-temporal / valid_from/valid_to + tx time),No,No bi-temporal.
+LangGraph,scoping_personas,Multi-level scoping (user/agent/session/run),Yes,Namespaces for long-term memory across threads.
+LangGraph,extraction_llm,LLM-based extraction on ingest,Partial,Tutorial patterns.
+LangGraph,consolidation_planner,Consolidation planner (ADD/UPDATE/DELETE logic),No,Not built-in.
+LangGraph,vector_search,Vector similarity search,Partial,Use retrievers in graph steps.
+LangGraph,bm25_keyword,Keyword/BM25 retrieval,Partial,Backend-dependent.
+LangGraph,graph_traversal,"Graph traversal retrieval (BFS, path search)",No,Not KG traversal.
+LangGraph,rerank_rrf_mmr,Reranking: RRF/MMR/Cross-Encoder,Partial,Use retriever configs.
+LangGraph,rerank_node_distance,Reranking: node-distance around focal entity,No,N/A
+LangGraph,summary_memory,Conversation summary memory / digesting long context,Partial,Examples/tutorials.
+LangGraph,chat_store_persistence,Chat history persistence / chat store interface,Yes,Thread stores & long-term stores via namespaces.
+LangGraph,vector_backends,Pluggable vector backends (Qdrant/Chroma/Azure AI Search/etc.),Yes,Integrations with vector stores.
+LangGraph,graph_backends,Pluggable graph backends (Neo4j/Memgraph/FalkorDB/Neptune),No,N/A
+LangGraph,hosted_cloud,Hosted cloud service available,No,Library.
+LangGraph,mcp_server,MCP server / tools interface,No,N/A
+LangGraph,rest_api,REST API official / self-hostable,No,N/A
+LangGraph,grpc_api,gRPC API,No,N/A
+LangGraph,sdks_multi,SDKs in multiple languages,Yes,Python/JS.
+LangGraph,cli_tooling,CLI commands / server runner,No,N/A
+LangGraph,auth_tenancy,"Auth & tenancy (API keys/JWT, multi-tenant)",No,App responsibility.
+LangGraph,observability_otel,Observability (OpenTelemetry and metrics),Partial,LangSmith; logging.
+LangGraph,benchmarks_eval,Benchmarks / evaluation harness,Partial,Community.
+LangGraph,browser_ingest,Browser/extension ingestion for memories,Partial,Via tools.
+LangGraph,multi_agent_shared,Multi-agent shared memory / crew memory,Partial,Possible via shared stores.
+LangGraph,pii_classification,PII scrubbing / dialog classification / structured extraction,No,N/A
+LangGraph,ttl_expiry,TTL/expiry & archival policies,Partial,Custom storage policies.
+LlamaIndex,data_model_graph,"Graph-native data model (nodes/edges, triplets)",Partial,KnowledgeGraphIndex exists; primarily doc indexes.
+LlamaIndex,temporal_bitemporal,Temporal knowledge graph (bi-temporal / valid_from/valid_to + tx time),No,No bi-temporal.
+LlamaIndex,scoping_personas,Multi-level scoping (user/agent/session/run),Partial,Chat stores keyed by user keys.
+LlamaIndex,extraction_llm,LLM-based extraction on ingest,Yes,Graph extraction/indexing pipelines.
+LlamaIndex,consolidation_planner,Consolidation planner (ADD/UPDATE/DELETE logic),No,Not built-in.
+LlamaIndex,vector_search,Vector similarity search,Yes,Core feature.
+LlamaIndex,bm25_keyword,Keyword/BM25 retrieval,Partial,Depends on backend.
+LlamaIndex,graph_traversal,"Graph traversal retrieval (BFS, path search)",Partial,KG index traversal limited.
+LlamaIndex,rerank_rrf_mmr,Reranking: RRF/MMR/Cross-Encoder,Partial,Rerankers available in retrievers.
+LlamaIndex,rerank_node_distance,Reranking: node-distance around focal entity,No,Not a standard feature.
+LlamaIndex,summary_memory,Conversation summary memory / digesting long context,Yes,ChatSummaryMemoryBuffer; Memory class.
+LlamaIndex,chat_store_persistence,Chat history persistence / chat store interface,Yes,Chat store interfaces.
+LlamaIndex,vector_backends,Pluggable vector backends (Qdrant/Chroma/Azure AI Search/etc.),Yes,Multiple vector stores.
+LlamaIndex,graph_backends,Pluggable graph backends (Neo4j/Memgraph/FalkorDB/Neptune),Partial,KG index uses graph DBs optional.
+LlamaIndex,hosted_cloud,Hosted cloud service available,No,Library.
+LlamaIndex,mcp_server,MCP server / tools interface,No,N/A
+LlamaIndex,rest_api,REST API official / self-hostable,No,N/A
+LlamaIndex,grpc_api,gRPC API,No,N/A
+LlamaIndex,sdks_multi,SDKs in multiple languages,Yes,Python first; JS partial.
+LlamaIndex,cli_tooling,CLI commands / server runner,No,N/A
+LlamaIndex,auth_tenancy,"Auth & tenancy (API keys/JWT, multi-tenant)",No,App responsibility.
+LlamaIndex,observability_otel,Observability (OpenTelemetry and metrics),No,Not built-in.
+LlamaIndex,benchmarks_eval,Benchmarks / evaluation harness,Partial,Examples; not unified.
+LlamaIndex,browser_ingest,Browser/extension ingestion for memories,Partial,Integrations.
+LlamaIndex,multi_agent_shared,Multi-agent shared memory / crew memory,Partial,Possible via stores.
+LlamaIndex,pii_classification,PII scrubbing / dialog classification / structured extraction,No,N/A
+LlamaIndex,ttl_expiry,TTL/expiry & archival policies,Partial,Custom policies.
+AutoGen,data_model_graph,"Graph-native data model (nodes/edges, triplets)",No,Memory protocol over stores; not a KG.
+AutoGen,temporal_bitemporal,Temporal knowledge graph (bi-temporal / valid_from/valid_to + tx time),No,N/A
+AutoGen,scoping_personas,Multi-level scoping (user/agent/session/run),Partial,Per-agent memory stores.
+AutoGen,extraction_llm,LLM-based extraction on ingest,Partial,RAG + Memory examples.
+AutoGen,consolidation_planner,Consolidation planner (ADD/UPDATE/DELETE logic),No,N/A
+AutoGen,vector_search,Vector similarity search,Partial,Via retrievers in examples.
+AutoGen,bm25_keyword,Keyword/BM25 retrieval,Partial,Backend-dependent.
+AutoGen,graph_traversal,"Graph traversal retrieval (BFS, path search)",No,N/A
+AutoGen,rerank_rrf_mmr,Reranking: RRF/MMR/Cross-Encoder,Partial,Retriever configs in examples.
+AutoGen,rerank_node_distance,Reranking: node-distance around focal entity,No,N/A
+AutoGen,summary_memory,Conversation summary memory / digesting long context,Partial,Examples.
+AutoGen,chat_store_persistence,Chat history persistence / chat store interface,Yes,Memory protocol supports persistent stores.
+AutoGen,vector_backends,Pluggable vector backends (Qdrant/Chroma/Azure AI Search/etc.),Yes,Use with vector DBs.
+AutoGen,graph_backends,Pluggable graph backends (Neo4j/Memgraph/FalkorDB/Neptune),No,N/A
+AutoGen,hosted_cloud,Hosted cloud service available,No,Library.
+AutoGen,mcp_server,MCP server / tools interface,No,N/A
+AutoGen,rest_api,REST API official / self-hostable,No,N/A
+AutoGen,grpc_api,gRPC API,No,N/A
+AutoGen,sdks_multi,SDKs in multiple languages,Yes,Python.
+AutoGen,cli_tooling,CLI commands / server runner,No,N/A
+AutoGen,auth_tenancy,"Auth & tenancy (API keys/JWT, multi-tenant)",No,App responsibility.
+AutoGen,observability_otel,Observability (OpenTelemetry and metrics),No,N/A
+AutoGen,benchmarks_eval,Benchmarks / evaluation harness,Partial,Examples.
+AutoGen,browser_ingest,Browser/extension ingestion for memories,No,N/A
+AutoGen,multi_agent_shared,Multi-agent shared memory / crew memory,Yes,Multi-agent memory per agent.
+AutoGen,pii_classification,PII scrubbing / dialog classification / structured extraction,No,N/A
+AutoGen,ttl_expiry,TTL/expiry & archival policies,Partial,Store-dependent.
+MemGPT,data_model_graph,"Graph-native data model (nodes/edges, triplets)",No,Tiered memory vs KG.
+MemGPT,temporal_bitemporal,Temporal knowledge graph (bi-temporal / valid_from/valid_to + tx time),No,N/A
+MemGPT,scoping_personas,Multi-level scoping (user/agent/session/run),Partial,Per-conversation/user config.
+MemGPT,extraction_llm,LLM-based extraction on ingest,Partial,Heuristics to offload to vector DBs.
+MemGPT,consolidation_planner,Consolidation planner (ADD/UPDATE/DELETE logic),Partial,Policies for paging between tiers.
+MemGPT,vector_search,Vector similarity search,Yes,Long-term store is vector DB.
+MemGPT,bm25_keyword,Keyword/BM25 retrieval,No,Not core.
+MemGPT,graph_traversal,"Graph traversal retrieval (BFS, path search)",No,N/A
+MemGPT,rerank_rrf_mmr,Reranking: RRF/MMR/Cross-Encoder,Partial,Retriever configs possible.
+MemGPT,rerank_node_distance,Reranking: node-distance around focal entity,No,N/A
+MemGPT,summary_memory,Conversation summary memory / digesting long context,Yes,Summarization for short-term vs long-term.
+MemGPT,chat_store_persistence,Chat history persistence / chat store interface,Yes,Stores chat history with vectors.
+MemGPT,vector_backends,Pluggable vector backends (Qdrant/Chroma/Azure AI Search/etc.),Yes,Vector DBs.
+MemGPT,graph_backends,Pluggable graph backends (Neo4j/Memgraph/FalkorDB/Neptune),No,N/A
+MemGPT,hosted_cloud,Hosted cloud service available,No,OSS system.
+MemGPT,mcp_server,MCP server / tools interface,No,N/A
+MemGPT,rest_api,REST API official / self-hostable,Partial,Some endpoints in forks; core is app framework.
+MemGPT,grpc_api,gRPC API,No,N/A
+MemGPT,sdks_multi,SDKs in multiple languages,No,Python app.
+MemGPT,cli_tooling,CLI commands / server runner,Partial,Run scripts.
+MemGPT,auth_tenancy,"Auth & tenancy (API keys/JWT, multi-tenant)",No,N/A
+MemGPT,observability_otel,Observability (OpenTelemetry and metrics),No,N/A
+MemGPT,benchmarks_eval,Benchmarks / evaluation harness,Partial,Paper & examples.
+MemGPT,browser_ingest,Browser/extension ingestion for memories,No,N/A
+MemGPT,multi_agent_shared,Multi-agent shared memory / crew memory,Partial,Multi-session via storage.
+MemGPT,pii_classification,PII scrubbing / dialog classification / structured extraction,No,N/A
+MemGPT,ttl_expiry,TTL/expiry & archival policies,Partial,Policies via store.
+CrewAI,data_model_graph,"Graph-native data model (nodes/edges, triplets)",No,Uses vector stores and SQLite for memory; knowledge storage as vectors.
+CrewAI,temporal_bitemporal,Temporal knowledge graph (bi-temporal / valid_from/valid_to + tx time),No,N/A
+CrewAI,scoping_personas,Multi-level scoping (user/agent/session/run),Partial,Per-agent/crew memory; multi-user patterns discussed.
+CrewAI,extraction_llm,LLM-based extraction on ingest,Partial,Depends on pipeline/tools.
+CrewAI,consolidation_planner,Consolidation planner (ADD/UPDATE/DELETE logic),No,N/A
+CrewAI,vector_search,Vector similarity search,Yes,Chroma/Qdrant supported; entity memory.
+CrewAI,bm25_keyword,Keyword/BM25 retrieval,No,Vector-first.
+CrewAI,graph_traversal,"Graph traversal retrieval (BFS, path search)",No,N/A
+CrewAI,rerank_rrf_mmr,Reranking: RRF/MMR/Cross-Encoder,Partial,Depends on retriever backend.
+CrewAI,rerank_node_distance,Reranking: node-distance around focal entity,No,N/A
+CrewAI,summary_memory,Conversation summary memory / digesting long context,Partial,Depends on task patterns.
+CrewAI,chat_store_persistence,Chat history persistence / chat store interface,Partial,Local by default; custom stores requested.
+CrewAI,vector_backends,Pluggable vector backends (Qdrant/Chroma/Azure AI Search/etc.),Yes,"Chroma, Qdrant; Couchbase example."
+CrewAI,graph_backends,Pluggable graph backends (Neo4j/Memgraph/FalkorDB/Neptune),No,N/A
+CrewAI,hosted_cloud,Hosted cloud service available,No,Framework.
+CrewAI,mcp_server,MCP server / tools interface,No,N/A
+CrewAI,rest_api,REST API official / self-hostable,No,N/A
+CrewAI,grpc_api,gRPC API,No,N/A
+CrewAI,sdks_multi,SDKs in multiple languages,Yes,Python.
+CrewAI,cli_tooling,CLI commands / server runner,No,N/A
+CrewAI,auth_tenancy,"Auth & tenancy (API keys/JWT, multi-tenant)",No,N/A
+CrewAI,observability_otel,Observability (OpenTelemetry and metrics),No,N/A
+CrewAI,benchmarks_eval,Benchmarks / evaluation harness,No,N/A
+CrewAI,browser_ingest,Browser/extension ingestion for memories,No,N/A
+CrewAI,multi_agent_shared,Multi-agent shared memory / crew memory,Yes,Crew memory across agents.
+CrewAI,pii_classification,PII scrubbing / dialog classification / structured extraction,No,N/A
+CrewAI,ttl_expiry,TTL/expiry & archival policies,Partial,Depends on vector store policies.
+Haystack,data_model_graph,"Graph-native data model (nodes/edges, triplets)",No,Agent memory is list-based.
+Haystack,temporal_bitemporal,Temporal knowledge graph (bi-temporal / valid_from/valid_to + tx time),No,N/A
+Haystack,scoping_personas,Multi-level scoping (user/agent/session/run),Partial,Per-conversation.
+Haystack,extraction_llm,LLM-based extraction on ingest,Partial,Pluggable pipelines.
+Haystack,consolidation_planner,Consolidation planner (ADD/UPDATE/DELETE logic),No,N/A
+Haystack,vector_search,Vector similarity search,Yes,RAG components.
+Haystack,bm25_keyword,Keyword/BM25 retrieval,Yes,BM25 retriever built-in.
+Haystack,graph_traversal,"Graph traversal retrieval (BFS, path search)",No,N/A
+Haystack,rerank_rrf_mmr,Reranking: RRF/MMR/Cross-Encoder,Partial,Rerankers exist.
+Haystack,rerank_node_distance,Reranking: node-distance around focal entity,No,N/A
+Haystack,summary_memory,Conversation summary memory / digesting long context,Partial,Summarization nodes.
+Haystack,chat_store_persistence,Chat history persistence / chat store interface,Partial,Pipelines store depending on user code.
+Haystack,vector_backends,Pluggable vector backends (Qdrant/Chroma/Azure AI Search/etc.),Yes,Multiple vector DBs.
+Haystack,graph_backends,Pluggable graph backends (Neo4j/Memgraph/FalkorDB/Neptune),No,N/A
+Haystack,hosted_cloud,Hosted cloud service available,No,Library.
+Haystack,mcp_server,MCP server / tools interface,No,N/A
+Haystack,rest_api,REST API official / self-hostable,No,N/A
+Haystack,grpc_api,gRPC API,No,N/A
+Haystack,sdks_multi,SDKs in multiple languages,Yes,Python.
+Haystack,cli_tooling,CLI commands / server runner,No,N/A
+Haystack,auth_tenancy,"Auth & tenancy (API keys/JWT, multi-tenant)",No,N/A
+Haystack,observability_otel,Observability (OpenTelemetry and metrics),No,N/A
+Haystack,benchmarks_eval,Benchmarks / evaluation harness,Partial,Examples.
+Haystack,browser_ingest,Browser/extension ingestion for memories,No,N/A
+Haystack,multi_agent_shared,Multi-agent shared memory / crew memory,Partial,Multiple agents possible in pipelines.
+Haystack,pii_classification,PII scrubbing / dialog classification / structured extraction,No,N/A
+Haystack,ttl_expiry,TTL/expiry & archival policies,Partial,Store-dependent.

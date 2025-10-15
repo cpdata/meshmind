@@ -1,0 +1,660 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>MeshMind vs Mem0 vs Graphiti — Competitive Report</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif; margin: 40px; color: #222; }
+    h1, h2, h3 { margin-top: 1.6em; }
+    table { border-collapse: collapse; width: 100%; margin: 1em 0; }
+    th, td { border: 1px solid #ddd; padding: 8px; vertical-align: top; }
+    th { background: #f6f8fa; text-align: left; }
+    .pill { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 12px; background: #eef; margin-right: 6px; }
+    .ok { background: #d1fadf; }
+    .partial { background: #fff3cd; }
+    .no { background: #ffe4e6; }
+    .small { color: #666; font-size: 12px; }
+    .code { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; background:#f6f8fa; padding:2px 6px; border-radius:4px; }
+  </style>
+</head>
+<body>
+<h1>MeshMind vs Mem0 vs Graphiti — Comprehensive Comparison & Recommendations</h1>
+<p class="small">Generated: 2025-10-15 02:30 UTC</p>
+
+<h2>Executive Summary</h2>
+<ul>
+  <li><b>MeshMind</b> already excels at <b>graph-native memories</b>, a practical <b>REST API</b>, and a <b>hybrid retrieval</b> toolbox (vector, BM25, fuzzy, regex, graph traversal + rerank).</li>
+  <li><b>Mem0</b> leads on <b>persona scoping</b> (user/agent/session/run), broad SDK ergonomics, and a strong ecosystem (REST + MCP/OpenMemory).</li>
+  <li><b>Graphiti</b> leads on <b>bi-temporal graph semantics</b>, <b>graph-aware reranking</b>, and an MCP-first integration story.</li>
+  <li>To surpass both: land <b>multi-level scopes</b>, ship an <b>MCP server</b>, add <b>bi-temporal edges</b>, and instrument with <b>OpenTelemetry</b>; publish SDKs and benchmarks.</li>
+</ul>
+
+<h2>Feature & Implementation Matrix</h2>
+<p>This table summarizes support (Yes/Partial/No) and implementation notes across the three projects.</p>
+<table class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Feature</th>
+      <th>MeshMind Support</th>
+      <th>Mem0 Support</th>
+      <th>Graphiti Support</th>
+      <th>MeshMind Notes</th>
+      <th>Mem0 Notes</th>
+      <th>Graphiti Notes</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Primary Purpose</td>
+      <td>Yes</td>
+      <td>Yes</td>
+      <td>Yes</td>
+      <td>LLM+Graph memory; extract→preprocess→store; hybrid retrieval.</td>
+      <td>Universal memory layer for agents (SDKs + REST + MCP/OpenMemory).</td>
+      <td>Temporally-aware knowledge graph for agent memory &amp; RAG.</td>
+    </tr>
+    <tr>
+      <td>Core Data Model</td>
+      <td>Yes</td>
+      <td>Yes</td>
+      <td>Yes</td>
+      <td>Triplets (subject–predicate–object) + entity registry.</td>
+      <td>Memory records (text+metadata) scoped by user/agent/run.</td>
+      <td>Nodes/Edges (Episodic, Entity, Communities); facts as edges.</td>
+    </tr>
+    <tr>
+      <td>Triplet/Graph CRUD</td>
+      <td>Yes</td>
+      <td>No</td>
+      <td>Yes</td>
+      <td>Upsert/list/delete triplets; predicate registry.</td>
+      <td>Not graph-native; record-centric.</td>
+      <td>First-class graph nodes/edges.</td>
+    </tr>
+    <tr>
+      <td>Temporal Modeling (Bi-temporal)</td>
+      <td>No</td>
+      <td>No</td>
+      <td>Yes</td>
+      <td>Timestamps/TTL only; no dual timelines yet.</td>
+      <td>Timestamps; no bi-temporal model published in OSS.</td>
+      <td>Bi-temporal (occurred vs ingested) with time-travel queries.</td>
+    </tr>
+    <tr>
+      <td>Namespaces / Scoping</td>
+      <td>Yes</td>
+      <td>Yes</td>
+      <td>Yes</td>
+      <td>Namespaces + entity_labels filters.</td>
+      <td>Scopes: user_id, session_id, agent_id, run/project.</td>
+      <td>group_id / graph namespacing.</td>
+    </tr>
+    <tr>
+      <td>Multi-level Personas (user/agent/session/run)</td>
+      <td>Partial</td>
+      <td>Yes</td>
+      <td>Partial</td>
+      <td>Namespaces present; personas proposed.</td>
+      <td>First-class across SDK/REST and platform.</td>
+      <td>group_id &amp; recipes; not identical to Mem0 personas.</td>
+    </tr>
+    <tr>
+      <td>Extraction (LLM)</td>
+      <td>Yes</td>
+      <td>Yes</td>
+      <td>Yes</td>
+      <td>extract→dedupe→score→compress→store pipeline.</td>
+      <td>Memory.add(messages|text).</td>
+      <td>Episode ingestion with LLM-assisted parsing.</td>
+    </tr>
+    <tr>
+      <td>Deduplication / Consolidation</td>
+      <td>Yes</td>
+      <td>Partial</td>
+      <td>Yes</td>
+      <td>Dedup + consolidate in pipeline.</td>
+      <td>Update/merge flows via SDK; backend-dependent.</td>
+      <td>Temporal invalidation + consolidation.</td>
+    </tr>
+    <tr>
+      <td>Importance Scoring</td>
+      <td>Yes</td>
+      <td>Partial</td>
+      <td>Yes</td>
+      <td>Importance ranking built into pipeline.</td>
+      <td>Via metadata/conventions; not a separate pipeline.</td>
+      <td>Recipes &amp; rerankers capture importance.</td>
+    </tr>
+    <tr>
+      <td>Vector Retrieval</td>
+      <td>Yes</td>
+      <td>Yes</td>
+      <td>Yes</td>
+      <td>Embedding encoder pluggable.</td>
+      <td>Common vector backends (FAISS/PGVector/etc.).</td>
+      <td>Embeddings integrated with graph/keyword.</td>
+    </tr>
+    <tr>
+      <td>Keyword/BM25 Retrieval</td>
+      <td>Yes</td>
+      <td>Yes</td>
+      <td>Yes</td>
+      <td>BM25 module.</td>
+      <td>Backend dependent; commonly supported.</td>
+      <td>Hybrid keyword + semantic.</td>
+    </tr>
+    <tr>
+      <td>Graph Traversal Retrieval</td>
+      <td>Yes</td>
+      <td>No</td>
+      <td>Yes</td>
+      <td>Graph traversal candidate hydration.</td>
+      <td>Record list search; not graph-native.</td>
+      <td>Traversal central to retrieval.</td>
+    </tr>
+    <tr>
+      <td>Reranking (LLM / RRF / Node Distance)</td>
+      <td>Partial</td>
+      <td>Partial</td>
+      <td>Yes</td>
+      <td>LLM reranker available; node-distance proposed.</td>
+      <td>Primarily top-k semantic; rerank not prominent.</td>
+      <td>RRF/MMR/Cross-Encoder + node-distance.</td>
+    </tr>
+    <tr>
+      <td>REST API (OSS)</td>
+      <td>Yes</td>
+      <td>Yes</td>
+      <td>No</td>
+      <td>FastAPI app/stub; endpoints for memories, triplets, search, predicates.</td>
+      <td>FastAPI server; OpenAPI docs (hosted).</td>
+      <td>Library-first; no standard REST in core.</td>
+    </tr>
+    <tr>
+      <td>gRPC API</td>
+      <td>Yes</td>
+      <td>No</td>
+      <td>No</td>
+      <td>Stubs included.</td>
+      <td>SDK/REST focus; no gRPC in OSS docs.</td>
+      <td>MCP/library focus, not gRPC.</td>
+    </tr>
+    <tr>
+      <td>MCP Integration</td>
+      <td>No</td>
+      <td>Yes</td>
+      <td>Yes</td>
+      <td>Proposed server skeleton provided.</td>
+      <td>OpenMemory MCP projects available.</td>
+      <td>Graphiti MCP server provided.</td>
+    </tr>
+    <tr>
+      <td>CLI</td>
+      <td>Yes</td>
+      <td>No</td>
+      <td>Partial</td>
+      <td>`meshmind ingest` + admin maintenance.</td>
+      <td>SDK &amp; REST/cURL; no general multi-command CLI.</td>
+      <td>MCP server runner scripts.</td>
+    </tr>
+    <tr>
+      <td>Observability (OTel)</td>
+      <td>Partial</td>
+      <td>Partial</td>
+      <td>Yes</td>
+      <td>Scaffolding/guides; draft OTel code provided.</td>
+      <td>Hosted analytics; OSS basic logs.</td>
+      <td>OTel supported in releases.</td>
+    </tr>
+    <tr>
+      <td>Auth &amp; Tenancy</td>
+      <td>Partial</td>
+      <td>Yes</td>
+      <td>Partial</td>
+      <td>Namespaces; API-key middleware provided in draft.</td>
+      <td>API keys and project/org scoping.</td>
+      <td>group_id isolation; auth left to host.</td>
+    </tr>
+    <tr>
+      <td>Backends (Graph/Vector/Full-text)</td>
+      <td>Yes</td>
+      <td>Yes</td>
+      <td>Yes</td>
+      <td>Memgraph/Neo4j/SQLite; vector+BM25 modules.</td>
+      <td>Common vector stores; platform-managed infra.</td>
+      <td>Neo4j/FalkorDB/Kuzu/Neptune + OpenSearch.</td>
+    </tr>
+    <tr>
+      <td>Predicate Registry</td>
+      <td>Yes</td>
+      <td>No</td>
+      <td>Partial</td>
+      <td>Admin CLI to list/add/remove predicates.</td>
+      <td>Not applicable.</td>
+      <td>Edge types defined in schemas; registry not a separate feature.</td>
+    </tr>
+    <tr>
+      <td>Counts/Aggregations</td>
+      <td>Yes</td>
+      <td>Partial</td>
+      <td>Yes</td>
+      <td>Counts by namespace/entity_label via API.</td>
+      <td>Available via search/list filters; depends on backend.</td>
+      <td>Graph aggregations common in examples.</td>
+    </tr>
+    <tr>
+      <td>Evaluation Harness</td>
+      <td>Partial</td>
+      <td>Partial</td>
+      <td>Partial</td>
+      <td>Draft harness provided (Recall@k, MRR, NDCG).</td>
+      <td>Benchmarks in posts/demos.</td>
+      <td>Recipes/benchmarks in docs.</td>
+    </tr>
+    <tr>
+      <td>Deployment &amp; Docker</td>
+      <td>Yes</td>
+      <td>Yes</td>
+      <td>Yes</td>
+      <td>Docker compose/test stacks.</td>
+      <td>Docker &amp; hosted.</td>
+      <td>Docker compose; library-first.</td>
+    </tr>
+    <tr>
+      <td>SDKs/Clients</td>
+      <td>Partial</td>
+      <td>Yes</td>
+      <td>Yes</td>
+      <td>Python client + TS SDK draft provided.</td>
+      <td>Python &amp; TypeScript SDKs.</td>
+      <td>Python library client; MCP tools.</td>
+    </tr>
+  </tbody>
+</table>
+<h2>API Endpoints</h2>
+<p><b>Note:</b> Graphiti is a library with MCP servers; Mem0 publishes its REST paths in hosted OpenAPI docs. MeshMind exposes REST in OSS.</p>
+<table class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Project</th>
+      <th>Method</th>
+      <th>Path</th>
+      <th>Notes</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>MeshMind</td>
+      <td>GET</td>
+      <td>/livez</td>
+      <td>Liveness probe</td>
+    </tr>
+    <tr>
+      <td>MeshMind</td>
+      <td>GET</td>
+      <td>/readyz</td>
+      <td>Readiness probe</td>
+    </tr>
+    <tr>
+      <td>MeshMind</td>
+      <td>GET</td>
+      <td>/healthz</td>
+      <td>Health probe</td>
+    </tr>
+    <tr>
+      <td>MeshMind</td>
+      <td>POST</td>
+      <td>/v1/extract</td>
+      <td>LLM extraction to memories</td>
+    </tr>
+    <tr>
+      <td>MeshMind</td>
+      <td>POST</td>
+      <td>/v1/memories</td>
+      <td>Create/ingest memory</td>
+    </tr>
+    <tr>
+      <td>MeshMind</td>
+      <td>POST</td>
+      <td>/v1/memories/search</td>
+      <td>Hybrid search (vector/BM25/graph + rerank)</td>
+    </tr>
+    <tr>
+      <td>MeshMind</td>
+      <td>PATCH</td>
+      <td>/v1/memories/{uuid}</td>
+      <td>Update memory</td>
+    </tr>
+    <tr>
+      <td>MeshMind</td>
+      <td>DELETE</td>
+      <td>/v1/memories/{uuid}</td>
+      <td>Delete memory</td>
+    </tr>
+    <tr>
+      <td>MeshMind</td>
+      <td>POST</td>
+      <td>/v1/triplets</td>
+      <td>Create relationship edge</td>
+    </tr>
+    <tr>
+      <td>MeshMind</td>
+      <td>GET</td>
+      <td>/v1/predicates</td>
+      <td>List allowed predicates</td>
+    </tr>
+    <tr>
+      <td>MeshMind</td>
+      <td>POST</td>
+      <td>/v1/predicates</td>
+      <td>Add predicate</td>
+    </tr>
+    <tr>
+      <td>MeshMind</td>
+      <td>DELETE</td>
+      <td>/v1/predicates/{name}</td>
+      <td>Delete predicate</td>
+    </tr>
+    <tr>
+      <td>Mem0</td>
+      <td>POST</td>
+      <td>(see hosted OpenAPI)</td>
+      <td>Create memory (scoped: user/agent/run)</td>
+    </tr>
+    <tr>
+      <td>Mem0</td>
+      <td>POST</td>
+      <td>(see hosted OpenAPI)</td>
+      <td>Search memories</td>
+    </tr>
+    <tr>
+      <td>Mem0</td>
+      <td>GET</td>
+      <td>(see hosted OpenAPI)</td>
+      <td>List memories (filters: user/agent/project)</td>
+    </tr>
+    <tr>
+      <td>Mem0</td>
+      <td>GET</td>
+      <td>(see hosted OpenAPI)</td>
+      <td>Get memory by id</td>
+    </tr>
+    <tr>
+      <td>Mem0</td>
+      <td>PATCH</td>
+      <td>(see hosted OpenAPI)</td>
+      <td>Update memory</td>
+    </tr>
+    <tr>
+      <td>Mem0</td>
+      <td>DELETE</td>
+      <td>(see hosted OpenAPI)</td>
+      <td>Delete memory</td>
+    </tr>
+    <tr>
+      <td>Mem0</td>
+      <td>GET/POST</td>
+      <td>(see hosted OpenAPI)</td>
+      <td>Projects/Orgs/Webhooks (platform)</td>
+    </tr>
+    <tr>
+      <td>Mem0</td>
+      <td>MCP/SSE</td>
+      <td>/mcp/…</td>
+      <td>MCP tools: add/search/list</td>
+    </tr>
+    <tr>
+      <td>Graphiti</td>
+      <td>MCP/SSE</td>
+      <td>/sse (example)</td>
+      <td>MCP transport for tools</td>
+    </tr>
+    <tr>
+      <td>Graphiti</td>
+      <td>MCP tool</td>
+      <td>add_memory</td>
+      <td>Ingest episodes</td>
+    </tr>
+    <tr>
+      <td>Graphiti</td>
+      <td>MCP tool</td>
+      <td>search_facts</td>
+      <td>Search edges/facts</td>
+    </tr>
+    <tr>
+      <td>Graphiti</td>
+      <td>MCP tool</td>
+      <td>search_nodes</td>
+      <td>Search nodes/entities</td>
+    </tr>
+    <tr>
+      <td>Graphiti</td>
+      <td>MCP tool</td>
+      <td>get_episodes</td>
+      <td>Retrieve episodes</td>
+    </tr>
+    <tr>
+      <td>Graphiti</td>
+      <td>MCP tool</td>
+      <td>delete_episode</td>
+      <td>Delete episodes</td>
+    </tr>
+    <tr>
+      <td>Graphiti</td>
+      <td>MCP tool</td>
+      <td>clear_graph</td>
+      <td>Reset graph</td>
+    </tr>
+  </tbody>
+</table>
+<h2>CLI Commands, Arguments & Options</h2>
+<table class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Project</th>
+      <th>Command</th>
+      <th>Arguments</th>
+      <th>Notes</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>MeshMind</td>
+      <td>meshmind ingest</td>
+      <td>-n/--namespace, -e/--embedding-model, -i/--instructions, &lt;paths...&gt;</td>
+      <td>Extract→preprocess→store pipeline</td>
+    </tr>
+    <tr>
+      <td>MeshMind</td>
+      <td>meshmind admin</td>
+      <td>predicates | maintenance | graph | counts</td>
+      <td>Predicate registry, maintenance, checks</td>
+    </tr>
+    <tr>
+      <td>Mem0</td>
+      <td>(use SDK/REST)</td>
+      <td>-</td>
+      <td>No consolidated OSS CLI</td>
+    </tr>
+    <tr>
+      <td>Graphiti</td>
+      <td>uv run graphiti_mcp_server.py</td>
+      <td>--model, --transport, --group-id</td>
+      <td>Run MCP server exposing graph tools</td>
+    </tr>
+  </tbody>
+</table>
+<h2>Internal Callables (Representative)</h2>
+<table class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Project</th>
+      <th>Module/Class</th>
+      <th>Callable</th>
+      <th>Summary</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>MeshMind</td>
+      <td>MeshMind</td>
+      <td>register_entity(model)</td>
+      <td>Register Pydantic model as entity label</td>
+    </tr>
+    <tr>
+      <td>MeshMind</td>
+      <td>MeshMind</td>
+      <td>register_allowed_predicates(list[str])</td>
+      <td>Define allowed relationship labels</td>
+    </tr>
+    <tr>
+      <td>MeshMind</td>
+      <td>MeshMind</td>
+      <td>add_predicate(name)</td>
+      <td>Add a predicate label</td>
+    </tr>
+    <tr>
+      <td>MeshMind</td>
+      <td>MeshMind</td>
+      <td>extract_memories(instructions, namespace, entity_types, content)</td>
+      <td>LLM extraction step</td>
+    </tr>
+    <tr>
+      <td>MeshMind</td>
+      <td>MeshMind</td>
+      <td>store_memory(memory)</td>
+      <td>Preprocess→dedupe→score→compress→consolidate→store</td>
+    </tr>
+    <tr>
+      <td>MeshMind</td>
+      <td>MeshMind</td>
+      <td>add_memory(...)</td>
+      <td>Mid-level API to add memory</td>
+    </tr>
+    <tr>
+      <td>MeshMind</td>
+      <td>MeshMind</td>
+      <td>update_memory(uuid,...)</td>
+      <td>Update existing memory</td>
+    </tr>
+    <tr>
+      <td>MeshMind</td>
+      <td>MeshMind</td>
+      <td>delete_memory(uuid)</td>
+      <td>Delete memory</td>
+    </tr>
+    <tr>
+      <td>MeshMind</td>
+      <td>retrieval</td>
+      <td>search(query, filters, limit, strategy)</td>
+      <td>Hybrid search + rerank</td>
+    </tr>
+    <tr>
+      <td>Mem0</td>
+      <td>mem0.Memory</td>
+      <td>add(messages|text, user_id, metadata)</td>
+      <td>Extract &amp; persist</td>
+    </tr>
+    <tr>
+      <td>Mem0</td>
+      <td>mem0.Memory</td>
+      <td>search(query, user_id, limit, filters)</td>
+      <td>Retrieve memories</td>
+    </tr>
+    <tr>
+      <td>Mem0</td>
+      <td>mem0.Memory</td>
+      <td>update(id, ...), delete(id), reset(scope)</td>
+      <td>Maintenance operations</td>
+    </tr>
+    <tr>
+      <td>Graphiti</td>
+      <td>GraphitiClient</td>
+      <td>add_episodes(text|messages|json, group_id)</td>
+      <td>Ingest episodes</td>
+    </tr>
+    <tr>
+      <td>Graphiti</td>
+      <td>GraphitiClient</td>
+      <td>search(query, focal_node_uuid=None, limit=...)</td>
+      <td>Hybrid search; node-distance rerank</td>
+    </tr>
+    <tr>
+      <td>Graphiti</td>
+      <td>Node/Edge</td>
+      <td>save(driver), delete(driver), get_by_uuid(driver, uuid)</td>
+      <td>CRUD on graph objects</td>
+    </tr>
+  </tbody>
+</table>
+<h2>Gap Analysis</h2>
+<ul>
+  <li><b>Persona Scopes:</b> MeshMind uses namespaces and entity_labels but lacks Mem0-style user/agent/session/run scoping across all surfaces.</li>
+  <li><b>Temporal Semantics:</b> MeshMind and Mem0 do not implement bi-temporal edges; Graphiti does.</li>
+  <li><b>MCP Integration:</b> MeshMind lacks a server; Mem0 and Graphiti expose MCP tools.</li>
+  <li><b>Observability:</b> MeshMind has scaffolding; Graphiti ships OTel. MeshMind should add first-class OTel tracing/metrics.</li>
+  <li><b>SDK Ergonomics:</b> MeshMind has Python; Mem0 and Graphiti have broader or more mature ecosystems. TS SDK for MeshMind is drafted.</li>
+</ul>
+
+<h2>Recommendations</h2>
+<ol>
+  <li><b>Add multi-level scoping</b> (user_id, agent_id, session_id, run_id) across models, drivers, REST, CLI; support purge/reset of scopes.</li>
+  <li><b>Publish an MCP server</b> for MeshMind with tools: <span class="code">add_memories</span>, <span class="code">search_memory</span>, <span class="code">list_memories</span>, compatible with stdio and SSE.</li>
+  <li><b>Implement bi-temporal edges</b>: add <span class="code">valid_from</span>, <span class="code">valid_to</span>, <span class="code">tx_from</span>, <span class="code">tx_to</span>; support point-in-time queries and invalidation.</li>
+  <li><b>Graph-aware reranking</b>: blend RRF with node-distance; expose a <span class="code">focal_node_uuid</span> in the search API.</li>
+  <li><b>OpenTelemetry</b>: instrument REST, pipelines, drivers, and LLM calls; export OTLP; add dashboards.</li>
+  <li><b>SDKs & Examples</b>: ship TS SDK, notebooks, and LangGraph/CrewAI examples; add Docker Compose for MCP+OTel.</li>
+  <li><b>Benchmark harness</b>: publish Recall@k/MRR/NDCG vs Mem0/Graphiti; track latency and token costs.</li>
+</ol>
+
+<h2>Implementation Drafts Provided</h2>
+<p>The following drafts are available (see earlier ZIP, or request regeneration):</p>
+<ul>
+  <li><span class="code">cypher_bitemporal_edges.cypher</span> — bi-temporal relationships & as-of queries.</li>
+  <li><span class="code">meshmind_mcp_server.py</span> — minimal MCP server (stdio/SSE).</li>
+  <li><span class="code">rest_api_auth.py</span> — API key dependency.</li>
+  <li><span class="code">opentelemetry_setup.md</span> — OTel setup & instrumentation points.</li>
+  <li><span class="code">meshmind_ts_sdk_stub.ts</span> — minimal TypeScript client.</li>
+  <li><span class="code">graph_aware_reranker.py</span> — RRF + node-distance skeleton.</li>
+  <li><span class="code">evaluation_harness.md</span> — metrics & procedure.</li>
+  <li><span class="code">rest_routes_scoping_example.py</span> — scoping fields for search route.</li>
+</ul>
+
+<h2>All API Endpoints (MeshMind) — Detail</h2>
+<ul>
+  <li><span class="code">GET /livez</span>, <span class="code">/readyz</span>, <span class="code">/healthz</span></li>
+  <li><span class="code">POST /v1/extract</span> — instructions, namespace, entity_types, content[]</li>
+  <li><span class="code">POST /v1/memories</span> — batch create</li>
+  <li><span class="code">POST /v1/memories/search</span> — query, filters, limit, rerank_k, encoder, entity_labels</li>
+  <li><span class="code">PATCH /v1/memories/{uuid}</span> — update</li>
+  <li><span class="code">DELETE /v1/memories/{uuid}</span> — delete</li>
+  <li><span class="code">POST /v1/triplets</span> — subject, predicate, object, namespace, metadata</li>
+  <li><span class="code">GET/POST/DELETE /v1/predicates</span> — list/add/remove allowed predicates</li>
+</ul>
+
+<h2>All CLI Commands — Detail</h2>
+<ul>
+  <li><span class="code">meshmind ingest</span> <span class="small">-n/--namespace, -e/--embedding-model, -i/--instructions, &lt;paths...&gt;</span></li>
+  <li><span class="code">meshmind admin predicates</span> <span class="small">--list | --add &lt;LABEL&gt; | --remove &lt;LABEL&gt;</span></li>
+  <li><span class="code">meshmind admin maintenance</span> <span class="small">--reset (and similar)</span></li>
+  <li><span class="code">meshmind admin graph</span> <span class="small">--backend memory|sqlite|memgraph|neo4j</span></li>
+  <li><span class="code">meshmind admin counts</span> <span class="small">--backend …, --namespace …</span></li>
+</ul>
+
+<h2>All Internal Callables — Detail (Representative)</h2>
+<ul>
+  <li>Service layer: <span class="code">ingest_memories</span>, <span class="code">ingest_triplets</span>, <span class="code">search</span>, <span class="code">list_memories</span>, <span class="code">list_triplets</span>, <span class="code">memory_counts</span>.</li>
+  <li>Manager layer: <span class="code">add_memory</span>, <span class="code">update_memory</span>, <span class="code">delete_memory</span>, <span class="code">get_memory</span>, <span class="code">count_memories</span>, <span class="code">add_triplet</span>, <span class="code">delete_triplet</span>.</li>
+  <li>Retrieval: vector, BM25, graph traversal, fuzzy/exact/regex, rerank (LLM; proposed graph-aware reranker).</li>
+</ul>
+
+<h2>Sources (high level)</h2>
+<ul>
+  <li>MeshMind repo (PR #10 branch): README, <span class="code">meshmind/api/*.py</span>, <span class="code">meshmind/retrieval/*</span>, <span class="code">meshmind/cli/*</span>, <span class="code">docs/*.md</span>.</li>
+  <li>Mem0 repo & docs: SDK usage, REST server README, hosted OpenAPI.</li>
+  <li>Graphiti repo & docs: Searching & CRUD pages, MCP server docs, temporal model notes.</li>
+</ul>
+
+</body>
+</html>

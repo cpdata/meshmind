@@ -1,0 +1,5 @@
+Project,Command,Arguments,Options
+MeshMind,meshmind ingest,"-n/--namespace, -e/--embedding-model, -i/--instructions, <paths...>",Reads files; extract→preprocess→store.
+MeshMind,meshmind admin,subcommands (maintenance),"Housekeeping (e.g., reindex, compact, purge)."
+Mem0,N/A (SDK & curl-centric),-,Use Python/TS SDKs or REST/MCP.
+Graphiti,uv run graphiti_mcp_server.py,--model <llm> --transport <stdio|sse> --group-id <id>,Run MCP server exposing graph tools.

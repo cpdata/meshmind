@@ -1,0 +1,161 @@
+
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<title>MeshMind vs Mem0 vs Graphiti — Codebase-Driven Update (v2)</title>
+<style>
+body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; margin: 32px; }
+table { border-collapse: collapse; width: 100%; margin: 16px 0; font-size: 14px; }
+th, td { border: 1px solid #ddd; padding: 8px; vertical-align: top; }
+th { background: #f7f7f7; }
+h1, h2 { margin-top: 32px; }
+small.muted { color: #555; }
+code { background: #f4f4f4; padding: 1px 4px; border-radius: 3px; }
+</style>
+<h1>MeshMind vs Mem0 vs Graphiti — Codebase-Driven Update (v2)</h1>
+<p><small class="muted">Generated: 2025-10-15</small></p>
+
+<h2>Feature & Implementation Matrix (Updated)</h2>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Feature</th>
+      <th>MeshMind</th>
+      <th>Mem0</th>
+      <th>Graphiti</th>
+      <th>Notes</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Placeholder</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>Endpoints & Tools</h2>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Project</th>
+      <th>Type</th>
+      <th>Name</th>
+      <th>Path/Signature</th>
+      <th>Notes</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Mem0 (OSS FastAPI)</td>
+      <td>HTTP</td>
+      <td>Create Memory</td>
+      <td>POST /api/v1/memories/</td>
+      <td>Field is 'text' (not 'memory') per recent change</td>
+    </tr>
+    <tr>
+      <td>Mem0 (Hosted)</td>
+      <td>HTTP</td>
+      <td>Memories (CRUD)</td>
+      <td>https://api.mem0.ai (SDK-wrapped)</td>
+      <td>See MemoryClient/TS Client</td>
+    </tr>
+    <tr>
+      <td>Graphiti MCP</td>
+      <td>MCP Tool</td>
+      <td>add_memory</td>
+      <td>mcp: add_memory</td>
+      <td>Add episode(s) to graph</td>
+    </tr>
+    <tr>
+      <td>Graphiti MCP</td>
+      <td>MCP Tool</td>
+      <td>search_facts</td>
+      <td>mcp: search_facts</td>
+      <td>Hybrid search over edges</td>
+    </tr>
+    <tr>
+      <td>Graphiti MCP</td>
+      <td>MCP Tool</td>
+      <td>search_nodes</td>
+      <td>mcp: search_nodes</td>
+      <td>Hybrid search over nodes; optional focal node uuid</td>
+    </tr>
+    <tr>
+      <td>Graphiti MCP</td>
+      <td>MCP Tool</td>
+      <td>get_episodes</td>
+      <td>mcp: get_episodes</td>
+      <td>List recent episodes</td>
+    </tr>
+    <tr>
+      <td>Graphiti MCP</td>
+      <td>MCP Tool</td>
+      <td>delete_episode</td>
+      <td>mcp: delete_episode</td>
+      <td>Remove episode</td>
+    </tr>
+    <tr>
+      <td>Graphiti MCP</td>
+      <td>MCP Tool</td>
+      <td>clear_graph</td>
+      <td>mcp: clear_graph</td>
+      <td>Reset graph</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>CLI Commands</h2>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Project</th>
+      <th>Command</th>
+      <th>Args/Options</th>
+      <th>Purpose</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Graphiti (MCP)</td>
+      <td>uv run graphiti_mcp_server.py</td>
+      <td>--transport sse|stdio</td>
+      <td>Run server</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>Internal Callables</h2>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Project</th>
+      <th>Class/Module</th>
+      <th>Callable</th>
+      <th>What it does</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Mem0</td>
+      <td>Memory</td>
+      <td>add/search</td>
+      <td>-</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>Sources</h2>
+<ol>
+  <li>Graphiti MCP server — <a href="https://help.getzep.com/graphiti/getting-started/mcp-server">help.getzep.com</a></li>
+  <li>Graphiti Searching — <a href="https://help.getzep.com/graphiti/working-with-data/searching">help.getzep.com</a></li>
+  <li>Graphiti CRUD — <a href="https://help.getzep.com/graphiti/working-with-data/crud-operations">help.getzep.com</a></li>
+  <li>Mem0 README — <a href="https://github.com/mem0ai/mem0/blob/main/README.md">github.com/mem0ai/mem0</a></li>
+  <li>Mem0 PyPI — <a href="https://pypi.org/project/mem0ai/">pypi.org</a></li>
+  <li>Mem0 endpoint change — <a href="https://github.com/mem0ai/mem0/issues/3331">github.com/mem0ai/mem0/issues/3331</a></li>
+  <li>Mem0 + Azure AI Search — <a href="https://devblogs.microsoft.com/foundry/azure-ai-mem0-integration/">devblogs.microsoft.com</a></li>
+</ol>
+</html>

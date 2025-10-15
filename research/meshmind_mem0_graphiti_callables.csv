@@ -1,0 +1,21 @@
+Project,Module/Class,Callable,Summary
+MeshMind,MeshMind,register_entity(model),Register Pydantic model as entity label.
+MeshMind,MeshMind,register_allowed_predicates(list[str]),Set allowed relationship labels.
+MeshMind,MeshMind,add_predicate(name),Add a single predicate label.
+MeshMind,MeshMind,"extract_memories(instructions, namespace, entity_types, content)",LLM extraction step.
+MeshMind,MeshMind,store_memory(memory),"Preprocess, dedupe, score, compress, consolidate, store."
+MeshMind,MeshMind,"add_memory(namespace, name, entity_label, entity, metadata)",Mid-level API to add memory.
+MeshMind,MeshMind,"update_memory(uuid, ...)",Update existing memory.
+MeshMind,MeshMind,delete_memory(uuid),Delete memory.
+MeshMind,retrieval,"search(query, filters, limit, strategy)",Hybrid search over vector/BM25/graph + rerank.
+MeshMind,client.Client,add/search/update/delete wrappers,Thin HTTP client over REST.
+Mem0,mem0.Memory,"add(messages|text, user_id, metadata)",Extract & persist new memories.
+Mem0,mem0.Memory,"search(query, user_id, limit, filters)",Retrieve memories.
+Mem0,mem0.Memory,"update(id, text|metadata)",Update an existing memory.
+Mem0,mem0.Memory,delete(id),Delete a memory.
+Mem0,mem0.Memory,reset(user_id|project),Clear scoped memories.
+Graphiti,GraphitiClient,"add_episodes(text|messages|json, group_id)",Ingest episodes.
+Graphiti,GraphitiClient,"search(query, focal_node_uuid=None, limit=...)",Hybrid search; node-distance rerank.
+Graphiti,Node/Edge,save(driver),Create/update nodes/edges.
+Graphiti,Node/Edge,delete(driver),Hard delete nodes/edges.
+Graphiti,Node/Edge,"get_by_uuid(driver, uuid)",Fetch specific node/edge.

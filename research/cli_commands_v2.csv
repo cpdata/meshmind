@@ -1,0 +1,2 @@
+Project,Command,Args/Options,Purpose
+Graphiti (MCP),uv run graphiti_mcp_server.py,--transport sse|stdio,Run server
