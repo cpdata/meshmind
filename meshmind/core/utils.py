@@ -1,16 +1,52 @@
-"""Utility functions for MeshMind."""
-import uuid
-from datetime import datetime
+"""Utility helpers for MeshMind with optional dependency guards."""
+from __future__ import annotations
+
 import hashlib
-from typing import Any
-import tiktoken
+import uuid
+from datetime import datetime, timezone
+from functools import lru_cache
+from typing import Any, Optional
+
+_TIKTOKEN = None
+
+
+def _ensure_tiktoken() -> Any:
+    """Return the ``tiktoken`` module if it is installed."""
+
+    global _TIKTOKEN
+    if _TIKTOKEN is None:
+        try:
+            import tiktoken  # type: ignore
+        except ImportError as exc:  # pragma: no cover - exercised in minimal envs
+            raise RuntimeError(
+                "tiktoken is required for token counting but is not installed."
+                " Install the optional 'tiktoken' extra to enable compression features."
+            ) from exc
+        _TIKTOKEN = tiktoken
+    return _TIKTOKEN
+
+
+@lru_cache(maxsize=8)
+def get_token_encoder(encoding_name: str = "o200k_base", optional: bool = False) -> Optional[Any]:
+    """Return a cached tiktoken encoder or ``None`` when optional."""
+
+    try:
+        module = _ensure_tiktoken()
+    except RuntimeError:
+        if optional:
+            return None
+        raise
+    return module.get_encoding(encoding_name)
+
+
 def generate_uuid() -> str:
     """Generate a UUID4 string."""
     return str(uuid.uuid4())
 
 def current_timestamp() -> datetime:
     """Get current UTC timestamp."""
-    return datetime.utcnow()
+
+    return datetime.now(timezone.utc)
 
 def hash_string(value: str) -> str:
     """Hash a string using SHA-256 and return the hex digest."""
@@ -21,13 +57,7 @@ def hash_dict(data: Any) -> str:
     return hash_string(str(data))
 
 def num_tokens_from_string(string: str, encoding_name: str = "o200k_base") -> int:
-    """Returns the number of tokens in a text string.
-    Args:
-        string: The text string to count tokens for.
-        encoding_name: The name of the encoding to use. Defaults to "o200k_base".
-    Returns:
-        The number of tokens in the text string.
-    """
-    encoding = tiktoken.get_encoding(encoding_name)
-    num_tokens = len(encoding.encode(string))
-    return num_tokens
+    """Return the number of tokens in ``string`` for ``encoding_name``."""
+
+    encoder = get_token_encoder(encoding_name, optional=False)
+    return len(encoder.encode(string))
