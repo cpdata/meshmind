@@ -1,12 +1,17 @@
-from typing import Any, List, Type
+from typing import Any, List, Sequence, Type
+
+from meshmind.core.observability import log_event, telemetry
+from meshmind.core.config import settings
+from meshmind.llm_client import LLMClient, LLMConfig, build_llm_config_from_settings
 
 def extract_memories(
     instructions: str,
     namespace: str,
-    entity_types: List[Type[Any]],
+    entity_types: Sequence[Type[Any]],
     embedding_model: str,
-    content: List[str],
+    content: Sequence[str],
     llm_client: Any = None,
+    llm_config: LLMConfig | None = None,
 ) -> List[Any]:
     """
     Extract structured Memory objects from provided content using an LLM.
@@ -20,16 +25,16 @@ def extract_memories(
     :return: List of extracted Memory-like dicts or objects.
     """
     import json
-    try:
-        from openai import OpenAI
-    except ImportError:
-        raise RuntimeError("openai package is required for extraction pipeline")
     from meshmind.core.types import Memory
     from meshmind.core.embeddings import EncoderRegistry
+    from meshmind.models.registry import EntityRegistry
+
+    log_event("pipeline.extract.start", segments=len(content))
 
     # Initialize default LLM client if not provided
     if llm_client is None:
-        llm_client = OpenAI()
+        config = llm_config or build_llm_config_from_settings(settings)
+        llm_client = LLMClient(config)
 
     # Prepare function schema for Memory items
     mem_schema = Memory.schema()
@@ -46,6 +51,9 @@ def extract_memories(
     }
 
     # Build system prompt using a default template and user instructions
+    entity_types = list(entity_types) or [Memory]
+    for model in entity_types:
+        EntityRegistry.register(model)
     allowed_labels = [cls.__name__ for cls in entity_types]
     default_prompt = (
         "You are an agent that extracts structured memories from text segments. "
@@ -58,15 +66,16 @@ def extract_memories(
         prompt += f"\nAllowed entity labels: {', '.join(allowed_labels)}."
     messages = [{"role": "system", "content": prompt}]
     # Add each text segment as a user message
-    messages += [{"role": "user", "content": text} for text in content]
+    messages += [{"role": "user", "content": text} for text in list(content)]
 
     # Call chat completion with function-calling
-    response = llm_client.responses.create(
-        model="gpt-4.1-mini",
-        messages=messages,
-        functions=[function_spec],
-        function_call={"name": "extract_memories"},
-    )
+    with telemetry.track_duration("pipeline.extract.duration"):
+        response = llm_client.responses.create(
+            operation="extraction",
+            messages=messages,
+            functions=[function_spec],
+            function_call={"name": "extract_memories"},
+        )
     msg = response.choices[0].message
     # Parse function call arguments or direct JSON
     if msg.get("function_call"):
@@ -82,7 +91,7 @@ def extract_memories(
 
     memories = []
     # Instantiate Memory objects, validate entity labels, and compute embeddings
-    from pydantic import ValidationError
+    from meshmind._compat.pydantic import ValidationError
     encoder = EncoderRegistry.get(embedding_model)
     for entry in items:
         label = entry.get("entity_label")
@@ -99,4 +108,8 @@ def extract_memories(
             emb = encoder.encode([mem.name])[0]
             mem.embedding = emb
         memories.append(mem)
+
+    telemetry.increment("pipeline.extract.segments", len(content))
+    telemetry.increment("pipeline.extract.memories", len(memories))
+    log_event("pipeline.extract.complete", memories=len(memories))
     return memories
