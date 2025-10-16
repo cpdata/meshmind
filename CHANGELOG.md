@@ -1,5 +1,41 @@
 # Changelog
 
+## [2025-10-16T05:12:43-04:00 (America/New_York)]
+### Added
+- Authored `meshmind/protos/memory_service.proto` and generated `memory_service_pb2(_grpc).py`, exposing helpers in `meshmind.api.grpc`
+  so the gRPC surface now shares a canonical protobuf schema.
+- Introduced `meshmind/protos/__init__.py` with a `data_path()` helper and configured `pyproject.toml` to ship `.proto` files with the
+  package.
+- Added a `make benchmarks` target that executes `scripts/evaluate_importance.py`, `scripts/consolidation_benchmark.py`, and
+  `scripts/benchmark_pagination.py`, writing JSON snapshots to `build/benchmarks/` for quick regressions.
+
+### Changed
+- Refactored `meshmind/api/grpc.py` to map protobuf messages to `MemoryPayload`/`TripletPayload`, ensuring search results preserve
+  timestamps and metadata while keeping convenience helpers for tests.
+- Updated gRPC-related tests and docs (`meshmind/tests/test_service_interfaces.py`, `meshmind/tests/test_api_examples.py`,
+  `docs/api.md`, `README.md`, `docs/testing.md`, `docs/operations.md`, `PROJECT.md`, `PLAN.md`, `RECOMMENDATIONS.md`, `FINDINGS.md`,
+  `SOT.md`, `ROADMAP.md`, `ISSUES.md`, `RESUME_NOTES.md`, `DUMMIES.md`, `CLEANUP.md`, `ENVIRONMENT_NEEDS.md`, `NEEDED_FOR_TESTING.md`,
+  `TODO.md`) to reference the protobuf-backed interface and new benchmarking workflow.
+- Declared `grpcio`, `grpcio-tools`, and `protobuf` as first-class dependencies (including the testing extra) and ensured setup scripts
+  continue validating optional packages.
+
+### Fixed
+- Ensured generated protobuf files are packaged by default via `[tool.setuptools.package-data]`, preventing downstream installs from
+  missing the canonical schema.
+
+## [2025-10-16T04:52:41-04:00 (America/New_York)]
+### Added
+- Introduced benchmarking and evaluation tooling: `scripts/evaluate_importance.py` for heuristic summaries, `scripts/consolidation_benchmark.py` for consolidation throughput, and `scripts/benchmark_pagination.py` for driver pagination measurements, each covered by pytest (`meshmind/tests/test_benchmark_scripts.py`).
+- Added REST/gRPC documentation smoke tests in `meshmind/tests/test_api_examples.py` to validate the new curl/grpcurl snippets against the FastAPI app and gRPC stub.
+
+### Changed
+- Extended `meshmind/cli/admin.py` and `meshmind/tests/test_cli_admin.py` with `--max-attempts`, `--base-delay`, and `--run` overrides so maintenance retries can be tuned per invocation.
+- Expanded consolidation coverage via `meshmind/tests/test_pipeline_preprocess_store.py` to exercise large synthetic datasets and ensure summaries/importance survive batching.
+- Updated project documentation (`README.md`, `docs/api.md`, `docs/operations.md`, `SOT.md`, `PROJECT.md`, `PLAN.md`, `RECOMMENDATIONS.md`, `FINDINGS.md`, `ISSUES.md`, `ENVIRONMENT_NEEDS.md`, `NEEDED_FOR_TESTING.md`, `RESUME_NOTES.md`, `TODO.md`, `DUMMIES.md`, `CLEANUP.md`) to describe the CLI overrides, benchmarking utilities, shim retirement, and refreshed backlog priorities.
+
+### Removed
+- Retired the Pydantic compatibility layer by deleting `meshmind/_compat/pydantic.py`, updating all imports to use first-party Pydantic models, and pruning `_compat` from the repository map.
+
 ## [2025-10-14T22:51:20-04:00 (America/New_York)]
 ### Changed
 - Documented LLM override precedence in `README.md`, expanded service documentation in `docs/api.md` and

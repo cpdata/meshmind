@@ -1,0 +1,83 @@
+syntax = "proto3";
+
+package meshmind.api.v1;
+
+import "google/protobuf/struct.proto";
+import "google/protobuf/wrappers.proto";
+
+message MemoryPayload {
+  string uuid = 1;
+  string namespace = 2;
+  string name = 3;
+  string entity_label = 4;
+  repeated double embedding = 5;
+  google.protobuf.Struct metadata = 6;
+  string reference_time = 7;
+  google.protobuf.DoubleValue importance = 8;
+  google.protobuf.Int64Value ttl_seconds = 9;
+  string created_at = 10;
+  string updated_at = 11;
+}
+
+message TripletPayload {
+  string subject = 1;
+  string predicate = 2;
+  string object = 3;
+  string namespace = 4;
+  string entity_label = 5;
+  google.protobuf.Struct metadata = 6;
+  string reference_time = 7;
+}
+
+message SearchPayload {
+  string query = 1;
+  string namespace = 2;
+  int32 top_k = 3;
+  string encoder = 4;
+  google.protobuf.Int32Value rerank_k = 5;
+  repeated string entity_labels = 6;
+  string rerank_model = 7;
+  bool use_llm_rerank = 8;
+  map<string, string> llm_models = 9;
+  map<string, string> llm_base_urls = 10;
+  string llm_api_key = 11;
+}
+
+message IngestMemoriesRequest {
+  repeated MemoryPayload memories = 1;
+}
+
+message IngestMemoriesResponse {
+  repeated string uuids = 1;
+}
+
+message IngestTripletsRequest {
+  repeated TripletPayload triplets = 1;
+}
+
+message IngestTripletsResponse {
+  int32 stored = 1;
+}
+
+message SearchResponse {
+  repeated MemoryPayload results = 1;
+}
+
+message MemoryCountsRequest {
+  string namespace = 1;
+}
+
+message NamespaceCounts {
+  map<string, int64> entity_counts = 1;
+}
+
+message MemoryCountsResponse {
+  map<string, NamespaceCounts> counts = 1;
+}
+
+service MeshMindService {
+  rpc IngestMemories(IngestMemoriesRequest) returns (IngestMemoriesResponse);
+  rpc IngestTriplets(IngestTripletsRequest) returns (IngestTripletsResponse);
+  rpc Search(SearchPayload) returns (SearchResponse);
+  rpc MemoryCounts(MemoryCountsRequest) returns (MemoryCountsResponse);
+}

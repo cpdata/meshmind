@@ -29,3 +29,4 @@
   `docker-compose.yml` files can run inside this environment; alternatively, provision
   remote services accessible to CI.
 - Document credential management procedures and rotation cadence so secrets stay current.
+- Keep gRPC tooling (`grpcio`, `grpcio-tools`, protobuf compiler) available in cached environments; the proto definitions now back the production stubs and need to be regenerated whenever the schema evolves.

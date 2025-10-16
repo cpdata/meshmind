@@ -19,13 +19,14 @@
   initialize lazily so import-time failures are avoided.
 - **Support code**: `meshmind.core` provides configuration, data models, embeddings, similarity math, and optional dependency
   guards around tokenization.
-- **Service adapters**: `meshmind.api.rest` and `.grpc` expose REST/gRPC entry points (with lightweight stubs for tests) so
-  ingestion and retrieval can run as services, including `/memories/counts` for namespace/label summaries.
+- **Service adapters**: `meshmind.api.rest` and `.grpc` expose REST/gRPC entry points. The gRPC surface now uses generated
+  protobuf messages (`meshmind/protos/memory_service.proto`) so tests and future services share a canonical schema while
+  retaining the in-process stub for fast feedback.
 - **Observability**: `meshmind.core.observability` collects metrics, gauges, and structured log events across pipelines and
   scheduled tasks.
 - **Tooling**: The CLI ingest command (`meshmind ingest`), updated example script, Makefile automation, CI workflow, and Docker
   Compose file illustrate extraction → preprocessing → storage → retrieval locally.
-- **Compatibility & fakes**: `_compat/pydantic` keeps models working when Pydantic is absent, while `meshmind/testing` provides fake Memgraph, Redis, and embedding drivers for offline test runs.
+- **Test doubles**: `meshmind/testing` provides fake Memgraph, Redis, embedding, and LLM drivers for offline test runs while production code now depends on first-party Pydantic models.
 
 ## Implemented Capabilities
 - Serialize knowledge as `Memory` (nodes) and `Triplet` (relationships) Pydantic models with namespaces, metadata, embeddings,
@@ -53,9 +54,8 @@
 - Graph-backed retrieval still hydrates namespace/entity-label filtered candidates client-side; pushing ranking into the graph store is future work.
 - Predicate management remains internal to the bootstrap process; external administration APIs are still missing.
 - Metrics remain in-memory; external exporters (Prometheus/OpenTelemetry) are not wired up.
-- gRPC wiring currently relies on stubs; production-ready servers are still future work.
-- Compatibility shims provide minimal validation and should be replaced with real Pydantic models in production builds; see
-  `DUMMIES.md` for a complete inventory and retirement plan.
+- gRPC still runs through an in-process stub; a production-ready server/binary interface remains future work despite the new
+  generated protobuf schema.
 
 ## External Services & Dependencies
 - **Graph backend**: Choose via `GRAPH_BACKEND`. In-memory and SQLite require no external services. Memgraph needs the `pymgclient` package (which exposes the `mgclient` module);
@@ -71,7 +71,8 @@
 - `Makefile` exposes `install`, `lint`, `fmt`, `fmt-check`, `typecheck`, `test`, `check`, `docs-guard`, `docker`, and `clean`
   targets. `make install` installs the `.[dev,docs,testing]` extras so optional dependencies are present.
 - `.github/workflows/ci.yml` runs formatting/linting checks, the documentation guard, and pytest on push and pull requests.
-- Tests rely on fixtures (`memory_factory`, `dummy_encoder`, in-memory drivers) and compatibility shims so they pass without external services, though installing optional dependencies improves fidelity.
+- Tests rely on fixtures (`memory_factory`, `dummy_encoder`, in-memory drivers`) so they pass without external services, though installing optional dependencies improves fidelity.
+- Benchmark and evaluation utilities live in `scripts/` (`evaluate_importance.py`, `consolidation_benchmark.py`, `benchmark_pagination.py`) to validate heuristics and driver performance without external infrastructure.
 - Developer-facing documentation now lives in `docs/` alongside the canonical `README.md`; the docs guard (`make docs-guard`) enforces synchronized updates when modules change.
 - Docker Compose now provisions Memgraph, Neo4j, and Redis; integration-specific stacks (including the Celery worker) live under
   `meshmind/tests/docker/`. See `ENVIRONMENT_NEEDS.md` and `SETUP.md` for enabling optional services locally.

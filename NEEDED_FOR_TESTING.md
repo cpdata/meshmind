@@ -10,14 +10,15 @@
 ## Python Dependencies
 - Install the project editable (with extras) using `pip install -e .[dev,docs,testing]` or
   `uv pip install --system -e .[dev,docs,testing]` from the repository root.
-- Core functionality relies on the OpenAI SDK (or compatible fork), `pydantic`, and `pydantic-settings`, but the repository
-  ships a compatibility shim (`meshmind/_compat/pydantic.py`) that unlocks tests when Pydantic is unavailable.
+- Core functionality relies on the OpenAI SDK (or compatible fork), `pydantic`, and `pydantic-settings`; the project now
+  requires Pydantic 2.x directly (the legacy shim has been removed).
 - Optional packages improve specific workflows (now bundled in the editable install extras so they install automatically when
   running the provisioning scripts):
   - `numpy`, `scikit-learn`, and `rapidfuzz` accelerate similarity and lexical search (pure-Python fallbacks are bundled).
   - `sentence-transformers`, `tiktoken`, and `pymgclient` enable local embeddings, compression, and Memgraph connectivity.
   - `celery[redis]` activates scheduled maintenance with a Redis broker.
   - `fastapi` + `uvicorn[standard]` power the REST adapter when exercising HTTP APIs.
+  - `grpcio` + `grpcio-tools` + `protobuf` enable the generated gRPC clients/servers that replace the former dataclass shim.
 - Optional drivers: install `neo4j` if exercising the Neo4j backend; SQLite support ships with the standard library. The
   provisioning scripts validate that the extras expose `neo4j`, `pymgclient`, `fastapi`, and `uvicorn`.
 - Development tooling referenced by the Makefile and CI (installed via `.[dev,docs,testing]`):
@@ -63,7 +64,8 @@
   `MeshMind` constructor handle this, but custom scripts must call `bootstrap_encoders()`.
 - For REST/gRPC testing, instantiate the `RestAPIStub`/`GrpcServiceStub` with the in-memory driver to avoid external services.
 - Use `meshmind/testing` fakes (`FakeMemgraphDriver`, `FakeRedisBroker`, `FakeEmbeddingEncoder`, `FakeLLMClient`) in tests or demos to eliminate external infrastructure requirements.
-- Invoke `meshmind admin predicates` and `meshmind admin maintenance` during local runs to inspect predicate registries and telemetry without external services.
+- Invoke `meshmind admin predicates` and `meshmind admin maintenance --max-attempts <n> --base-delay <seconds> --run <task>` during local runs to inspect predicate registries, telemetry, and tune maintenance retries without external services.
+- Use the benchmarking utilities in `scripts/` (`evaluate_importance.py`, `consolidation_benchmark.py`, `benchmark_pagination.py`) to validate heuristics and driver performance offline before connecting to live infrastructure.
 - Seed demo data as needed using the `examples/extract_preprocess_store_example.py` script after configuring environment
   variables.
 - Create a `.env` file storing the environment variables above for consistent local configuration.

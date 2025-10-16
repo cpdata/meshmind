@@ -32,7 +32,12 @@ def test_in_memory_driver_roundtrip():
         namespace="test",
         entity_label="Relation",
     )
-    driver.upsert_edge(triplet.subject, triplet.predicate, triplet.object, triplet.dict())
+    driver.upsert_edge(
+        triplet.subject,
+        triplet.predicate,
+        triplet.object,
+        triplet.model_dump(exclude_none=True),
+    )
     records = driver.list_triplets("test")
     assert records and records[0]["predicate"] == "related_to"
 
@@ -74,7 +79,12 @@ def test_sqlite_driver_roundtrip():
         namespace="test",
         entity_label="Relation",
     )
-    driver.upsert_edge(triplet.subject, triplet.predicate, triplet.object, triplet.dict())
+    driver.upsert_edge(
+        triplet.subject,
+        triplet.predicate,
+        triplet.object,
+        triplet.model_dump(exclude_none=True),
+    )
     records = driver.list_triplets("test")
     assert records and records[0]["predicate"] == "mentions"
 

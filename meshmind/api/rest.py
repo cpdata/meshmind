@@ -26,7 +26,7 @@ class RestAPIStub:
         if method == "POST" and path == "/search":
             request = SearchPayload(**payload)
             results = self.service.search(request)
-            return {"results": [mem.dict() for mem in results]}
+            return {"results": [mem.model_dump(exclude_none=True) for mem in results]}
         if method == "GET" and path == "/memories":
             namespace = payload.get("namespace")
             entity_labels = payload.get("entity_labels")
@@ -43,7 +43,7 @@ class RestAPIStub:
                 query=query,
                 use_search=use_search,
             )
-            return {"memories": [mem.dict() for mem in memories]}
+            return {"memories": [mem.model_dump(exclude_none=True) for mem in memories]}
         if method == "GET" and path == "/memories/counts":
             namespace = payload.get("namespace")
             counts = self.service.memory_counts(namespace)
@@ -51,7 +51,7 @@ class RestAPIStub:
         if method == "GET" and path == "/triplets":
             namespace = payload.get("namespace")
             triplets = self.service.list_triplets(namespace)
-            return {"triplets": [triplet.dict() for triplet in triplets]}
+            return {"triplets": [triplet.model_dump(exclude_none=True) for triplet in triplets]}
         raise ValueError(f"Unsupported route {method} {path}")
 
 
@@ -90,7 +90,7 @@ def create_app(service: MemoryService) -> Any:
         except Exception as exc:  # pragma: no cover
             raise HTTPException(status_code=400, detail=str(exc))
         results = service.search(request)
-        return {"results": [mem.dict() for mem in results]}
+        return {"results": [mem.model_dump(exclude_none=True) for mem in results]}
 
     @app.get("/memories")
     def list_memories(
@@ -109,12 +109,12 @@ def create_app(service: MemoryService) -> Any:
             query=query,
             use_search=use_search,
         )
-        return {"memories": [mem.dict() for mem in memories]}
+        return {"memories": [mem.model_dump(exclude_none=True) for mem in memories]}
 
     @app.get("/triplets")
     def list_triplets(namespace: str | None = None):
         triplets = service.list_triplets(namespace)
-        return {"triplets": [triplet.dict() for triplet in triplets]}
+        return {"triplets": [triplet.model_dump(exclude_none=True) for triplet in triplets]}
 
     @app.get("/memories/counts")
     def memory_counts(namespace: str | None = None):

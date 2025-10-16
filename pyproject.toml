@@ -22,6 +22,9 @@ dependencies = [
     "neo4j>=5.26.0",
     "pymgclient>=1.4.0",
     "redis>=5.0.0",
+    "grpcio>=1.67.0",
+    "grpcio-tools>=1.67.0",
+    "protobuf>=5.29.2",
 ]
 
 [project.scripts]
@@ -46,4 +49,12 @@ testing = [
     "uvicorn>=0.32.0",
     "neo4j>=5.25.0",
     "pymgclient>=1.5.1",
+    "grpcio>=1.67.0",
+    "grpcio-tools>=1.67.0",
+    "protobuf>=5.29.2",
+]
+
+[tool.setuptools.package-data]
+"meshmind" = [
+    "protos/*.proto",
 ]

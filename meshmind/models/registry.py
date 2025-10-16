@@ -1,6 +1,6 @@
 """Registry for entity and predicate models."""
 from typing import Type, Optional, Dict, Set
-from meshmind._compat.pydantic import BaseModel
+from pydantic import BaseModel
 
 
 class EntityRegistry:

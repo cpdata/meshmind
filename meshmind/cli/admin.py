@@ -4,7 +4,7 @@ from __future__ import annotations
 import argparse
 import json
 import sys
-from typing import TextIO
+from typing import Callable, TextIO
 
 from meshmind.api.memory_manager import MemoryManager
 from meshmind.core.config import settings
@@ -34,6 +34,23 @@ def register_admin_subcommands(subparsers: argparse._SubParsersAction) -> None:
     )
     maintenance_parser.add_argument(
         "--reset", action="store_true", help="Reset telemetry after printing"
+    )
+    maintenance_parser.add_argument(
+        "--max-attempts",
+        type=int,
+        default=None,
+        help="Override MAINTENANCE_MAX_ATTEMPTS for this invocation",
+    )
+    maintenance_parser.add_argument(
+        "--base-delay",
+        type=float,
+        default=None,
+        help="Override MAINTENANCE_BASE_DELAY_SECONDS (seconds)",
+    )
+    maintenance_parser.add_argument(
+        "--run",
+        choices=("expire", "consolidate", "compress"),
+        help="Execute a maintenance task after applying overrides",
     )
     maintenance_parser.set_defaults(func=handle_maintenance)
 
@@ -86,11 +103,35 @@ def handle_maintenance(args: argparse.Namespace, stream: TextIO | None = None) -
     """Print maintenance telemetry and optionally reset it."""
 
     stream = stream or sys.stdout
+    overrides: dict[str, float] = {}
+    if getattr(args, "max_attempts", None) is not None:
+        value = max(int(args.max_attempts), 1)
+        settings.MAINTENANCE_MAX_ATTEMPTS = value
+        overrides["MAINTENANCE_MAX_ATTEMPTS"] = float(value)
+    if getattr(args, "base_delay", None) is not None:
+        value = max(float(args.base_delay), 0.0)
+        settings.MAINTENANCE_BASE_DELAY_SECONDS = value
+        overrides["MAINTENANCE_BASE_DELAY_SECONDS"] = value
+
     snapshot = telemetry.snapshot()
+    if overrides:
+        snapshot.setdefault("overrides", {}).update(overrides)
+
     print(json.dumps(snapshot, indent=2, sort_keys=True), file=stream)
     if args.reset:
         telemetry.reset()
         print("Telemetry reset", file=stream)
+
+    if getattr(args, "run", None):
+        from meshmind.tasks import scheduled
+
+        operations: dict[str, Callable[[], object]] = {
+            "expire": scheduled.expire_task,
+            "consolidate": scheduled.consolidate_task,
+            "compress": scheduled.compress_task,
+        }
+        result = operations[args.run]()
+        print(json.dumps({"task": args.run, "result": result}, indent=2, sort_keys=True), file=stream)
 
 
 def handle_graph_check(args: argparse.Namespace, stream: TextIO | None = None) -> int:

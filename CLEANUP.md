@@ -6,14 +6,9 @@ place, and the exact remediation steps required to bring the implementation in l
 
 ## Compatibility Layers
 
-### Replace Pydantic Shim
+### Replace Pydantic Shim (Completed)
 - **Files**: `meshmind/_compat/pydantic.py`, modules importing from `meshmind._compat.pydantic`.
-- **Current State**: Custom `BaseModel` drop-in used when `pydantic` is unavailable.
-- **Action**:
-  1. Reintroduce `pydantic` as a hard dependency and update `pyproject.toml` extras accordingly.
-  2. Migrate all models to inherit from the official `pydantic` classes.
-  3. Delete `meshmind/_compat/pydantic.py` once no modules import it directly.
-  4. Update tests to cover validation using real `pydantic` features (e.g., `.model_dump`).
+- **Status**: Completed – the shim has been removed, `pydantic>=2.11` is a required dependency, and all models/tests now consume the official APIs directly.
 
 ### Retire FastAPI Stub
 - **Files**: `meshmind/api/rest.py`, `meshmind/api/service.py`, `docs/api.md`, `SETUP.md`.
@@ -24,14 +19,17 @@ place, and the exact remediation steps required to bring the implementation in l
   3. Update tests to spin up the FastAPI test client instead of the stub.
   4. Refresh documentation to reflect the production stack only.
 
-### Replace gRPC Dataclass Shim
-- **Files**: `meshmind/api/grpc.py`, `meshmind/tests/test_service_interfaces.py`, `docs/api.md`.
-- **Current State**: Dataclass-based stubs mirror generated proto classes.
+### Replace gRPC Dataclass Shim (Completed)
+- **Files**: `meshmind/api/grpc.py`, `meshmind/protos/memory_service.proto`, `meshmind/tests/test_service_interfaces.py`, `docs/api.md`.
+- **Status**: Completed – protobuf definitions now live under `meshmind/protos`, generated modules back the Python stub, setup scripts install `grpcio`/`grpcio-tools`, and tests exercise the canonical schema.
+
+### Promote gRPC Server Implementation
+- **Files**: `meshmind/api/grpc.py`, future server entry point, integration tests.
+- **Current State**: Tests rely on the in-process stub; there is no deployable server or channel bootstrap yet.
 - **Action**:
-  1. Author protobuf definitions for service contracts and commit generated Python code.
-  2. Integrate `grpcio` and `grpcio-tools` into the setup scripts and lockfile.
-  3. Update the service module to use generated classes and channel/server implementations.
-  4. Convert tests to rely on `grpc.aio` test utilities and remove dataclass shims.
+  1. Implement a gRPC server (synchronous or `grpc.aio`) that binds the generated service to an actual channel.
+  2. Add integration tests (possibly using `grpc.aio.insecure_channel`) that cover ingestion, search, and memory counts against the running server.
+  3. Document provisioning steps (`SETUP.md`, `docs/api.md`) and add CLI helpers or docker-compose services if required.
 
 ## Task Scheduling Workarounds
 

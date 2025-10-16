@@ -16,8 +16,9 @@ meshmind/
 ├── retrieval/          # Search strategies (hybrid, lexical, fuzzy, vector, regex, rerank helpers)
 ├── tasks/              # Celery beat schedules and maintenance jobs
 ├── testing/            # Fake drivers (Memgraph, Redis, embedding, LLM client) for offline tests
-├── _compat/            # Compatibility shims (e.g., fallback Pydantic base classes)
 ├── tests/              # Pytest suites with local fixtures (no external services required)
+├── protos/             # Generated protobuf modules and schema for the gRPC surface
+├── scripts/            # Operational/benchmark utilities (setup automation, evaluation, benchmarking)
 └── examples/           # Scripts and notebooks showing ingestion and retrieval flows
 ```
 Supporting assets:
@@ -26,12 +27,13 @@ Supporting assets:
   `meshmind/tests/docker/` (Memgraph-only, Neo4j-only, Redis-only, and full integration).
 - `SETUP.md`: End-to-end provisioning instructions covering Python deps, environment variables, and Compose workflows.
 - `run/install_setup.sh`, `run/maintenance_setup.sh`: Automation scripts for provisioning fresh environments and refreshing cached workspaces.
+- `scripts/evaluate_importance.py`, `scripts/consolidation_benchmark.py`, `scripts/benchmark_pagination.py`: Evaluation and benchmarking tools for importance heuristics, consolidation throughput, and driver pagination performance.
 - `.github/workflows/ci.yml`: GitHub Actions workflow running linting/formatting checks and pytest.
 - `pyproject.toml`: Project metadata and dependency list (pins Python `>=3.11,<3.13`; see compatibility notes in `ISSUES.md`).
 - Documentation (`PROJECT.md`, `PLAN.md`, `SOT.md`, `README.md`, etc.) describing the system and roadmap.
 - Strategic context (`ROADMAP.md`, `PLANNING_THOUGHTS.md`, `research/overview.md`) summarising milestones, planning questions, and competitor analysis.
-- `DUMMIES.md`: Catalog of temporary shims (Pydantic fallback, REST/gRPC stubs, Celery dummies, fake drivers) with removal
-  guidance now that dependencies can be installed.
+- `DUMMIES.md`: Catalog of temporary shims (REST/gRPC stubs, Celery dummies, fake drivers) with removal guidance and a retired
+  section for historical compatibility layers.
 
 ## Configuration (`meshmind/core/config.py`)
 - Loads environment variables for the active graph backend (`GRAPH_BACKEND`), Memgraph (`MEMGRAPH_URI`, `MEMGRAPH_USERNAME`,
@@ -42,7 +44,7 @@ Supporting assets:
 - Provides a module-level `settings` instance used across the client, drivers, CLI, and Celery tasks.
 
 ## Core Data Models (`meshmind/core/types.py`)
-- `Memory`: Pydantic model (or compatibility fallback) that represents a knowledge record, including embeddings, metadata, and optional TTL. Timestamp fields now default to timezone-aware UTC values to avoid naive datetime bugs.
+- `Memory`: Pydantic model that represents a knowledge record, including embeddings, metadata, and optional TTL. Timestamp fields now default to timezone-aware UTC values to avoid naive datetime bugs.
 - `Triplet`: Subject–predicate–object edge connecting two memory UUIDs with namespace and metadata.
 - `SearchConfig`: Retrieval configuration (encoder name, `top_k`, `rerank_k`, optional rerank model, metadata filters,
   hybrid weights).
@@ -96,7 +98,8 @@ Supporting assets:
 - `memory_manager.py`: CRUD façade over the active graph driver that forwards namespace/entity-label filters, pagination hints, search strings, and exposes aggregate counts alongside triplet listings.
 - `service.py`: Pydantic payloads and orchestration helpers shared by REST/gRPC surfaces. `MemoryService.search` leans on driver-side filtering before ranking, handles per-request LLM overrides (`use_llm_rerank`, `llm_models`, `llm_base_urls`, `llm_api_key`, `rerank_model`), and exposes `memory_counts` for CLI/HTTP usage.
 - `rest.py`: `create_app` returns a FastAPI application when available or a `RestAPIStub` for tests. Routes support pagination parameters and include `/memories/counts` for namespace/label summaries.
-- `grpc.py`: `GrpcServiceStub` plus simple request/response dataclasses mirroring planned RPCs.
+- `grpc.py`: `GrpcServiceStub` backed by generated protobuf messages (`meshmind/protos/memory_service.proto`) to keep the Python
+  stub aligned with the production RPC schema.
 
 ## Retrieval (`meshmind/retrieval`)
 - `filters.py`: Namespace, entity label, and metadata filtering helpers.
@@ -112,6 +115,7 @@ Supporting assets:
 - CLI bootstraps encoder and entity registries, validates configuration early, surfaces actionable errors when optional
   dependencies are missing, and routes predicate maintenance, telemetry inspection, and graph connectivity checks through
   `meshmind.cli.admin`.
+- Maintenance overrides (`--max-attempts`, `--base-delay`, `--run`) allow operators to tune consolidation retries per invocation before launching Celery or on-demand tasks.
 
 ## Tasks (`meshmind/tasks`)
 - `celery_app.py`: Creates the Celery application lazily, returning a shim when Celery is not installed.

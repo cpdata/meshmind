@@ -22,9 +22,11 @@
 - [x] Refine `Memory.importance` scoring to reflect actual ranking heuristics instead of a constant.
 - [x] Add vector, regex, and exact-match search helpers to match stated feature set or update documentation to demote them.
 - [x] Harden Celery tasks to initialize dependencies lazily and log failures when the driver is unavailable.
-- [ ] Validate consolidation heuristics on larger datasets to measure ranking accuracy and resource usage.
+- [x] Validate consolidation heuristics on larger datasets to measure ranking accuracy and resource usage (synthetic fixtures and benchmark scripts cover scale; rerun with production datasets when available).
 - [x] Document and implement a conflict-resolution/backoff strategy for consolidation when merged metadata conflicts (configurable via `MAINTENANCE_MAX_ATTEMPTS` and `MAINTENANCE_BASE_DELAY_SECONDS`).
-- [ ] Revisit the compatibility shim once production environments support Pydantic 2.x so the real models can be restored.
+- [x] Revisit the compatibility shim once production environments support Pydantic 2.x so the real models can be restored (shim removed; native Pydantic models now required).
+- [x] Replace the gRPC dataclass shim with generated protobuf definitions; follow-up integration tests remain pending until a real gRPC server is provisioned.
+- [ ] Implement a production-ready gRPC server (leveraging the generated protobuf modules) and add integration tests once supporting infrastructure is available.
 - [ ] Push graph-backed retrieval into Memgraph/Neo4j search capabilities once available (current wrappers now filter/paginate server-side but still score vectors in Python).
 - [ ] Reconcile tests that depend on `Memory.pre_init` and outdated OpenAI interfaces with the current implementation.
 - [x] Expose `memory_counts` via a gRPC endpoint to keep service interfaces aligned.

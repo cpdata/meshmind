@@ -4,7 +4,7 @@ from __future__ import annotations
 import warnings
 from typing import Iterable, Sequence, Type
 
-from meshmind._compat.pydantic import BaseModel
+from pydantic import BaseModel
 
 from meshmind.core.config import settings
 from meshmind.core.embeddings import EncoderRegistry, OpenAIEmbeddingEncoder

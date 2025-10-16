@@ -17,6 +17,8 @@ backends.
 - `meshmind/tests/test_tasks_scheduled.py`: assert maintenance consolidation retries handle transient conflicts via configurable backoff.
 - `meshmind/tests/test_docs_guard.py`: ensure the documentation guard script enforces wiki updates when code modules change.
 - `meshmind/tests/test_observability.py`: confirm telemetry metrics/counters update during preprocessing steps.
+- `meshmind/tests/test_benchmark_scripts.py`: smoke the benchmarking CLI utilities (`scripts/evaluate_importance.py`, `scripts/consolidation_benchmark.py`, `scripts/benchmark_pagination.py`).
+- `meshmind/tests/test_api_examples.py`: validate the documented curl/grpcurl payloads against the FastAPI app and gRPC stub.
 
 ## Fakes & Fixtures
 
@@ -39,6 +41,25 @@ Optional extras:
 - `PYTHONPATH=.` ensures imports resolve when running tests manually.
 - To test the Neo4j/Memgraph drivers, set `GRAPH_BACKEND` appropriately, point `MEMGRAPH_URI` / `NEO4J_URI` at the Docker
   services, and export credentials as described in `SETUP.md` and `ENVIRONMENT_NEEDS.md`.
+
+## Benchmarking Scripts
+
+MeshMind ships synthetic benchmarks that exercise the importance heuristic, consolidation planner, and graph pagination
+behaviour. Run them locally with the provided Make target:
+
+```bash
+make benchmarks
+```
+
+The command stores JSON summaries under `build/benchmarks/`:
+
+- `importance.json` – descriptive statistics for the heuristic across synthetic memories.
+- `consolidation.json` – retry counts, removals, and latency distributions for consolidation batches.
+- `pagination.json` – pagination duration and fetch counts for the configured graph backend (defaults to the in-memory driver).
+
+Adjust the script flags (for example `--backend`, `--iterations`, or `--count`) to stress alternative drivers or larger
+datasets; see `scripts/*.py` for supported options. Document notable findings in `FINDINGS.md` or `ENVIRONMENT_NEEDS.md`
+when tuning defaults for new environments.
 
 ## Adding Tests
 

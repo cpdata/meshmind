@@ -5,13 +5,15 @@
 - Maintain declared Python support at `>=3.11,<3.13` and monitor dependency releases before widening the range.
 - Harden the LLM-backed embedding adapter to consume SDK response objects directly and surface actionable errors for rate limits.
 - Expand automated smoke coverage (counts endpoints, maintenance retries) to the new SQLite/Neo4j drivers to ensure regressions are caught early.
-- Use `DUMMIES.md` to track compatibility layers and schedule their removal once real dependencies are part of the default
-  bootstrap path.
+- Continue using `DUMMIES.md` to track remaining shims (FastAPI/gRPC/Celery) and log retirements as dependencies graduate into the default bootstrap path.
 
 ## Restore and Extend Functionality
 - Extend the new server-side filtering and pagination work by pushing similarity ranking into Memgraph/Neo4j so vector scoring runs without loading namespaces in Python.
 - Validate consolidation heuristics at scale and tune the new exponential backoff settings (`MAINTENANCE_MAX_ATTEMPTS`, `MAINTENANCE_BASE_DELAY_SECONDS`) before enabling automated writes in production.
-- Introduce evaluation loops for the new importance heuristic (e.g., LLM-assisted ranking or analytics-driven weights) to tune thresholds over time, leveraging the telemetry stats now emitted.
+- Leverage the new benchmarking scripts (`scripts/evaluate_importance.py`, `scripts/consolidation_benchmark.py`, `scripts/benchmark_pagination.py`) to validate heuristics and driver performance; schedule follow-up runs against production-sized datasets.
+- Introduce feedback loops for the importance heuristic (e.g., LLM-assisted ranking or analytics-driven weights) to tune thresholds over time once real-world telemetry is available.
+- Promote the new protobuf-backed gRPC schema into a deployable server binary and publish generated clients (Python + other
+  languages) once infrastructure is available.
 - Exercise the new `llm_client` overrides via REST/gRPC integration smoke tests (once credentials are available) to confirm per-request models/endpoints behave consistently outside unit tests.
 - Expand predicate/registry management APIs beyond the CLI helper so services can manage vocabularies programmatically.
 - Plan for reintroducing full Pydantic models once packaging support is aligned with target Python versions.
@@ -20,7 +22,7 @@
 - Document usage patterns for each graph backend (memory/sqlite/memgraph/neo4j) inside `docs/` and keep the docs-guard mapping current so contributors know which pages to update when modules change.
 - Add Makefile targets for running Celery workers and seeding demo data once infrastructure is provisioned (potentially reusing
   the new Docker Compose stacks).
-- Broaden pytest coverage with cross-backend integration tests (Memgraph/Neo4j) and failure injection to complement the new graph retrieval, CLI admin, counts smoke, and maintenance backoff tests.
+- Broaden pytest coverage with cross-backend integration tests (Memgraph/Neo4j) and failure injection to complement the new graph retrieval, CLI admin, counts smoke, benchmark, and maintenance backoff tests.
 - Cache dependencies and split lint/test jobs in CI for faster feedback once the dependency stack stabilizes.
 - Maintain the new `run/install_setup.sh` and `run/maintenance_setup.sh` automation scripts alongside provisioning docs so environment bootstrap stays reproducible, and document timezone-aware timestamp expectations when integrating with downstream stores.
 

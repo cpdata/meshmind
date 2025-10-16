@@ -14,15 +14,9 @@
 
 ## Latest Changes
 
-- Created strategic references (`ROADMAP.md`, `PLANNING_THOUGHTS.md`, `research/overview.md`) to capture milestones, decision
-  context, and competitor analysis alongside the existing planning docs.
-- Added configurable maintenance retry controls (`MAINTENANCE_MAX_ATTEMPTS`, `MAINTENANCE_BASE_DELAY_SECONDS`) and implemented
-  exponential backoff for consolidation/compression writes. Updated `README.md`, `docs/configuration.md`, `docs/operations.md`,
-  `docs/telemetry.md`, and `SOT.md` to describe the new behaviour and metrics.
-- Introduced REST/CLI smoke coverage for `/memories/counts` via `meshmind/tests/test_counts_smoke.py` and expanded maintenance
-  tests in `meshmind/tests/test_tasks_scheduled.py` to assert retry semantics. `docs/testing.md` now highlights the new suites.
-- Refreshed `PROJECT.md`, `PLAN.md`, `RECOMMENDATIONS.md`, `FINDINGS.md`, `ISSUES.md`, `ENVIRONMENT_NEEDS.md`,
-  `NEEDED_FOR_TESTING.md`, and `RESUME_NOTES.md` to align with the retry controls, new docs, and expanded smoke coverage.
+- Generated protobuf modules (`meshmind/protos/memory_service.proto`) now back the gRPC stub; tests and docs were updated to reference the canonical schema instead of dataclasses.
+- Added a `make benchmarks` target that executes the synthetic benchmarking scripts and stores JSON output under `build/benchmarks/`, with documentation updates in `docs/testing.md` and `README.md`.
+- Refreshed planning and environment docs (`PROJECT.md`, `PLAN.md`, `RECOMMENDATIONS.md`, `FINDINGS.md`, `ISSUES.md`, `ENVIRONMENT_NEEDS.md`, `NEEDED_FOR_TESTING.md`, `CLEANUP.md`, `DUMMIES.md`, `ROADMAP.md`) to capture the protobuf integration and benchmarking workflow.
 
 ## Environment State
 
@@ -35,11 +29,11 @@
 
 ## Next Session Starting Points
 
-1. Work through the remaining `TODO.md` priority items (Neo4j validation, heuristic evaluation loops, gRPC definitions, backend-native vector search). Add follow-up tasks as new discoveries surface.
+1. Work through the remaining `TODO.md` priority items (Neo4j validation, backend-native vector search, benchmarking against live backends, regenerating locks). Add follow-up tasks as new discoveries surface.
 2. Validate Neo4j connectivity end-to-end once a reachable instance is available, using `meshmind admin graph --backend neo4j` and the docker-compose stack.
-3. Benchmark consolidation heuristics with larger datasets to tune the new maintenance retry defaults and record recommended values in `ENVIRONMENT_NEEDS.md` / `README.md`.
-4. Plan integration tests for LLM override payloads and counts endpoints against live REST/gRPC deployments when credentials and infrastructure are provisioned; update docs/testing accordingly.
-5. Continue chipping away at shim retirements documented in `DUMMIES.md`—prioritise reintroducing real Pydantic models once packaging constraints are resolved.
+3. Run the new benchmarking scripts against production-sized or synthetic datasets hosted externally to calibrate maintenance retry defaults and document recommended values in `ENVIRONMENT_NEEDS.md` / `README.md`.
+4. Promote the protobuf-backed gRPC stub into a real server once infrastructure is available, then add end-to-end tests using a live channel.
+5. Push vector similarity into Memgraph/Neo4j or document fallback limitations once native index strategies are available; continue updating `docs/api.md`/`docs/retrieval.md` with findings.
 
 ## Helpful References
 

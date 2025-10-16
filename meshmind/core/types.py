@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 from typing import Any, Optional, Tuple
 from uuid import UUID, uuid4
 
-from meshmind._compat.pydantic import BaseModel, Field
+from pydantic import BaseModel, Field
 
 
 def _utcnow() -> datetime:

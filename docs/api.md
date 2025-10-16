@@ -55,21 +55,34 @@ MeshMind exposes multiple integration points for ingestion and retrieval workflo
   }
   ```
 - The `RestAPIStub` mirrors these routes for tests without requiring FastAPI.
+- Example `curl` invocations against a local FastAPI server:
+  ```bash
+  curl -s -X POST http://localhost:8000/search \
+    -H "Content-Type: application/json" \
+    -d '{"query":"architecture","namespace":"demo","entity_labels":["Memory"],"top_k":5}'
+  curl -s "http://localhost:8000/memories/counts?namespace=demo"
+  ```
 
-## gRPC Stub (`meshmind.api.grpc`)
+## gRPC Service (`meshmind.api.grpc` + `meshmind/protos`)
 
-- Provides dataclasses representing typical RPC messages.
-- `GrpcServiceStub` implements the service interface in pure Python for unit tests and demos.
-- `SearchRequest` mirrors the REST payload including `entity_labels` to ensure consistent filtering semantics. It also carries
-  `use_llm_rerank`, `llm_models`, `llm_base_urls`, `llm_api_key`, and `rerank_model` so RPC callers can override LLM behaviour
-  per request. Overrides remain scoped to the single RPC and never mutate the global client configuration.
+- `meshmind/protos/memory_service.proto` defines the canonical MeshMind RPC schema. Running `python -m grpc_tools.protoc` on
+  the file regenerates `memory_service_pb2.py` and `memory_service_pb2_grpc.py`.
+- `GrpcServiceStub` wires the generated protobuf messages to the `MemoryService` business logic so unit tests and demos can run
+  without standing up a gRPC server.
+- `SearchPayload` mirrors the REST payload including `entity_labels`, `use_llm_rerank`, per-operation LLM overrides, and
+  rerank-specific settings. Overrides remain scoped to the single RPC and never mutate the global client configuration.
 - `MemoryCountsRequest` returns namespace/entity-label aggregates so service parity with REST/CLI is preserved.
+- A running gRPC server can be exercised with `grpcurl`:
+  ```bash
+  grpcurl -plaintext -d '{"namespace":"demo"}' localhost:50051 meshmind.api.MemoryService/MemoryCounts
+  ```
 
 ## CLI (`meshmind/cli`)
 
 - `meshmind.cli.__main__` bootstraps default encoders, validates configuration, and exposes ingestion commands.
 - `meshmind.cli.admin` contains administrative tasks for registry inspection, backend connectivity checks, memory counts,
-  and maintenance triggers.
+  and maintenance triggers. Use `meshmind admin maintenance --max-attempts <n> --base-delay <seconds> --run <task>` to
+  override retry/backoff settings per run.
 
 ## Client (`meshmind/client.py`)
 

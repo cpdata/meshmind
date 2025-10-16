@@ -15,7 +15,7 @@
 ## Mid-Term (2–6 Weeks)
 - Run load tests against SQLite and hosted graph backends to tune pagination defaults, consolidation heuristics, and token compression strategies.
 - Implement backend-native vector similarity queries and schema indexes so embeddings never leave the database during scoring.
-- Ship production gRPC definitions plus generated clients in multiple languages, aligning the Python stub with the canonical service contract.
+- Finalise the gRPC surface by packaging the existing protobuf schema with a deployable server and generated clients (Python + additional languages) so external agents can integrate without the in-process stub.
 - Instrument observability exports (Prometheus/OpenTelemetry) and wire dashboards/alerts for ingestion latency, queue depth, and error rates.
 - Replace compatibility shims with official Pydantic/FastAPI packages once dependency constraints are lifted, and backfill validation coverage.
 

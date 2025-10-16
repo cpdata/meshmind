@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from typing import Any, Iterable
 
-from meshmind._compat.pydantic import BaseModel
+from pydantic import BaseModel
 
 from meshmind.core.observability import log_event, telemetry
 from meshmind.core.types import Triplet
@@ -13,11 +13,11 @@ from meshmind.models.registry import EntityRegistry, PredicateRegistry
 
 def _props(obj: Any) -> dict[str, Any]:
     if isinstance(obj, BaseModel):
-        return obj.dict(exclude_none=True)
-    if hasattr(obj, "dict"):
+        return obj.model_dump(exclude_none=True)
+    if hasattr(obj, "dict") or hasattr(obj, "model_dump"):
         try:
-            return obj.dict(exclude_none=True)  # type: ignore[attr-defined]
-        except TypeError:
+            return obj.model_dump(exclude_none=True)  # type: ignore[attr-defined]
+        except (TypeError, AttributeError):
             pass
     if isinstance(obj, dict):
         return {k: v for k, v in obj.items() if v is not None}

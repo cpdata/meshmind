@@ -37,7 +37,7 @@ def extract_memories(
         llm_client = LLMClient(config)
 
     # Prepare function schema for Memory items
-    mem_schema = Memory.schema()
+    mem_schema = Memory.model_json_schema()
     function_spec = {
         "name": "extract_memories",
         "description": "Extract structured memories from text segments",
@@ -91,7 +91,7 @@ def extract_memories(
 
     memories = []
     # Instantiate Memory objects, validate entity labels, and compute embeddings
-    from meshmind._compat.pydantic import ValidationError
+    from pydantic import ValidationError
     encoder = EncoderRegistry.get(embedding_model)
     for entry in items:
         label = entry.get("entity_label")

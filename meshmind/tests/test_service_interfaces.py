@@ -1,15 +1,10 @@
 from uuid import UUID
 
-from meshmind.api.grpc import (
-    GrpcServiceStub,
-    IngestMemoriesRequest,
-    IngestTripletsRequest,
-    MemoryCountsRequest,
-    SearchRequest,
-)
+from meshmind.api.grpc import GrpcServiceStub, memory_to_proto, triplet_to_proto
 from meshmind.api.rest import RestAPIStub
 from meshmind.api.service import MemoryPayload, SearchPayload, TripletPayload
 from meshmind.core.types import Memory
+from meshmind.protos import memory_service_pb2 as pb2
 
 
 def _memory(name: str) -> MemoryPayload:
@@ -176,54 +171,57 @@ def test_memory_service_search_applies_llm_overrides(memory_service, dummy_encod
 
 def test_grpc_stub(memory_service, dummy_encoder):
     grpc = GrpcServiceStub(memory_service)
-    request = IngestMemoriesRequest(memories=[_memory("cherry").model_dump()])
+    request = pb2.IngestMemoriesRequest(
+        memories=[memory_to_proto(_memory("cherry").to_memory())]
+    )
     resp = grpc.IngestMemories(request)
     assert resp.uuids
 
     search_resp = grpc.Search(
-        SearchRequest(
+        pb2.SearchPayload(
             query="cherry",
             namespace="test",
-            encoder=dummy_encoder,
             top_k=1,
+            encoder=dummy_encoder,
             entity_labels=["Note"],
         )
     )
     assert search_resp.results
 
     memory_service.llm_client.calls.clear()
-    override_resp = grpc.Search(
-        SearchRequest(
-            query="cherry",
-            namespace="test",
-            encoder=dummy_encoder,
-            top_k=1,
-            entity_labels=["Note"],
-            use_llm_rerank=True,
-            llm_models={"rerank": "rerank-grpc"},
-            llm_base_urls={"rerank": "https://llm.example/grpc"},
-            llm_api_key="override-key",
-        )
+    override_request = pb2.SearchPayload(
+        query="cherry",
+        namespace="test",
+        top_k=1,
+        encoder=dummy_encoder,
+        entity_labels=["Note"],
+        use_llm_rerank=True,
+        llm_models={"rerank": "rerank-grpc"},
+        llm_base_urls={"rerank": "https://llm.example/grpc"},
+        llm_api_key="override-key",
     )
+    override_resp = grpc.Search(override_request)
     assert override_resp.results
     assert memory_service.llm_client.calls
     grpc_call = memory_service.llm_client.calls[-1]
     assert grpc_call["model"] == "rerank-grpc"
     assert grpc_call["base_url"] == "https://llm.example/grpc"
 
-    counts_resp = grpc.MemoryCounts(MemoryCountsRequest(namespace="test"))
-    assert counts_resp.counts["test"]["Note"] >= 1
+    counts_resp = grpc.MemoryCounts(pb2.MemoryCountsRequest(namespace="test"))
+    assert counts_resp.counts["test"].entity_counts["Note"] >= 1
 
     triplet_resp = grpc.IngestTriplets(
-        IngestTripletsRequest(
+        pb2.IngestTripletsRequest(
             triplets=[
-                TripletPayload(
-                    subject=resp.uuids[0],
-                    predicate="linked_to",
-                    object=resp.uuids[0],
-                    namespace="test",
-                    entity_label="Relation",
-                ).model_dump()
+                triplet_to_proto(
+                    TripletPayload(
+                        subject=resp.uuids[0],
+                        predicate="linked_to",
+                        object=resp.uuids[0],
+                        namespace="test",
+                        entity_label="Relation",
+                    ).to_triplet()
+                )
             ]
         )
     )

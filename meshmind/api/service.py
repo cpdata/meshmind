@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from typing import Any, Callable, Dict, Iterable, List, Optional, Sequence
 
-from meshmind._compat.pydantic import BaseModel, Field
+from pydantic import BaseModel, Field
 
 from meshmind.api.memory_manager import MemoryManager
 from meshmind.core.types import Memory, SearchConfig, Triplet

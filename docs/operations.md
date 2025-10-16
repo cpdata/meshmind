@@ -48,10 +48,16 @@ This guide covers operational tasks for MeshMind deployments.
   - Validate backend connectivity (Neo4j/Memgraph/SQLite).
   - Summarize stored memories via `mesh admin counts --namespace <ns>` grouped by entity label.
   - Run consolidation plans manually.
+  - Tune maintenance retries per invocation with `meshmind admin maintenance --max-attempts <n> --base-delay <seconds> --run <task>`.
   - Inspect registry contents.
   - Summarize configuration with sensitive values masked.
   Automated smoke tests exercise the `/memories/counts` REST endpoint and the CLI counts command using the in-memory driver so
   documentation stays in sync with working behaviour.
+
+## Benchmarking Utilities
+
+- `make benchmarks` runs the synthetic benchmarking scripts (`scripts/evaluate_importance.py`, `scripts/consolidation_benchmark.py`, `scripts/benchmark_pagination.py`) with fast defaults and stores JSON summaries in `build/benchmarks/`.
+- Override script flags to stress specific backends (for example `--backend neo4j` or higher iteration counts) once live services are provisioned, and capture findings in `FINDINGS.md` / `ENVIRONMENT_NEEDS.md`.
 
 ## Deployment Considerations
 

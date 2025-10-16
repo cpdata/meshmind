@@ -1,8 +1,9 @@
 import pytest
 
 from datetime import datetime, timezone
+from random import Random
 
-from meshmind.pipeline.consolidate import consolidate_memories
+from meshmind.pipeline.consolidate import ConsolidationSettings, consolidate_memories
 from meshmind.pipeline.preprocess import (
     compress,
     deduplicate,
@@ -120,6 +121,44 @@ def test_consolidate_memories_merges_duplicates():
     outcome = plan.outcomes[0]
     assert "consolidated_summary" in outcome.updated.metadata
     assert outcome.removed_ids
+
+
+def test_consolidate_memories_scales_with_large_dataset():
+    rng = Random(42)
+    memories: list[Memory] = []
+    for namespace_idx in range(3):
+        namespace = f"bulk-{namespace_idx}"
+        for group_idx in range(10):
+            base_name = f"Entity {namespace_idx}-{group_idx}"
+            primary = make_memory(base_name)
+            primary.namespace = namespace
+            primary.metadata = {"content": f"{base_name} base description"}
+            primary.importance = round(rng.random() + 0.5, 3)
+            memories.append(primary)
+            for dup_idx in range(7):
+                duplicate = make_memory(base_name)
+                duplicate.namespace = namespace
+                duplicate.metadata = {
+                    "content": f"{base_name} duplicate {dup_idx}",
+                    "summary": f"{base_name} summary {dup_idx}",
+                }
+                duplicate.importance = max(primary.importance - 0.1, 0.1)
+                memories.append(duplicate)
+
+    settings = ConsolidationSettings(
+        max_group_size=25,
+        max_updates=400,
+        max_updates_per_namespace=150,
+    )
+    plan = consolidate_memories(memories, settings=settings)
+
+    assert len(plan.outcomes) == 30
+    removed_total = sum(len(outcome.removed_ids) for outcome in plan)
+    assert removed_total == len(memories) - len(plan.outcomes)
+    for outcome in plan:
+        assert outcome.updated.metadata.get("consolidated_summary")
+        assert outcome.updated.importance is not None
+        assert all(uid for uid in outcome.removed_ids)
 
 
 def test_store_memories_calls_driver():

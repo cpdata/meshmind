@@ -2,9 +2,11 @@
 
 ## General Observations
 - Core modules are now wired through the `MeshMind` client, including CRUD, triplet storage, and retrieval helpers. Graph-backed wrappers fetch namespace/entity-label filtered candidates from the configured driver automatically; remaining integration work focuses on server-side query optimisation and heuristic evaluation loops.
-- Optional dependencies are largely guarded behind lazy imports, compatibility shims, or factory functions, improving portability. Environments still need to install tooling referenced by the Makefile and CI (ruff, pyright, typeguard, toml-sort, yamllint). `DUMMIES.md` now tracks every shim so we can retire them as integration coverage expands.
+- Optional dependencies are largely guarded behind lazy imports or factory functions, improving portability. Environments still need to install tooling referenced by the Makefile and CI (ruff, pyright, typeguard, toml-sort, yamllint). `DUMMIES.md` now tracks remaining shims (FastAPI/gRPC/Celery) and documents retired items such as the former Pydantic fallback.
 - LLM usage is now centralized in `meshmind.llm_client` with per-operation defaults cascading from `LLM_*` environment variables and CLI overrides, reducing the risk of divergent configurations across pipelines and retrieval. REST/gRPC payloads now provide matching override dictionaries so services can experiment per request.
 - Timestamp helpers default to timezone-aware UTC, eliminating naive datetime outputs that previously leaked into maintenance pipelines and compatibility shims.
+- The gRPC interface is now defined by `meshmind/protos/memory_service.proto`; generated Python modules back the `GrpcServiceStub`
+  so tests and future services share a canonical schema without bespoke dataclasses.
 - Documentation artifacts (`README.md`, `SOT.md`, `ENVIRONMENT_NEEDS.md`, `docs/`) stay current when updated with each iteration; the legacy README has been archived as `README_OLD.md`. A docs-guard script now enforces synchronized updates during CI.
 
 ## Dependency & Environment Notes
@@ -20,7 +22,7 @@
   wrapper.
 - Celery tasks initialize lazily, yet Redis/Memgraph services are still required at runtime. Docker Compose now provisions
   Memgraph, Neo4j, and Redis, while targeted stacks under `meshmind/tests/docker/` support integration testing. `SETUP.md`
-  explains provisioning and teardown commands.
+  explains provisioning and teardown commands, and `scripts/benchmark_pagination.py` offers an offline way to measure driver throughput before integrating external services.
 
 ## Data Flow & Persistence
 - Triplet storage now persists relationships and tracks predicates automatically, closing an earlier data-loss gap.
@@ -28,13 +30,15 @@
 - Importance scoring uses heuristics (token diversity, recency, metadata richness, embedding magnitude) and now records telemetry summaries; continued evaluation will raise retrieval quality.
 
 ## CLI & Tooling
-- CLI ingestion bootstraps encoders and entities automatically and now ships `admin` subcommands for predicate maintenance, telemetry dumps, graph connectivity checks, and namespace/entity counts. Automated smoke tests cover the counts workflow end-to-end using the in-memory driver. External backends still require valid credentials and running services.
+- CLI ingestion bootstraps encoders and entities automatically and now ships `admin` subcommands for predicate maintenance, telemetry dumps, graph connectivity checks, namespace/entity counts, and per-run maintenance overrides (`--max-attempts`, `--base-delay`, `--run`). Automated smoke tests cover the counts workflow end-to-end using the in-memory driver. External backends still require valid credentials and running services.
 - The Makefile introduces lint, format, type-check, test, and docs-guard targets, plus Docker helpers. External tooling installation is
   required before targets succeed.
+- A `make benchmarks` target now executes the synthetic benchmarking scripts and writes JSON summaries under `build/benchmarks/`,
+  simplifying regression tracking for importance scoring, consolidation retries, and pagination performance.
 - GitHub Actions now run formatting checks, the docs guard, and pytest on push/PR, providing basic CI coverage.
 
 ## Testing & Quality
-- Pytest suites rely on fixtures (`memory_factory`, `dummy_encoder`) and compatibility shims to run without external services. Coverage now includes graph-backed retrieval wrappers, Neo4j connectivity shims, CLI admin flows, counts smoke tests, docs guard checks, and Celery consolidation telemetry/backoff handling.
+- Pytest suites rely on fixtures (`memory_factory`, `dummy_encoder`) and fake drivers to run without external services. Coverage now includes graph-backed retrieval wrappers, Neo4j connectivity shims, CLI admin flows, counts smoke tests, docs guard checks, Celery consolidation telemetry/backoff handling, the new benchmarking scripts, and REST/gRPC example payloads.
 - Type checking via `pyright` and runtime checks via `typeguard` are exposed in the Makefile; dependency installation is
   necessary for full validation.
 

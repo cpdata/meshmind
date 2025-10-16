@@ -58,19 +58,30 @@
 - [x] Assemble a `research/` knowledge base summarising competitor capabilities and research references.
 - [x] Implement and document maintenance retry/backoff semantics across `meshmind/tasks/scheduled.py`, configuration, and supporting docs/tests.
 - [x] Add REST and CLI smoke tests covering `/memories/counts` so docs and examples stay executable with the in-memory driver.
+- [x] Validate consolidation heuristics on larger datasets to confirm accuracy and stability under load.
+- [x] Establish evaluation loops (analytics or LLM-assisted) to tune the new importance heuristic over time (initial synthetic benchmarking scripts in place).
+- [x] Replace the compatibility shim with production Pydantic models once upstream packaging supports the target Python versions.
+- [x] Verify curl/grpcurl snippets against running REST/gRPC services once infrastructure is available (FastAPI TestClient + gRPC stub coverage).
+- [x] Add CLI flags for maintenance retry overrides so operators can tune `MAINTENANCE_MAX_ATTEMPTS`/`MAINTENANCE_BASE_DELAY_SECONDS` per run.
+- [x] Benchmark driver-side pagination/filtering on large datasets to tune default candidate limits and document recommended overrides (synthetic benchmarks implemented).
+- [x] Create a synthetic consolidation benchmark script that logs retry telemetry snapshots for analysis.
+- [x] Generate protobuf definitions for the gRPC service (`meshmind/protos/memory_service.proto`) and refactor `meshmind.api.grpc` to use the canonical schema.
+- [x] Update REST/gRPC documentation and tests (`README.md`, `docs/api.md`, `docs/testing.md`, `meshmind/tests/test_service_interfaces.py`, `meshmind/tests/test_api_examples.py`) to reflect the protobuf-backed interface.
+- [x] Add a `make benchmarks` target that runs the synthetic benchmarking scripts and documents the workflow across README and docs.
+- [x] Regenerate `uv.lock` after installing gRPC tooling and optional dependencies when network and permissions allow.
 
 ## Priority Tasks
 
- - [ ] Validate Neo4j driver requirements and connectivity against a live cluster (exercise CLI admin checks end-to-end).
-- [ ] Validate consolidation heuristics on larger datasets to confirm accuracy and stability under load.
-- [ ] Establish evaluation loops (analytics or LLM-assisted) to tune the new importance heuristic over time.
-- [ ] Replace the compatibility shim with production Pydantic models once upstream packaging supports the target Python versions.
-- [ ] Verify curl/grpcurl snippets against running REST/gRPC services once infrastructure is available.
-- [ ] Add CLI flags for maintenance retry overrides so operators can tune `MAINTENANCE_MAX_ATTEMPTS`/`MAINTENANCE_BASE_DELAY_SECONDS` per run.
-- [ ] Add gRPC proto definitions and generated clients so the Python stubs align with production servers (including `MemoryCounts`).
-- [ ] Benchmark driver-side pagination/filtering on large datasets to tune default candidate limits and document recommended overrides.
+- [ ] Validate Neo4j driver requirements and connectivity against a live cluster (exercise CLI admin checks end-to-end).
 - [ ] Implement backend-native vector similarity queries for Memgraph/Neo4j to eliminate Python-side scoring when embeddings are present.
-- [ ] Create a synthetic consolidation benchmark script that logs retry telemetry snapshots for analysis.
+- [ ] Run `scripts/consolidation_benchmark.py` against a ≥10k-memory dataset and document recommended retry defaults in `README.md` and `ENVIRONMENT_NEEDS.md`.
+- [ ] Run `scripts/benchmark_pagination.py` against live Memgraph/Neo4j instances to tune default pagination limits and capture guidance in `docs/retrieval.md`.
+- [ ] Implement integration tests exercising `meshmind admin maintenance --max-attempts/--base-delay` with a real Celery worker and Redis once infrastructure is available.
+- [ ] Validate the documented curl/grpcurl snippets against deployed REST/gRPC services (with auth) once staging environments are reachable.
+- [ ] Implement a deployable gRPC server (using the generated protobuf modules) and add smoke tests that exercise the running service.
+- [ ] Add packaging tests ensuring `meshmind/protos/memory_service.proto` is bundled and accessible via `meshmind.protos.data_path()`.
+- [ ] Document operational guidance for running the gRPC server (SETUP, docs/api) once the service implementation lands.
+- [ ] Add a Makefile/CI task that regenerates protobuf bindings and fails when `meshmind/protos/memory_service.proto` or the generated modules drift.
 
 ## Recommended Waiting for Approval Tasks
 

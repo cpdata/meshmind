@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Any, Dict, List, Optional, Sequence
 from uuid import UUID
 
-from meshmind._compat.pydantic import BaseModel
+from pydantic import BaseModel
 
 from meshmind.core.types import Memory, Triplet
 
@@ -17,11 +17,11 @@ class MemoryManager:
     @staticmethod
     def _props(model: Any) -> Dict[str, Any]:
         if isinstance(model, BaseModel):
-            return model.dict(exclude_none=True)
-        if hasattr(model, "dict"):
+            return model.model_dump(exclude_none=True)
+        if hasattr(model, "dict") or hasattr(model, "model_dump"):
             try:
-                return model.dict(exclude_none=True)  # type: ignore[attr-defined]
-            except TypeError:
+                return model.model_dump(exclude_none=True)  # type: ignore[attr-defined]
+            except (TypeError, AttributeError):
                 pass
         if isinstance(model, dict):
             return {k: v for k, v in model.items() if v is not None}

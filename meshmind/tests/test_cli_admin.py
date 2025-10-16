@@ -1,4 +1,5 @@
 from argparse import Namespace
+from argparse import Namespace
 from io import StringIO
 
 import pytest
@@ -32,9 +33,47 @@ def test_handle_predicates_add_list_remove():
 def test_handle_maintenance_outputs_snapshot():
     telemetry.increment("events.test")
     stream = StringIO()
-    admin.handle_maintenance(Namespace(reset=False), stream=stream)
+    admin.handle_maintenance(
+        Namespace(reset=False, max_attempts=None, base_delay=None, run=None),
+        stream=stream,
+    )
     output = stream.getvalue()
     assert "events.test" in output
+
+
+def test_handle_maintenance_overrides_and_runs(monkeypatch):
+    original_max = admin.settings.MAINTENANCE_MAX_ATTEMPTS
+    original_delay = admin.settings.MAINTENANCE_BASE_DELAY_SECONDS
+    calls: list[str] = []
+
+    def fake_consolidate():
+        calls.append("consolidate")
+        return {"merged": 1}
+
+    monkeypatch.setattr(
+        "meshmind.tasks.scheduled.consolidate_task", fake_consolidate
+    )
+
+    try:
+        stream = StringIO()
+        admin.handle_maintenance(
+            Namespace(
+                reset=False,
+                max_attempts=5,
+                base_delay=2.5,
+                run="consolidate",
+            ),
+            stream=stream,
+        )
+        assert admin.settings.MAINTENANCE_MAX_ATTEMPTS == 5
+        assert admin.settings.MAINTENANCE_BASE_DELAY_SECONDS == 2.5
+        assert calls == ["consolidate"]
+        output = stream.getvalue()
+        assert '"task": "consolidate"' in output
+        assert "MAINTENANCE_MAX_ATTEMPTS" in output
+    finally:
+        admin.settings.MAINTENANCE_MAX_ATTEMPTS = original_max
+        admin.settings.MAINTENANCE_BASE_DELAY_SECONDS = original_delay
 
 
 def test_handle_graph_check_with_verify(monkeypatch):

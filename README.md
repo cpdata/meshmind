@@ -15,7 +15,7 @@ regex, exact-match, fuzzy, and BM25 scoring with optional LLM reranking.
 - ✅ Docker Compose provisions Memgraph, Neo4j, and Redis for local orchestration, with
   integration-specific stacks under `meshmind/tests/docker/` for Celery workers.
 - ✅ Built-in observability surfaces structured events and in-memory metrics for pipelines and scheduled tasks while Celery consolidation/compression flows now persist their updates.
-- ✅ Compatibility shims and fake drivers let the suite run without Pydantic, scikit-learn, rapidfuzz, Redis, or live Memgraph instances.
+- ✅ Native Pydantic 2.x models and fake drivers let the suite run without scikit-learn, rapidfuzz, Redis, or live Memgraph instances.
 - ✅ Graph-backed retrieval wrappers load memories directly from the configured driver when collections are omitted.
 - ✅ Graph drivers filter by namespace and entity label before hydrating candidates, keeping hybrid searches efficient on large graphs.
 
@@ -171,7 +171,7 @@ Administrative helpers expose predicate registry and telemetry insight:
 ```bash
 meshmind admin predicates --list
 meshmind admin predicates --add RELATED_TO
-meshmind admin maintenance
+meshmind admin maintenance --max-attempts 5 --base-delay 2.5 --run consolidate
 meshmind admin graph --backend neo4j
 meshmind admin counts --namespace demo
 ```
@@ -181,7 +181,7 @@ Celery tasks in `meshmind.tasks.scheduled` provide expiry, consolidation, and co
 ```bash
 celery -A meshmind.tasks.celery_app.app worker -B
 ```
-Tasks instantiate the driver lazily, emit structured logs/metrics, and persist consolidated or compressed memories back to the selected graph driver. Consolidation writes now honour exponential backoff and retry semantics driven by `MAINTENANCE_MAX_ATTEMPTS` and `MAINTENANCE_BASE_DELAY_SECONDS`, logging every conflict and recording telemetry about retry durations. Provide valid environment variables and ensure Memgraph/Redis are running when using external backends.
+Tasks instantiate the driver lazily, emit structured logs/metrics, and persist consolidated or compressed memories back to the selected graph driver. Consolidation writes now honour exponential backoff and retry semantics driven by `MAINTENANCE_MAX_ATTEMPTS` and `MAINTENANCE_BASE_DELAY_SECONDS`, logging every conflict and recording telemetry about retry durations. You can override those values before triggering Celery or the on-demand CLI by supplying `meshmind admin maintenance --max-attempts ... --base-delay ... --run <task>`. Provide valid environment variables and ensure Memgraph/Redis are running when using external backends.
 
 ## Tooling
 - **Makefile** – `make fmt`, `make lint`, `make typecheck`, `make test`, `make check`, `make docker`, `make clean`,
@@ -196,6 +196,15 @@ Tasks instantiate the driver lazily, emit structured logs/metrics, and persist c
   `neo4j`, `pymgclient`, `uvicorn`) are present and respect `MESH_SKIP_SYSTEM_PACKAGES=1` / `MESH_SKIP_PYTHON_SYNC=1` when you
   need a dry run without network access.
 
+## Benchmarking & Evaluation
+- **Importance scoring** – `scripts/evaluate_importance.py` runs the heuristic against JSON or synthetic datasets and reports
+  descriptive statistics for quick regression checks.
+- **Consolidation throughput** – `scripts/consolidation_benchmark.py` generates synthetic workloads to measure batch merging
+  duration, skipped groups, and retry behaviour across configuration options.
+- **Driver pagination** – `scripts/benchmark_pagination.py` seeds synthetic memories into the selected backend and records
+  list latency by page size so operators can tune defaults before production rollouts.
+  Use `make benchmarks` to run all three scripts with synthetic defaults and capture JSON summaries under `build/benchmarks/`.
+
 ## Service Interfaces
 - **REST** – `meshmind.api.rest.create_app` returns a FastAPI app (or lightweight stub) that exposes `/memories`, `/triplets`,
   `/search`, and `/memories/counts` endpoints. Search payloads accept:
@@ -203,20 +212,31 @@ Tasks instantiate the driver lazily, emit structured logs/metrics, and persist c
   - `llm_models`, `llm_base_urls`, and `llm_api_key` dictionaries for per-request overrides,
   - `rerank_model` when you need to pin the reranker explicitly.
   Example:
-  ```json
+-  ```json
   {
     "query": "architecture",
     "namespace": "demo",
-    "entity_labels": ["Knowledge"],
+    "entity_labels": ["Memory"],
     "top_k": 5,
     "use_llm_rerank": true,
     "llm_models": {"rerank": "openrouter/reranker-v1"},
     "llm_base_urls": {"rerank": "https://openrouter.ai/api/v1"}
   }
   ```
-- **gRPC** – `meshmind.api.grpc.GrpcServiceStub` mirrors the ingestion and retrieval RPC surface for integration tests and
-  future server wiring. `SearchRequest` now carries the same LLM override fields as the REST payload so clients can experiment
-  with alternative endpoints or models without diverging code paths.
+  Equivalent `curl` invocations against a local FastAPI instance:
+  ```bash
+  curl -s -X POST http://localhost:8000/search \
+    -H "Content-Type: application/json" \
+    -d '{"query":"architecture","namespace":"demo","entity_labels":["Memory"],"top_k":5}'
+  curl -s "http://localhost:8000/memories/counts?namespace=demo"
+  ```
+- **gRPC** – `meshmind/protos/memory_service.proto` defines the canonical schema and generates the Python modules consumed by
+  `meshmind.api.grpc.GrpcServiceStub`. The stub mirrors the ingestion and retrieval RPC surface so integration tests can run
+  without deploying a gRPC server, and the generated `SearchPayload` message carries the same LLM override fields as the REST
+  payload. To exercise a running gRPC server, use:
+  ```bash
+  grpcurl -plaintext -d '{"namespace":"demo"}' localhost:50051 meshmind.api.MemoryService/MemoryCounts
+  ```
 - **CLI** – `meshmind admin counts` proxies the new driver aggregation helper so operators can audit namespace/entity totals.
   Automated smoke tests cover the REST `/memories/counts` route and the CLI command using the in-memory driver, ensuring
   documentation snippets stay aligned with the live interface.
@@ -239,15 +259,15 @@ Tasks instantiate the driver lazily, emit structured logs/metrics, and persist c
 - `meshmind.core.observability.log_event` emits structured log messages that annotate pipeline progress.
 - Metrics remain in-memory today; export hooks (Prometheus, OpenTelemetry) are future enhancements.
 
-## Compatibility & Test Doubles
-- `meshmind/_compat/pydantic.py` provides a lightweight `BaseModel` implementation so the codebase functions without installing Pydantic.
+## Test Doubles & Offline Helpers
+- MeshMind now depends on first-party Pydantic 2.x models; the legacy compatibility shim has been removed.
 - `meshmind/retrieval/bm25.py`, `meshmind/retrieval/fuzzy.py`, and `meshmind/core/similarity.py` include pure-Python fallbacks for scikit-learn, rapidfuzz, and numpy.
 - `meshmind/testing` exports fake Memgraph, Redis, and embedding drivers that power the pytest suite and examples without external infrastructure.
 - `DUMMIES.md` lists every remaining stub (REST/gRPC service adapters, Celery fallbacks, compatibility layers) with guidance
   on whether to remove or preserve them once external services are provisioned.
 
 ## Testing
-- Run `pytest` to execute the suite; tests rely on fixtures, fake drivers, and compatibility shims so they do not require external services or optional libraries.
+- Run `pytest` to execute the suite; tests rely on fixtures and fake drivers so they do not require external services or optional libraries.
 - `make typecheck` invokes `pyright` and `typeguard`; install the tooling listed above beforehand.
 - See `ENVIRONMENT_NEEDS.md` for environment requirements and known blockers (Docker/Memgraph/Redis availability).
 
