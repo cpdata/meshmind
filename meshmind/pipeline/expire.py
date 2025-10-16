@@ -1,7 +1,5 @@
-"""
-Pipeline for expiring memories with TTL.
-"""
-from datetime import datetime, timedelta
+"""Pipeline for expiring memories with TTL."""
+from datetime import datetime, timedelta, timezone
 from typing import List
 
 from meshmind.api.memory_manager import MemoryManager
@@ -18,7 +16,7 @@ def expire_memories(manager: MemoryManager) -> List[str]:
     expired = []
     # List all memories
     memories = manager.list_memories()
-    now = datetime.utcnow()
+    now = datetime.now(timezone.utc)
     for mem in memories:
         ttl = getattr(mem, 'ttl_seconds', None)
         if ttl is None:
