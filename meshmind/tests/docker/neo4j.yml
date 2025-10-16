@@ -1,0 +1,28 @@
+version: "3.9"
+
+services:
+  neo4j:
+    image: neo4j:5.26
+    container_name: meshmind-test-neo4j
+    restart: unless-stopped
+    ports:
+      - "17474:7474"
+      - "17688:7687"
+    environment:
+      NEO4J_AUTH: neo4j/meshminD123
+      NEO4J_PLUGINS: '["apoc"]'
+      NEO4J_dbms_security_procedures_unrestricted: apoc.*
+      NEO4J_apoc_import_file_enabled: "true"
+      NEO4J_apoc_export_file_enabled: "true"
+    healthcheck:
+      test: ["CMD", "cypher-shell", "-u", "neo4j", "-p", "meshminD123", "RETURN 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+    volumes:
+      - neo4j-test-data:/data
+      - neo4j-test-logs:/logs
+
+volumes:
+  neo4j-test-data:
+  neo4j-test-logs:
