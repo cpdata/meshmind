@@ -10,37 +10,34 @@ place, and the exact remediation steps required to bring the implementation in l
 - **Files**: `meshmind/_compat/pydantic.py`, modules importing from `meshmind._compat.pydantic`.
 - **Status**: Completed – the shim has been removed, `pydantic>=2.11` is a required dependency, and all models/tests now consume the official APIs directly.
 
-### Retire FastAPI Stub
+### Retire FastAPI Stub (Completed)
 - **Files**: `meshmind/api/rest.py`, `meshmind/api/service.py`, `docs/api.md`, `SETUP.md`.
-- **Current State**: A lightweight FastAPI replacement exposes REST endpoints without requiring the framework.
-- **Action**:
-  1. Install `fastapi`, `uvicorn`, and related extras via the setup scripts.
-  2. Replace the stub implementation with a true FastAPI app using pydantic request/response models.
-  3. Update tests to spin up the FastAPI test client instead of the stub.
-  4. Refresh documentation to reflect the production stack only.
+- **Status**: Completed – the REST layer now requires FastAPI, tests rely on
+  `fastapi.testclient.TestClient`, and documentation reflects the production
+  stack.
 
 ### Replace gRPC Dataclass Shim (Completed)
 - **Files**: `meshmind/api/grpc.py`, `meshmind/protos/memory_service.proto`, `meshmind/tests/test_service_interfaces.py`, `docs/api.md`.
 - **Status**: Completed – protobuf definitions now live under `meshmind/protos`, generated modules back the Python stub, setup scripts install `grpcio`/`grpcio-tools`, and tests exercise the canonical schema.
 
 ### Promote gRPC Server Implementation
-- **Files**: `meshmind/api/grpc.py`, future server entry point, integration tests.
-- **Current State**: Tests rely on the in-process stub; there is no deployable server or channel bootstrap yet.
+- **Files**: `meshmind/api/grpc.py`, `meshmind/api/grpc_server.py`, CLI entry points,
+  integration tests.
+- **Current State**: An asyncio server helper and CLI (`meshmind serve-grpc`) now
+  run the service; Docker Compose provisions a gRPC container. Integration tests
+  against a live server remain outstanding.
 - **Action**:
-  1. Implement a gRPC server (synchronous or `grpc.aio`) that binds the generated service to an actual channel.
-  2. Add integration tests (possibly using `grpc.aio.insecure_channel`) that cover ingestion, search, and memory counts against the running server.
-  3. Document provisioning steps (`SETUP.md`, `docs/api.md`) and add CLI helpers or docker-compose services if required.
+  1. Add integration tests (possibly using `grpc.aio.insecure_channel`) that cover
+     ingestion, search, and memory counts against the running server.
+  2. Publish generated client artifacts for downstream consumers once
+     infrastructure is available.
 
 ## Task Scheduling Workarounds
 
-### Remove Celery Dummy App and Beat Fallback
+### Remove Celery Dummy App and Beat Fallback (Completed)
 - **Files**: `meshmind/tasks/celery_app.py`, `meshmind/tasks/scheduled.py`.
-- **Current State**: Custom placeholders allow imports without Celery and Celery Beat.
-- **Action**:
-  1. Make `celery` a required dependency for maintenance tasks.
-  2. Refactor scheduling utilities to import real Celery constructs and fail fast when misconfigured.
-  3. Add integration tests that execute Celery workers against Redis or RabbitMQ in docker-compose.
-  4. Delete fallback classes once coverage exists.
+- **Status**: Completed – Celery is a required dependency, the runtime imports the
+  real app/beat scheduler, and docker-compose stacks provision Redis for workers.
 
 ## Testing Fakes
 

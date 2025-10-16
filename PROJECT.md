@@ -19,9 +19,10 @@
   initialize lazily so import-time failures are avoided.
 - **Support code**: `meshmind.core` provides configuration, data models, embeddings, similarity math, and optional dependency
   guards around tokenization.
-- **Service adapters**: `meshmind.api.rest` and `.grpc` expose REST/gRPC entry points. The gRPC surface now uses generated
-  protobuf messages (`meshmind/protos/memory_service.proto`) and runtime helpers in `meshmind.api.grpc_server` so tests,
-  scripts, and deployments share a canonical schema while retaining the in-process stub for fast feedback.
+- **Service adapters**: `meshmind.api.rest` exposes a FastAPI application, while
+  `.grpc` ships generated protobuf stubs alongside asyncio server helpers and a CLI
+  (`meshmind serve-grpc`) so deployments share a canonical schema while retaining
+  the in-process stub for fast feedback.
 - **Observability**: `meshmind.core.observability` collects metrics, gauges, and structured log events across pipelines and
   scheduled tasks.
 - **Tooling**: The CLI ingest command (`meshmind ingest`), updated example script, Makefile automation, CI workflow, and Docker
@@ -54,8 +55,8 @@
 - Graph-backed retrieval still hydrates namespace/entity-label filtered candidates client-side; pushing ranking into the graph store is future work.
 - Predicate management remains internal to the bootstrap process; external administration APIs are still missing.
 - Metrics remain in-memory; external exporters (Prometheus/OpenTelemetry) are not wired up.
-- gRPC deployments now rely on the asyncio server helpers; packaging an executable entry point and adding end-to-end integration
-  tests remain future work.
+- gRPC deployments now rely on the asyncio server helpers; end-to-end integration
+  tests against a live CLI-managed server remain future work.
 
 ## External Services & Dependencies
 - **Graph backend**: Choose via `GRAPH_BACKEND`. In-memory and SQLite require no external services. Memgraph needs the `pymgclient` package (which exposes the `mgclient` module);

@@ -73,6 +73,12 @@
 - [x] Add packaging tests to guarantee `meshmind/protos/memory_service.proto` ships with the distribution and exposes the expected service definition.
 - [x] Document runtime and operational guidance for the gRPC server across README, SETUP, `docs/api.md`, and `docs/operations.md`.
 - [x] Add Makefile and CI targets (`make protos`, `make protos-check`) plus scripts to regenerate/verify protobuf bindings, failing CI when drift occurs.
+- [x] Replace the REST stub with the concrete FastAPI application and migrate smoke tests to `fastapi.testclient.TestClient`.
+- [x] Remove Celery dummy fallbacks by requiring the real app/beat imports and keeping docker-compose stacks in sync.
+- [x] Add a `serve-grpc` CLI subcommand and verify it delegates to the runtime helpers.
+- [x] Teach docker-compose stacks (root and `meshmind/tests/docker/full-stack.yml`) to launch the gRPC service via the new CLI entry point.
+- [x] Add pytest coverage for `scripts/check_protos.py` so protobuf drift detection stays exercised.
+- [x] Expand the documentation guard mapping to require API/operations updates when CLI modules change.
 
 ## Priority Tasks
 
@@ -82,14 +88,16 @@
 - [ ] Run `scripts/benchmark_pagination.py` against live Memgraph/Neo4j instances to tune default pagination limits and capture guidance in `docs/retrieval.md`.
 - [ ] Implement integration tests exercising `meshmind admin maintenance --max-attempts/--base-delay` with a real Celery worker and Redis once infrastructure is available.
 - [ ] Validate the documented curl/grpcurl snippets against deployed REST/gRPC services (with auth) once staging environments are reachable.
-- [ ] Add a CLI entry point (e.g., `meshmind serve-grpc`) that constructs a `MemoryService` from settings and delegates to `meshmind.api.grpc_server.serve_forever`, with pytest coverage exercising the command in-process.
-- [ ] Teach `docker-compose.yml` (and the targeted stacks) how to launch the gRPC server container once the CLI entry point exists, documenting the new service in `docs/operations.md` and `SETUP.md`.
-- [ ] Add pytest coverage that executes `python scripts/check_protos.py` to ensure the verification script succeeds against the current tree.
-- [ ] Extend `docs/testing.md` and the docs guard mapping so gRPC runtime changes require updates to the new CLI/server documentation once the entry point lands.
+- [ ] Add integration tests that spin up `meshmind serve-grpc` and exercise ingestion/search via grpcurl to complement the unit-level coverage (blocked until network-accessible infrastructure is ready).
+- [ ] Publish protobuf-generated client artifacts (Python wheel or language-neutral bundles) so external services can consume the API once infrastructure is available.
+- [ ] Provision Neo4j, Memgraph, and Redis instances accessible from the development environment to unblock live integration tests (requires infrastructure support).
+- [ ] Approve and install optional dependencies (`neo4j`, `pymgclient`, `redis`, `celery`, `tiktoken`, `sentence-transformers`) across CI and developer machines to exercise full workflows.
+- [ ] Source or generate large synthetic datasets for consolidation and retrieval benchmarking to validate heuristics under load.
+- [ ] Define and ratify a policy for reintroducing Pydantic models (version targets, rollout timeline) so compatibility shims remain unnecessary going forward.
+- [ ] Document the retired REST/Celery shims in release notes and communicate migration steps to downstream integrators.
+- [ ] Capture gRPC CLI usage examples (including docker-compose orchestration) in `docs/api.md` and `docs/operations.md` once integration smoke tests complete.
 
 ## Recommended Waiting for Approval Tasks
 
-- [ ] Provision Neo4j, Memgraph, and Redis instances accessible from the development environment to unblock live integration tests (requires infrastructure approval).
-- [ ] Approve installation of optional dependencies (`neo4j`, `pymgclient`, `redis`, `celery`, `tiktoken`, `sentence-transformers`) across CI and developer machines to exercise full workflows.
-- [ ] Source or generate large synthetic datasets for consolidation and retrieval benchmarking to validate heuristics under load.
-- [ ] Define a policy for reintroducing Pydantic models (version targets, rollout timeline) so compatibility shims can be retired once approved.
+- [ ] Identify candidate observability exporters (Prometheus/OpenTelemetry) and draft rollout steps for external telemetry sinks.
+- [ ] Explore UI concepts for inspecting memories/triplets once the API hardening tasks land.

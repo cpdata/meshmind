@@ -1,7 +1,9 @@
 from uuid import UUID
 
+from fastapi.testclient import TestClient
+
 from meshmind.api.grpc import GrpcServiceStub, memory_to_proto, triplet_to_proto
-from meshmind.api.rest import RestAPIStub
+from meshmind.api.rest import create_app
 from meshmind.api.service import MemoryPayload, SearchPayload, TripletPayload
 from meshmind.core.types import Memory
 from meshmind.protos import memory_service_pb2 as pb2
@@ -47,27 +49,34 @@ def test_memory_service_ingest_and_search(memory_service, dummy_encoder):
     assert captured["kwargs"]["limit"] is not None
 
 
-def test_rest_stub_routes(memory_service, dummy_encoder):
-    app = RestAPIStub(memory_service)
-    response = app.dispatch(
-        "POST",
-        "/memories",
-        {"memories": [_memory("alpha").model_dump()]},
-    )
-    assert "uuids" in response
+def test_rest_routes(memory_service, dummy_encoder):
+    client = TestClient(create_app(memory_service))
 
-    search_response = app.dispatch(
-        "POST",
-        "/search",
-        {"query": "alpha", "namespace": "test", "encoder": dummy_encoder, "top_k": 1},
+    response = client.post(
+        "/memories",
+        json={"memories": [_memory("alpha").model_dump()]},
     )
-    assert search_response["results"]
+    assert response.status_code == 200
+    payload = response.json()
+    assert "uuids" in payload
+
+    search_response = client.post(
+        "/search",
+        json={
+            "query": "alpha",
+            "namespace": "test",
+            "encoder": dummy_encoder,
+            "top_k": 1,
+        },
+    )
+    assert search_response.status_code == 200
+    search_payload = search_response.json()
+    assert search_payload["results"]
 
     memory_service.llm_client.calls.clear()
-    override_response = app.dispatch(
-        "POST",
+    override_response = client.post(
         "/search",
-        {
+        json={
             "query": "alpha",
             "namespace": "test",
             "encoder": dummy_encoder,
@@ -78,29 +87,33 @@ def test_rest_stub_routes(memory_service, dummy_encoder):
             "llm_api_key": "override-key",
         },
     )
-    assert override_response["results"]
+    assert override_response.status_code == 200
+    override_payload = override_response.json()
+    assert override_payload["results"]
     assert memory_service.llm_client.calls
     last_call = memory_service.llm_client.calls[-1]
     assert last_call["model"] == "rerank-dev"
     assert last_call["base_url"] == "https://llm.example/rerank"
     assert memory_service.llm_client.last_override["models"]["rerank"] == "rerank-dev"
 
-    filtered = app.dispatch(
-        "GET",
+    filtered = client.get(
         "/memories",
-        {"namespace": "test", "entity_labels": ["Note"]},
+        params={"namespace": "test", "entity_labels": ["Note"]},
     )
-    assert filtered["memories"]
+    assert filtered.status_code == 200
+    filtered_payload = filtered.json()
+    assert filtered_payload["memories"]
 
-    filtered_none = app.dispatch(
-        "GET",
+    filtered_none = client.get(
         "/memories",
-        {"namespace": "test", "entity_labels": ["Task"]},
+        params={"namespace": "test", "entity_labels": ["Task"]},
     )
-    assert filtered_none["memories"] == []
+    assert filtered_none.status_code == 200
+    assert filtered_none.json()["memories"] == []
 
-    counts = app.dispatch("GET", "/memories/counts", {"namespace": "test"})
-    assert counts["counts"]["test"]["Note"] >= 1
+    counts = client.get("/memories/counts", params={"namespace": "test"})
+    assert counts.status_code == 200
+    assert counts.json()["counts"]["test"]["Note"] >= 1
 
 
 def test_memory_service_list_memories_forwards_kwargs(memory_service):

@@ -174,6 +174,7 @@ meshmind admin predicates --add RELATED_TO
 meshmind admin maintenance --max-attempts 5 --base-delay 2.5 --run consolidate
 meshmind admin graph --backend neo4j
 meshmind admin counts --namespace demo
+meshmind serve-grpc --host 0.0.0.0 --port 50051 --backend memgraph
 ```
 
 ## Maintenance Tasks
@@ -190,8 +191,8 @@ Tasks instantiate the driver lazily, emit structured logs/metrics, and persist c
   to ensure code changes keep the wiki up to date.
 - **Examples** – `examples/extract_preprocess_store_example.py` demonstrates ingestion, triplet creation, and multiple retrieval
   strategies.
-- **Dockerfile / docker-compose** – Container definition and orchestration files that provision Memgraph, Neo4j, Redis, and the
-  Celery worker stacks documented in `SETUP.md` and `meshmind/tests/docker/`.
+- **Dockerfile / docker-compose** – Container definition and orchestration files that provision Memgraph, Neo4j, Redis, the
+  Celery worker, and the gRPC server documented in `SETUP.md` and `meshmind/tests/docker/`.
 - **Provisioning scripts** – `run/install_setup.sh` and `run/maintenance_setup.sh` validate that optional packages (`fastapi`,
   `neo4j`, `pymgclient`, `uvicorn`) are present and respect `MESH_SKIP_SYSTEM_PACKAGES=1` / `MESH_SKIP_PYTHON_SYNC=1` when you
   need a dry run without network access.
@@ -206,7 +207,7 @@ Tasks instantiate the driver lazily, emit structured logs/metrics, and persist c
   Use `make benchmarks` to run all three scripts with synthetic defaults and capture JSON summaries under `build/benchmarks/`.
 
 ## Service Interfaces
-- **REST** – `meshmind.api.rest.create_app` returns a FastAPI app (or lightweight stub) that exposes `/memories`, `/triplets`,
+- **REST** – `meshmind.api.rest.create_app` returns a FastAPI app that exposes `/memories`, `/triplets`,
   `/search`, and `/memories/counts` endpoints. Search payloads accept:
   - `use_llm_rerank` to toggle LLM-based reranking,
   - `llm_models`, `llm_base_urls`, and `llm_api_key` dictionaries for per-request overrides,
@@ -264,8 +265,9 @@ Tasks instantiate the driver lazily, emit structured logs/metrics, and persist c
 - MeshMind now depends on first-party Pydantic 2.x models; the legacy compatibility shim has been removed.
 - `meshmind/retrieval/bm25.py`, `meshmind/retrieval/fuzzy.py`, and `meshmind/core/similarity.py` include pure-Python fallbacks for scikit-learn, rapidfuzz, and numpy.
 - `meshmind/testing` exports fake Memgraph, Redis, and embedding drivers that power the pytest suite and examples without external infrastructure.
-- `DUMMIES.md` lists every remaining stub (REST/gRPC service adapters, Celery fallbacks, compatibility layers) with guidance
-  on whether to remove or preserve them once external services are provisioned.
+- `DUMMIES.md` lists every remaining stub (for example the gRPC in-process adapter
+  and offline test doubles) with guidance on whether to remove or preserve them
+  once external services are provisioned.
 
 ## Testing
 - Run `pytest` to execute the suite; tests rely on fixtures and fake drivers so they do not require external services or optional libraries.

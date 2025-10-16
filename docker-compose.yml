@@ -62,6 +62,33 @@ services:
     networks:
       - meshmind
 
+  grpc:
+    build: .
+    container_name: meshmind-grpc
+    command:
+      - meshmind
+      - serve-grpc
+      - --host
+      - 0.0.0.0
+      - --port
+      - "50051"
+      - --backend
+      - memgraph
+    environment:
+      GRAPH_BACKEND: memgraph
+      MEMGRAPH_URI: bolt://memgraph:7687
+      REDIS_URL: redis://redis:6379/0
+      PYTHONUNBUFFERED: "1"
+    depends_on:
+      memgraph:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - "50051:50051"
+    networks:
+      - meshmind
+
 networks:
   meshmind:
     name: meshmind

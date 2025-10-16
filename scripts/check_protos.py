@@ -26,6 +26,14 @@ def main() -> None:
             str(PROTO_FILE),
         ]
         subprocess.check_call(command)
+        grpc_candidate = tmp_path / "memory_service_pb2_grpc.py"
+        if grpc_candidate.exists():
+            text = grpc_candidate.read_text(encoding="utf-8")
+            text = text.replace(
+                "import memory_service_pb2 as",
+                "from . import memory_service_pb2 as",
+            )
+            grpc_candidate.write_text(text, encoding="utf-8")
         drift = []
         for filename in GENERATED:
             target = PROTO_DIR / filename

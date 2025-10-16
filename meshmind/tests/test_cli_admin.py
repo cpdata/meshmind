@@ -1,10 +1,10 @@
 from argparse import Namespace
-from argparse import Namespace
 from io import StringIO
 
 import pytest
 
 from meshmind.cli import admin
+from meshmind.cli.__main__ import serve_grpc_command
 from meshmind.core.observability import telemetry
 from meshmind.models.registry import PredicateRegistry
 
@@ -105,3 +105,41 @@ def test_handle_counts_outputs_grouped(monkeypatch):
 
     assert status == 0
     assert "\"Note\": 3" in stream.getvalue()
+
+
+def test_serve_grpc_command_invokes_runtime(monkeypatch):
+    drivers = []
+    calls = []
+
+    class DummyDriver:
+        def __init__(self) -> None:
+            self.closed = False
+
+        def close(self) -> None:
+            self.closed = True
+
+    def fake_create_graph_driver(backend=None):  # noqa: ANN001 - signature match
+        driver = DummyDriver()
+        drivers.append((backend, driver))
+        return driver
+
+    def fake_serve_forever(service, host, port, shutdown_grace, **kwargs):  # noqa: ANN001
+        calls.append({
+            "service": service,
+            "host": host,
+            "port": port,
+            "shutdown_grace": shutdown_grace,
+        })
+
+    monkeypatch.setattr("meshmind.cli.__main__.create_graph_driver", fake_create_graph_driver)
+    monkeypatch.setattr("meshmind.cli.__main__.serve_forever", fake_serve_forever)
+
+    args = Namespace(host="127.0.0.1", port=50052, backend="sqlite", shutdown_grace=1.5)
+
+    serve_grpc_command(args)
+
+    assert calls and calls[0]["host"] == "127.0.0.1"
+    assert calls[0]["port"] == 50052
+    assert abs(calls[0]["shutdown_grace"] - 1.5) < 1e-6
+    assert drivers and drivers[0][0] == "sqlite"
+    assert drivers[0][1].closed

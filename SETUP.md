@@ -48,8 +48,9 @@ execution and automated testing.
 
 ## 3. Provision external services
 
-The repository ships with a root `docker-compose.yml` that starts Redis, Memgraph, and
-Neo4j with sane defaults. Run the stack in the background:
+The repository ships with a root `docker-compose.yml` that starts Redis, Memgraph,
+Neo4j, the gRPC API server, and the Celery worker with sane defaults. Run the stack in
+the background:
 
 ```bash
 docker compose up -d
@@ -69,7 +70,7 @@ For integration scenarios or CI jobs, use the compose files in
 | `memgraph.yml` | Runs only Memgraph with local port mapping. |
 | `neo4j.yml` | Runs only Neo4j with APOC enabled. |
 | `redis.yml` | Runs only Redis with persistence. |
-| `full-stack.yml` | Spins up all services plus an optional Celery worker. |
+| `full-stack.yml` | Spins up all services, the Celery worker, and the gRPC server. |
 
 Example (Memgraph only):
 
@@ -130,13 +131,8 @@ You should see passing pytest output and successful graph connectivity checks. R
 To validate the gRPC surface locally:
 
 ```bash
-python -c "from meshmind.api.grpc_server import serve_forever;\nfrom meshmind.api.memory_manager import MemoryManager;\nfrom meshmind.api.service import MemoryService;\nfrom meshmind.db.in_memory_driver import InMemoryGraphDriver;\nserve_forever(MemoryService(MemoryManager(InMemoryGraphDriver())), host='0.0.0.0', port=50051)"
-```
-
-In a second terminal, run:
-
-```bash
+meshmind serve-grpc --host 0.0.0.0 --port 50051 --backend memgraph
 grpcurl -plaintext -d '{"namespace":"demo"}' localhost:50051 meshmind.api.MemoryService/MemoryCounts
 ```
 
-Stop the server with `Ctrl+C` when finished.
+Stop the server with `Ctrl+C` when finished (the CLI handles graceful shutdown).

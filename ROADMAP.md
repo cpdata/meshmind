@@ -15,7 +15,7 @@
 ## Mid-Term (2–6 Weeks)
 - Run load tests against SQLite and hosted graph backends to tune pagination defaults, consolidation heuristics, and token compression strategies.
 - Implement backend-native vector similarity queries and schema indexes so embeddings never leave the database during scoring.
-- Finalise the gRPC surface by building on the new asyncio server helpers—package a deployable CLI/entry point, wire it into Docker Compose, and publish generated clients (Python + additional languages) so external agents can integrate without the in-process stub.
+- Finalise the gRPC surface by building on the new asyncio server helpers—exercise the `meshmind serve-grpc` CLI entry point within Docker Compose, publish generated clients (Python + additional languages), and add integration smoke tests so external agents can integrate without the in-process stub.
 - Instrument observability exports (Prometheus/OpenTelemetry) and wire dashboards/alerts for ingestion latency, queue depth, and error rates.
 - Replace compatibility shims with official Pydantic/FastAPI packages once dependency constraints are lifted, and backfill validation coverage.
 

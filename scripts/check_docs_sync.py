@@ -18,7 +18,7 @@ DOC_MAP: Dict[str, List[str]] = {
     "meshmind/pipeline": ["docs/pipelines.md"],
     "meshmind/core": ["docs/architecture.md", "docs/development.md"],
     "meshmind/llm_client.py": ["docs/architecture.md", "docs/configuration.md"],
-    "meshmind/cli": ["docs/operations.md"],
+    "meshmind/cli": ["docs/operations.md", "docs/api.md"],
     "meshmind/tasks": ["docs/operations.md", "docs/telemetry.md"],
     "meshmind/tests/docker": ["SETUP.md", "docs/operations.md"],
     "docker-compose": ["SETUP.md", "docs/operations.md", "ENVIRONMENT_NEEDS.md"],

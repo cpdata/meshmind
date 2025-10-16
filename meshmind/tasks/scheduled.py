@@ -4,14 +4,7 @@ from __future__ import annotations
 import time
 from typing import Callable
 
-try:
-    from celery.schedules import crontab
-    _CELERY_BEAT = True
-except ImportError:
-    # Celery not installed; define dummy crontab
-    _CELERY_BEAT = False
-    def crontab(*args, **kwargs):  # type: ignore
-        return None
+from celery.schedules import crontab
 from meshmind.api.memory_manager import MemoryManager
 from meshmind.core.config import settings
 from meshmind.core.observability import log_event, telemetry
@@ -87,8 +80,8 @@ def _get_manager() -> MemoryManager | None:
     _MANAGER = MemoryManager(driver)
     return _MANAGER
 
-# Define periodic task schedule if Celery is available
-if _CELERY_BEAT and hasattr(app, 'conf'):
+# Define periodic task schedule
+if hasattr(app, "conf"):
     app.conf.beat_schedule = {
         'expire-memories-every-day': {
             'task': 'meshmind.tasks.scheduled.expire_task',

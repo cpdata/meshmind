@@ -44,6 +44,35 @@ services:
       - ../../..:/app
     working_dir: /app
 
+  grpc:
+    build:
+      context: ../../..
+    container_name: meshmind-int-grpc
+    command:
+      - meshmind
+      - serve-grpc
+      - --host
+      - 0.0.0.0
+      - --port
+      - "50051"
+      - --backend
+      - memgraph
+    environment:
+      GRAPH_BACKEND: memgraph
+      MEMGRAPH_URI: bolt://memgraph:7687
+      REDIS_URL: redis://redis:6379/0
+      PYTHONUNBUFFERED: "1"
+    depends_on:
+      memgraph:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - "25051:50051"
+    volumes:
+      - ../../..:/app
+    working_dir: /app
+
 networks:
   default:
     name: meshmind-integration

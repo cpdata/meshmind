@@ -35,14 +35,17 @@
    incrementally.
 2. **Automation & CI** – Makefile provides lint/format/type/test/docs-guard targets and CI runs fmt-check, docs guard, and
    pytest. Protobuf drift now fails CI via `make protos-check`. Add caching and matrix builds when dependencies stabilize.
-3. **Environment Provisioning** – Docker Compose now provisions Memgraph, Neo4j, and Redis (with targeted stacks for tests).
-   Track multi-backend examples, document the new `SETUP.md`, keep docs current, and distribute the new `run/install_setup.sh`
-   and `run/maintenance_setup.sh` automation scripts for environment bootstrap.
+3. **Environment Provisioning** – Docker Compose now provisions Memgraph, Neo4j,
+   Redis, the gRPC server, and the Celery worker (with targeted stacks for tests).
+   Track multi-backend examples, document the new `SETUP.md`, keep docs current,
+   and distribute the new `run/install_setup.sh` and `run/maintenance_setup.sh`
+   automation scripts for environment bootstrap.
 
 ## Phase 5 – Strategic Enhancements (Planned)
 1. **Graph-Backed Retrieval** – Extend the new driver-side filtering/pagination to full vector/lexical execution using backend-native indexes to avoid round-tripping candidate embeddings.
 2. **Operational Observability** – Export telemetry to Prometheus/OpenTelemetry and surface dashboards/alerts.
 3. **Celery Hardening** – Stress test consolidation/compression heuristics at scale and codify retry/backoff policies.
-4. **Service Contracts** – Generated protobuf modules (`meshmind/protos/memory_service.proto`) back both the Python stub and the
-   new asyncio gRPC server helpers. Next: package a deployable entry point, publish generated clients, and add integration tests
-   once infrastructure is ready.
+4. **Service Contracts** – Generated protobuf modules (`meshmind/protos/memory_service.proto`)
+   back both the Python stub and the asyncio gRPC server helpers. A dedicated CLI
+   entry point (`meshmind serve-grpc`) now launches the runtime. Next: publish
+   generated clients and add integration tests once infrastructure is ready.

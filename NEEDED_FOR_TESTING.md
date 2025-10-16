@@ -62,7 +62,10 @@
 ## Local Configuration Steps
 - Ensure an embedding encoder is registered before extraction or hybrid search. The bootstrap utilities invoked by the CLI and
   `MeshMind` constructor handle this, but custom scripts must call `bootstrap_encoders()`.
-- For REST/gRPC testing, instantiate the `RestAPIStub`/`GrpcServiceStub` with the in-memory driver to avoid external services.
+- For REST/gRPC testing, instantiate the FastAPI app via `meshmind.api.rest.create_app`
+  and exercise it with `fastapi.testclient.TestClient` (requires the `httpx`
+  package); pair it with the `GrpcServiceStub` for lightweight gRPC coverage when
+  external services are unavailable.
 - Use `meshmind/testing` fakes (`FakeMemgraphDriver`, `FakeRedisBroker`, `FakeEmbeddingEncoder`, `FakeLLMClient`) in tests or demos to eliminate external infrastructure requirements.
 - Invoke `meshmind admin predicates` and `meshmind admin maintenance --max-attempts <n> --base-delay <seconds> --run <task>` during local runs to inspect predicate registries, telemetry, and tune maintenance retries without external services.
 - Use the benchmarking utilities in `scripts/` (`evaluate_importance.py`, `consolidation_benchmark.py`, `benchmark_pagination.py`) to validate heuristics and driver performance offline before connecting to live infrastructure.

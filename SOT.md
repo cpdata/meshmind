@@ -97,7 +97,7 @@ Supporting assets:
 ## Service Layers (`meshmind/api`)
 - `memory_manager.py`: CRUD façade over the active graph driver that forwards namespace/entity-label filters, pagination hints, search strings, and exposes aggregate counts alongside triplet listings.
 - `service.py`: Pydantic payloads and orchestration helpers shared by REST/gRPC surfaces. `MemoryService.search` leans on driver-side filtering before ranking, handles per-request LLM overrides (`use_llm_rerank`, `llm_models`, `llm_base_urls`, `llm_api_key`, `rerank_model`), and exposes `memory_counts` for CLI/HTTP usage.
-- `rest.py`: `create_app` returns a FastAPI application when available or a `RestAPIStub` for tests. Routes support pagination parameters and include `/memories/counts` for namespace/label summaries.
+- `rest.py`: `create_app` returns a FastAPI application exposing ingestion, retrieval, and reporting routes. Routes support pagination parameters and include `/memories/counts` for namespace/label summaries.
 - `grpc.py`: `GrpcServiceStub` backed by generated protobuf messages (`meshmind/protos/memory_service.proto`) to keep the Python
   stub aligned with the production RPC schema.
 - `grpc_server.py`: Async server helpers (`create_server`, `serve`, `serve_forever`) that expose the canonical RPC interface

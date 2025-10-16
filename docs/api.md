@@ -13,7 +13,8 @@ MeshMind exposes multiple integration points for ingestion and retrieval workflo
 
 ## REST API (`meshmind.api.rest`)
 
-- `create_app` dynamically returns a FastAPI application if FastAPI is installed, otherwise a lightweight stub.
+- `create_app` returns a FastAPI application exposing ingestion, retrieval, and
+  reporting routes.
 - Routes:
   - `POST /memories`: ingest a batch of memories.
   - `POST /triplets`: ingest relationships.
@@ -54,7 +55,6 @@ MeshMind exposes multiple integration points for ingestion and retrieval workflo
     "namespace": "demo"
   }
   ```
-- The `RestAPIStub` mirrors these routes for tests without requiring FastAPI.
 - Example `curl` invocations against a local FastAPI server:
   ```bash
   curl -s -X POST http://localhost:8000/search \
@@ -82,10 +82,15 @@ MeshMind exposes multiple integration points for ingestion and retrieval workflo
 
 ## CLI (`meshmind/cli`)
 
-- `meshmind.cli.__main__` bootstraps default encoders, validates configuration, and exposes ingestion commands.
-- `meshmind.cli.admin` contains administrative tasks for registry inspection, backend connectivity checks, memory counts,
-  and maintenance triggers. Use `meshmind admin maintenance --max-attempts <n> --base-delay <seconds> --run <task>` to
-  override retry/backoff settings per run.
+- `meshmind.cli.__main__` bootstraps default encoders, validates configuration,
+  and exposes ingestion commands.
+- `meshmind.cli.admin` contains administrative tasks for registry inspection,
+  backend connectivity checks, memory counts, and maintenance triggers. Use
+  `meshmind admin maintenance --max-attempts <n> --base-delay <seconds> --run <task>`
+  to override retry/backoff settings per run.
+- `meshmind serve-grpc --host 0.0.0.0 --port 50051` launches the asyncio gRPC
+  server defined in `meshmind.api.grpc_server` using the configured graph backend
+  and LLM settings.
 
 ## Client (`meshmind/client.py`)
 

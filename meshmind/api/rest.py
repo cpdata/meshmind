@@ -3,65 +3,13 @@ from __future__ import annotations
 
 from typing import Any, Dict, Iterable, List
 
+from fastapi import FastAPI, HTTPException, Query
+
 from meshmind.api.service import MemoryPayload, MemoryService, SearchPayload, TripletPayload
 
 
-class RestAPIStub:
-    """Fallback handler that emulates REST routes without FastAPI."""
-
-    def __init__(self, service: MemoryService) -> None:
-        self.service = service
-
-    def dispatch(self, method: str, path: str, payload: Dict[str, Any] | None = None) -> Dict[str, Any]:
-        method = method.upper()
-        payload = payload or {}
-        if method == "POST" and path == "/memories":
-            memories = [MemoryPayload(**item) for item in payload.get("memories", [])]
-            uuids = self.service.ingest_memories(memories)
-            return {"uuids": uuids}
-        if method == "POST" and path == "/triplets":
-            triplets = [TripletPayload(**item) for item in payload.get("triplets", [])]
-            count = self.service.ingest_triplets(triplets)
-            return {"stored": count}
-        if method == "POST" and path == "/search":
-            request = SearchPayload(**payload)
-            results = self.service.search(request)
-            return {"results": [mem.model_dump(exclude_none=True) for mem in results]}
-        if method == "GET" and path == "/memories":
-            namespace = payload.get("namespace")
-            entity_labels = payload.get("entity_labels")
-            offset = int(payload.get("offset", 0))
-            limit_value = payload.get("limit")
-            limit = int(limit_value) if limit_value is not None else None
-            query = payload.get("query")
-            use_search = payload.get("use_search")
-            memories = self.service.list_memories(
-                namespace,
-                entity_labels,
-                offset=offset,
-                limit=limit,
-                query=query,
-                use_search=use_search,
-            )
-            return {"memories": [mem.model_dump(exclude_none=True) for mem in memories]}
-        if method == "GET" and path == "/memories/counts":
-            namespace = payload.get("namespace")
-            counts = self.service.memory_counts(namespace)
-            return {"counts": counts}
-        if method == "GET" and path == "/triplets":
-            namespace = payload.get("namespace")
-            triplets = self.service.list_triplets(namespace)
-            return {"triplets": [triplet.model_dump(exclude_none=True) for triplet in triplets]}
-        raise ValueError(f"Unsupported route {method} {path}")
-
-
 def create_app(service: MemoryService) -> Any:
-    """Create a FastAPI application if FastAPI is installed, otherwise return a stub."""
-
-    try:  # pragma: no cover - optional dependency path
-        from fastapi import FastAPI, HTTPException
-    except ImportError:  # pragma: no cover - executed in tests without fastapi
-        return RestAPIStub(service)
+    """Create a FastAPI application exposing MeshMind service routes."""
 
     app = FastAPI(title="MeshMind API")
 
@@ -95,15 +43,23 @@ def create_app(service: MemoryService) -> Any:
     @app.get("/memories")
     def list_memories(
         namespace: str | None = None,
-        entity_labels: List[str] | None = None,
+        entity_labels: List[str] | None = Query(default=None),
         offset: int = 0,
         limit: int | None = None,
         query: str | None = None,
         use_search: bool | None = None,
     ):
+        labels: List[str] | None
+        if entity_labels is None:
+            labels = None
+        elif isinstance(entity_labels, str):  # pragma: no cover - defensive guard
+            labels = [entity_labels]
+        else:
+            labels = list(entity_labels)
+
         memories = service.list_memories(
             namespace,
-            entity_labels,
+            labels,
             offset=offset,
             limit=limit,
             query=query,

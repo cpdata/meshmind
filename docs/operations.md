@@ -27,6 +27,8 @@ This guide covers operational tasks for MeshMind deployments.
   the check script automatically so outdated bindings fail fast.
 - Construct a `MemoryService` (for example, using the driver factory) and call
   `meshmind.api.grpc_server.serve_forever(service, host="0.0.0.0", port=50051)` to expose the RPC interface.
+- The CLI provides `meshmind serve-grpc --host 0.0.0.0 --port 50051 --backend memgraph`
+  to launch the server with configuration derived from environment variables.
 - To embed the server inside a larger application, call `meshmind.api.grpc_server.create_server(...)`, start the returned
   `grpc.aio.Server`, and integrate its lifecycle with your event loop.
 - `grpcurl -plaintext -d '{"namespace":"demo"}' localhost:50051 meshmind.api.MemoryService/MemoryCounts` queries the
@@ -75,4 +77,6 @@ This guide covers operational tasks for MeshMind deployments.
 - Provision graph databases externally (Docker, managed service) and expose Bolt endpoints reachable from the runtime.
 - Ensure optional dependencies (`neo4j`, `pymgclient`, `redis`, `celery`, `fastapi`, `uvicorn`, `tiktoken`) are installed where required (or install `.[dev,docs,testing]`).
 - Configure logging/metrics sinks to capture telemetry emitted by pipeline stages.
-- Use `docker-compose.yml` as a reference for local orchestration (Memgraph, Neo4j, Redis) and the targeted stacks in `meshmind/tests/docker/` for integration testing.
+- Use `docker-compose.yml` as a reference for local orchestration (Memgraph, Neo4j,
+  Redis, gRPC server, Celery worker) and the targeted stacks in
+  `meshmind/tests/docker/` for integration testing.

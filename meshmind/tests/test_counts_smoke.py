@@ -1,10 +1,12 @@
 import argparse
+import argparse
 import json
 
 import pytest
+from fastapi.testclient import TestClient
 
 from meshmind.api.memory_manager import MemoryManager
-from meshmind.api.rest import RestAPIStub
+from meshmind.api.rest import create_app
 from meshmind.api.service import MemoryService
 from meshmind.cli import admin
 from meshmind.core.types import Memory
@@ -29,14 +31,16 @@ def populated_service():
 
 
 def test_rest_counts_endpoint_returns_totals(populated_service):
-    driver, service = populated_service
-    api = RestAPIStub(service)
+    _, service = populated_service
+    client = TestClient(create_app(service))
 
-    response = api.dispatch("GET", "/memories/counts", {"namespace": "docs"})
+    response = client.get("/memories/counts", params={"namespace": "docs"})
 
-    assert "counts" in response
-    assert response["counts"]["docs"]["Note"] == 2
-    assert "support" not in response["counts"]
+    assert response.status_code == 200
+    payload = response.json()
+    assert "counts" in payload
+    assert payload["counts"]["docs"]["Note"] == 2
+    assert "support" not in payload["counts"]
 
 
 def test_cli_admin_counts_reports_json(populated_service, monkeypatch, capsys):

@@ -10,10 +10,14 @@ backends.
 - `meshmind/tests/test_db_*`: ensure graph drivers implement CRUD semantics (with fakes for optional dependencies).
 - `meshmind/tests/test_retrieval.py` and `test_graph_retrieval.py`: exercise hybrid, textual, vector, and graph-based
   searches.
-- `meshmind/tests/test_service_interfaces.py`: cover REST and gRPC stubs, including entity-label filtering, pagination hints, and memory count routes with LLM override payloads.
+- `meshmind/tests/test_service_interfaces.py`: cover the FastAPI REST app and
+  gRPC stub, including entity-label filtering, pagination hints, and memory count
+  routes with LLM override payloads.
 - `meshmind/tests/test_grpc_runtime.py`: spin up the asyncio gRPC server helpers to confirm ingestion/search round-trips work over the network and that cancellation shuts servers down cleanly.
 - `meshmind/tests/test_setup_scripts.py`: run the provisioning scripts in validation mode to ensure optional dependencies are declared in `pyproject.toml`, that `uv` is bootstrapped, and that skip flags behave as expected.
-- `meshmind/tests/test_cli_admin.py`: verify administrative CLI commands use the correct driver factory, settings, and counts reporting.
+- `meshmind/tests/test_cli_admin.py`: verify administrative CLI commands use the
+  correct driver factory, settings, and counts reporting, and confirm the
+  `meshmind serve-grpc` command delegates to the runtime helpers.
 - `meshmind/tests/test_counts_smoke.py`: exercise the REST `/memories/counts` endpoint and `meshmind admin counts` command against the in-memory driver as smoke coverage.
 - `meshmind/tests/test_tasks_scheduled.py`: assert maintenance consolidation retries handle transient conflicts via configurable backoff.
 - `meshmind/tests/test_docs_guard.py`: ensure the documentation guard script enforces wiki updates when code modules change.

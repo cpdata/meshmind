@@ -1,5 +1,33 @@
 # Changelog
 
+## [2025-10-16T16:35:00-04:00 (America/New_York)]
+### Added
+- Added a `serve-grpc` CLI subcommand (`meshmind/cli/__main__.py`) that instantiates
+  `MemoryService` via `create_graph_driver`, delegates to
+  `meshmind.api.grpc_server.serve_forever`, and is exercised by
+  `meshmind/tests/test_cli_admin.py` alongside the new docker-compose service
+  definitions (`docker-compose.yml`, `meshmind/tests/docker/full-stack.yml`).
+- Recorded CLI runtime coverage and protobuf drift checks by extending
+  `meshmind/tests/test_cli_admin.py` and `meshmind/tests/test_protos_packaging.py`,
+  ensuring the new `serve-grpc` command and `scripts/check_protos.py` guard remain
+  functional.
+
+### Changed
+- Removed the legacy REST stub and Celery fallbacks by requiring real FastAPI and
+  Celery imports (`meshmind/api/rest.py`, `meshmind/tasks/celery_app.py`,
+  `meshmind/tasks/scheduled.py`) and updated smoke tests to exercise the FastAPI
+  app via `fastapi.testclient.TestClient` (`meshmind/tests/test_service_interfaces.py`,
+  `meshmind/tests/test_counts_smoke.py`).
+- Hardened protobuf utilities (`scripts/generate_protos.py`, `scripts/check_protos.py`)
+  to normalise relative imports so package builds remain import-safe.
+- Updated provisioning assets and documentation (README.md, SETUP.md,
+  docs/api.md, docs/operations.md, docs/testing.md, PROJECT.md, PLAN.md,
+  RECOMMENDATIONS.md, FINDINGS.md, ROADMAP.md, DUMMIES.md, CLEANUP.md,
+  ENVIRONMENT_NEEDS.md, NEEDED_FOR_TESTING.md, SOT.md, TODO.md, RESUME_NOTES.md)
+  to describe the new gRPC workflow, retired shims, and compose stacks.
+- Expanded the documentation guard mapping (`scripts/check_docs_sync.py`) so CLI
+  changes require updates to the API/operations guides.
+
 ## [2025-10-16T12:06:05-04:00 (America/New_York)]
 ### Added
 - Introduced `meshmind/api/grpc_server.py` with `create_server`, `serve`, and `serve_forever` helpers so production deployments

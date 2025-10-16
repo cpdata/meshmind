@@ -5,15 +5,16 @@
 - Maintain declared Python support at `>=3.11,<3.13` and monitor dependency releases before widening the range.
 - Harden the LLM-backed embedding adapter to consume SDK response objects directly and surface actionable errors for rate limits.
 - Expand automated smoke coverage (counts endpoints, maintenance retries) to the new SQLite/Neo4j drivers to ensure regressions are caught early.
-- Continue using `DUMMIES.md` to track remaining shims (FastAPI/gRPC/Celery) and log retirements as dependencies graduate into the default bootstrap path.
+- Continue using `DUMMIES.md` to track remaining shims (gRPC stub, fake drivers) and log retirements as dependencies graduate into the default bootstrap path.
 
 ## Restore and Extend Functionality
 - Extend the new server-side filtering and pagination work by pushing similarity ranking into Memgraph/Neo4j so vector scoring runs without loading namespaces in Python.
 - Validate consolidation heuristics at scale and tune the new exponential backoff settings (`MAINTENANCE_MAX_ATTEMPTS`, `MAINTENANCE_BASE_DELAY_SECONDS`) before enabling automated writes in production.
 - Leverage the new benchmarking scripts (`scripts/evaluate_importance.py`, `scripts/consolidation_benchmark.py`, `scripts/benchmark_pagination.py`) to validate heuristics and driver performance; schedule follow-up runs against production-sized datasets.
 - Introduce feedback loops for the importance heuristic (e.g., LLM-assisted ranking or analytics-driven weights) to tune thresholds over time once real-world telemetry is available.
-- Build on the new `meshmind.api.grpc_server` helpers by packaging a deployable server entry point (CLI or module), wiring it
-  into Docker Compose, and publishing generated clients (Python + other languages) once infrastructure is available.
+- Build on the new `meshmind.api.grpc_server` helpers and CLI entry point by
+  publishing generated clients (Python + other languages) and exercising
+  end-to-end smoke tests once infrastructure is available.
 - Exercise the new `llm_client` overrides via REST/gRPC integration smoke tests (once credentials are available) to confirm per-request models/endpoints behave consistently outside unit tests.
 - Expand predicate/registry management APIs beyond the CLI helper so services can manage vocabularies programmatically.
 - Plan for reintroducing full Pydantic models once packaging support is aligned with target Python versions.

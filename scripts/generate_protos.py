@@ -22,6 +22,16 @@ def main() -> None:
         str(PROTO_FILE),
     ]
     subprocess.check_call(command)
+
+    grpc_file = PROTO_DIR / "memory_service_pb2_grpc.py"
+    if grpc_file.exists():
+        text = grpc_file.read_text(encoding="utf-8")
+        text = text.replace(
+            "import memory_service_pb2 as",
+            "from . import memory_service_pb2 as",
+        )
+        grpc_file.write_text(text, encoding="utf-8")
+
     print("Regenerated protobuf bindings", file=sys.stderr)
 
 
