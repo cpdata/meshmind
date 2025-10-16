@@ -1,39 +1,31 @@
-"""
-Celery application setup for MeshMind maintenance tasks.
-If Celery is not installed, provides a dummy app for imports.
-"""
-try:
-    from celery import Celery
-except ImportError:
-    Celery = None  # type: ignore
+"""Celery application setup for MeshMind maintenance tasks."""
 
-class _DummyConf:
-    pass
+from __future__ import annotations
 
-class _DummyCeleryApp:
-    def __init__(self):
-        self.conf = _DummyConf()
+from celery import Celery
 
-    def task(self, name=None):
-        def decorator(fn):
-            return fn
-        return decorator
+from meshmind.core.config import settings
 
-if Celery:
-    from meshmind.core.config import settings
 
-    # Initialize Celery app with Redis broker
+def _create_celery_app() -> Celery:
+    """Initialise the Celery application bound to the configured Redis broker."""
+
     app = Celery(
-        'meshmind',
+        "meshmind",
         broker=settings.REDIS_URL,
         backend=settings.REDIS_URL,
     )
-    # Celery configuration
     app.conf.result_backend = settings.REDIS_URL
-    app.conf.task_serializer = 'json'
-    app.conf.result_serializer = 'json'
-    app.conf.accept_content = ['json']
-    app.conf.timezone = 'UTC'
+    app.conf.task_serializer = "json"
+    app.conf.result_serializer = "json"
+    app.conf.accept_content = ["json"]
+    app.conf.timezone = "UTC"
     app.conf.enable_utc = True
-else:
-    app = _DummyCeleryApp()
+    app.conf.broker_connection_retry_on_startup = True
+    return app
+
+
+app = _create_celery_app()
+
+
+__all__ = ["app", "_create_celery_app"]
