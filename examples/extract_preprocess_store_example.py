@@ -1,40 +1,73 @@
-"""
-Example flow: extract → preprocess → store using Meshmind pipeline.
-Requires a running Memgraph instance and a valid OPENAI_API_KEY.
-"""
-from meshmind.core.types import Memory
+"""End-to-end MeshMind example covering extraction, storage, and retrieval."""
+from __future__ import annotations
+
 from meshmind.client import MeshMind
+from meshmind.core.types import Memory, Triplet
 
-def main():
-    # Initialize MeshMind client (uses OpenAI and default MemgraphDriver)
+
+def main() -> None:
     mm = MeshMind()
-    driver = mm.driver
 
-    # Sample content for extraction
     texts = [
         "The Eiffel Tower is located in Paris and was built in 1889.",
-        "Python is a programming language created by Guido van Rossum."
+        "Python is a programming language created by Guido van Rossum.",
     ]
 
-    # Extract memories via LLM
     memories = mm.extract_memories(
         instructions="Extract key facts as Memory objects.",
         namespace="demo",
-        entity_types=[Memory],        
+        entity_types=[Memory],
         content=texts,
     )
-    print(f"Extracted {len(memories)} memories:")
-    for m in memories:
-        print(m.json())
-
-    # Preprocess: deduplicate, score importance, compress
-    memories = mm.deduplicate(memories, threshold=0.9)
+    memories = mm.deduplicate(memories)
     memories = mm.score_importance(memories)
     memories = mm.compress(memories)
-
-    # Store into graph
     mm.store_memories(memories)
-    print("Memories stored to graph.")
+    print(f"Stored {len(memories)} memories.")
+
+    if len(memories) >= 2:
+        relation = Triplet(
+            subject=str(memories[0].uuid),
+            predicate="RELATED_TO",
+            object=str(memories[1].uuid),
+            namespace="demo",
+            entity_label="Knowledge",
+            metadata={"confidence": 0.9},
+        )
+        mm.store_triplets([relation])
+        print("Stored relationship between first two memories.")
+
+    stored = mm.list_memories(namespace="demo", entity_labels=["Memory"], limit=10)
+
+    hits = mm.search("Eiffel Tower", namespace="demo", entity_labels=["Memory"])
+    print("Hybrid search results:")
+    for mem in hits:
+        print(f"- {mem.name} (importance={mem.importance})")
+
+    vector_hits = mm.search_vector("programming", namespace="demo", entity_labels=["Memory"])
+    print("Vector-only search results:")
+    for mem in vector_hits:
+        print(f"- {mem.name}")
+
+    regex_hits = mm.search_regex(r"Paris", namespace="demo", entity_labels=["Memory"])
+    print("Regex search results:")
+    for mem in regex_hits:
+        print(f"- {mem.name}")
+
+    exact_hits = mm.search_exact(
+        "Python",
+        namespace="demo",
+        entity_labels=["Memory"],
+        fields=["name"],
+    )
+    print("Exact match search results:")
+    for mem in exact_hits:
+        print(f"- {mem.name}")
+
+    counts = mm.memory_counts(namespace="demo")
+    print(f"Filtered view returned {len(stored)} memories from the driver.")
+    print(f"Namespace counts: {counts}")
+
 
 if __name__ == "__main__":
     main()

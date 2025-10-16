@@ -1,0 +1,20 @@
+# Dummies and Compatibility Artifacts
+
+The following table tracks all temporary shims, fake implementations, and stub services that were introduced while the
+sandbox lacked internet access or external infrastructure. Each row notes what the component does today and the
+recommended next step now that full dependencies can be installed.
+
+| Component | Location | Purpose | Current Usage | Recommended Action |
+| --- | --- | --- | --- | --- |
+| FastAPI REST stub | `meshmind/api/rest.py` (`RestAPIStub`, `create_app`) | Exposes REST behaviour without the FastAPI dependency. | Tests use the stub when FastAPI is not installed; production should use FastAPI. | Keep temporarily for offline tests but plan to gate it behind an explicit test flag once FastAPI becomes mandatory. |
+| gRPC stub implementation | `meshmind/api/grpc.py` (`GrpcServiceStub` + generated protobuf helpers) | Provides an in-process service implementation backed by the canonical proto schema so tests can exercise the service layer without spinning up gRPC infrastructure. | Unit tests and docs rely on the stub while production traffic should flow through the new asyncio helpers in `meshmind.api.grpc_server`. | Keep the stub for tests; package the new server behind a CLI entry point and retire any ad-hoc wrappers once infrastructure is provisioned. |
+| Celery dummy app | `meshmind/tasks/celery_app.py` (`_DummyCeleryApp`) | Allows module imports when Celery is missing. | Unit tests rely on the dummy to avoid Celery; production should use real Celery. | Retire dummy once Celery is a hard dependency; until then ensure tests explicitly exercise the real app when installed. |
+| Celery beat fallback | `meshmind/tasks/scheduled.py` (`crontab` shim) | Supplies a no-op crontab when Celery beat is missing. | Prevents import errors in test environments without Celery. | Remove once Celery is required; otherwise guard usage with feature flags. |
+| Fake graph/storage drivers | `meshmind/testing/fakes.py` (`FakeMemgraphDriver`, `FakeRedisBroker`, `FakeEmbeddingEncoder`) | Provide offline stand-ins for Memgraph, Redis, and embedding models. | Pytest fixtures and documentation rely on these for isolation. | Keep as long as offline tests are desired; supplement with integration suites that use real services. |
+| Fake LLM client | `meshmind/testing/fakes.py` (`FakeLLMClient`) | Records per-request overrides and emits deterministic responses so tests exercise reranking without installing the OpenAI SDK. | Service/interface tests (`meshmind/tests/test_service_interfaces.py`, `test_client.py`) and the CLI fixtures inject this stub when `openai` is unavailable. | Keep for unit tests; add integration tests with real providers once keys and network access are provisioned. |
+| Dummy encoder fixture | `meshmind/tests/conftest.py` (`dummy_encoder`) and dependent tests | Supplies a lightweight embedding encoder for search tests. | Used across retrieval and service tests to avoid network calls. | Keep for unit tests; add integration coverage with real encoders once APIs are configured. |
+| Fake mgclient module | `meshmind/tests/test_memgraph_driver.py` (monkeypatch of `mgclient`) | Simulates the Memgraph client so driver code runs without the native binary. | Enables driver unit tests without installing `mgclient`. | Replace with real `mgclient`-backed tests once package access is ensured; keep shim for fallback coverage. |
+
+## Retired Items
+
+- **Pydantic compatibility shim (`meshmind/_compat/pydantic.py`)** – Removed now that the project installs `pydantic>=2.11` during setup. All models import directly from Pydantic and tests confirm no fallback is required.

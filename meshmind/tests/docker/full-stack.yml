@@ -1,0 +1,49 @@
+version: "3.9"
+
+services:
+  memgraph:
+    extends:
+      file: ./memgraph.yml
+      service: memgraph
+    container_name: meshmind-int-memgraph
+    ports:
+      - "27687:7687"
+      - "23000:3000"
+
+  neo4j:
+    extends:
+      file: ./neo4j.yml
+      service: neo4j
+    container_name: meshmind-int-neo4j
+    ports:
+      - "27474:7474"
+      - "27688:7687"
+
+  redis:
+    extends:
+      file: ./redis.yml
+      service: redis
+    container_name: meshmind-int-redis
+    ports:
+      - "26379:6379"
+
+  celery-worker:
+    build:
+      context: ../../..
+    command: celery -A meshmind.tasks.celery_app worker -B -l info
+    environment:
+      MEMGRAPH_URI: bolt://memgraph:7687
+      REDIS_URL: redis://redis:6379/0
+      PYTHONUNBUFFERED: "1"
+    depends_on:
+      memgraph:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ../../..:/app
+    working_dir: /app
+
+networks:
+  default:
+    name: meshmind-integration

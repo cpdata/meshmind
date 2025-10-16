@@ -1,9 +1,15 @@
 from __future__ import annotations
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Optional, Tuple
 from uuid import UUID, uuid4
 
 from pydantic import BaseModel, Field
+
+
+def _utcnow() -> datetime:
+    """Return the current UTC time with timezone information."""
+
+    return datetime.now(timezone.utc)
 
 
 class Memory(BaseModel):
@@ -17,7 +23,7 @@ class Memory(BaseModel):
     embedding: Optional[list[float]] = None
     metadata: dict[str, Any] = Field(default_factory=dict)
     reference_time: Optional[datetime] = None
-    created_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=_utcnow)
     updated_at: Optional[datetime] = None
     importance: Optional[float] = None
     ttl_seconds: Optional[int] = None
@@ -43,5 +49,6 @@ class SearchConfig(BaseModel):
     encoder: str = "text-embedding-3-small"
     top_k: int = 20
     rerank_k: int = 10
+    rerank_model: Optional[str] = None
     filters: Optional[dict[str, Any]] = None
     hybrid_weights: Tuple[float, float] = (0.5, 0.5)
