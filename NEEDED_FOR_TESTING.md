@@ -69,7 +69,7 @@
   external services are unavailable.
 - Use `meshmind/testing` fakes (`FakeMemgraphDriver`, `FakeRedisBroker`, `FakeEmbeddingEncoder`, `FakeLLMClient`) in tests or demos to eliminate external infrastructure requirements. Integration suites marked with `@pytest.mark.integration` exercise live Memgraph/Neo4j/Redis instances and expect the docker stack to be running.
 - Invoke `meshmind admin predicates` and `meshmind admin maintenance --max-attempts <n> --base-delay <seconds> --run <task>` during local runs to inspect predicate registries, telemetry, and tune maintenance retries without external services.
-- Use the benchmarking utilities in `scripts/` (`evaluate_importance.py`, `consolidation_benchmark.py`, `benchmark_pagination.py`) to validate heuristics and driver performance offline before connecting to live infrastructure. Generate large corpora with `scripts/generate_synthetic_dataset.py` when you need ≥10k memories for stress tests.
+- Use the benchmarking utilities in `scripts/` (`evaluate_importance.py`, `consolidation_benchmark.py`, `benchmark_pagination.py`) to validate heuristics and driver performance offline before connecting to live infrastructure. Generate large corpora with `scripts/generate_synthetic_dataset.py` when you need ≥10k memories for stress tests and follow the ingestion workflow in `docs/retrieval.md` to load them into the graph drivers used by your tests.
 - Seed demo data as needed using the `examples/extract_preprocess_store_example.py` script after configuring environment
   variables.
 - Create a `.env` file storing the environment variables above for consistent local configuration.

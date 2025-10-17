@@ -1,5 +1,17 @@
 # Changelog
 
+## [2025-10-16T21:44:46-04:00 (America/New_York)]
+### Added
+- Documented a synthetic dataset ingestion workflow in `docs/retrieval.md` (including sample loader code) so benchmarking
+  runs can hydrate graph drivers without recomputing embeddings.
+
+### Changed
+- Expanded operations, setup, and environment guides (`docs/operations.md`, `SETUP.md`, `ENVIRONMENT_NEEDS.md`,
+  `NEEDED_FOR_TESTING.md`) with batching/verification tips for loading generated JSONL/CSV corpora.
+- Updated core documentation and planning artifacts (`README.md`, `PROJECT.md`, `PLAN.md`, `ROADMAP.md`, `SOT.md`,
+  `RECOMMENDATIONS.md`, `PLANNING_THOUGHTS.md`, `ISSUES.md`, `RESUME_NOTES.md`, `TODO.md`) to reference the ingestion workflow
+  and capture the follow-up automation task.
+
 ## [2025-10-16T20:39:06-04:00 (America/New_York)]
 ### Added
 - Added live integration coverage for Memgraph, Neo4j, and Redis via `meshmind/tests/test_integration_live.py` and configured

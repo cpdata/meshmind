@@ -37,5 +37,5 @@
 ## Low Priority / Nice to Have
 - [x] Offer alternative storage backends (in-memory driver, SQLite, etc.) for easier local development.
 - [x] Provide an administrative dashboard or CLI commands for listing namespaces, counts, and maintenance statistics (CLI admin subcommands now expose predicates, telemetry, and graph checks).
-- [ ] Publish onboarding guides and troubleshooting FAQs for contributors.
+- [ ] Publish onboarding guides and troubleshooting FAQs for contributors (synthetic dataset ingestion docs landed in `docs/retrieval.md`, but a broader newcomer guide is still pending).
 - [ ] Explore plugin registration for embeddings and retrieval strategies to reduce manual wiring.

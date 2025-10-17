@@ -30,7 +30,8 @@
 
 ## Documentation & Onboarding
 - Keep `README.md`, `SOT.md`, `docs/`, and onboarding guides synchronized with each release; document rerank, retrieval, and
-  registry flows with diagrams when possible.
+  registry flows with diagrams when possible. The new synthetic dataset ingestion workflow in `docs/retrieval.md` should be
+  incorporated into future onboarding materials.
 - Maintain the troubleshooting section for optional tooling (ruff, pyright, typeguard, toml-sort, yamllint) now referenced in
   the Makefile and expand it as new developer utilities are introduced. Keep `SETUP.md` synchronized when dependencies change.
 - Provide walkthroughs for configuring LLM reranking, including sample prompts and response expectations.

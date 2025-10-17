@@ -7,7 +7,7 @@
 
 ## Near-Term (0–2 Weeks)
 - Automate the new integration suite (`pytest -m integration`) in CI so Memgraph/Neo4j/Redis regressions fail fast.
-- Finalize maintenance write policies by implementing retry/backoff semantics and measuring consolidation accuracy against representative datasets (now aided by `scripts/generate_synthetic_dataset.py`).
+- Finalize maintenance write policies by implementing retry/backoff semantics and measuring consolidation accuracy against representative datasets (now aided by `scripts/generate_synthetic_dataset.py` and the documented ingestion workflow in `docs/retrieval.md`).
 - Publish ROADMAP and PLANNING_THOUGHTS artifacts, and seed the `research/` folder with competitive analysis to ground prioritization discussions.
 - Expand automated smoke tests for REST `/memories/counts`, CLI `meshmind admin counts`, and provisioning scripts to ensure guardrails stay trustworthy.
 - Capture outstanding shim retirement work (FastAPI tests now live; continue tracking FakeLLM/Fake drivers) in CLEANUP.md with precise acceptance criteria for each removal.

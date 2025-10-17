@@ -73,6 +73,7 @@
 - [x] Add packaging tests to guarantee `meshmind/protos/memory_service.proto` ships with the distribution and exposes the expected service definition.
 - [x] Document runtime and operational guidance for the gRPC server across README, SETUP, `docs/api.md`, and `docs/operations.md`.
 - [x] Add Makefile and CI targets (`make protos`, `make protos-check`) plus scripts to regenerate/verify protobuf bindings, failing CI when drift occurs.
+- [x] Document ingestion workflows for the synthetic dataset generator across `docs/retrieval.md` and operations guides so benchmarking instructions stay cohesive.
 - [x] Replace the REST stub with the concrete FastAPI application and migrate smoke tests to `fastapi.testclient.TestClient`.
 - [x] Remove Celery dummy fallbacks by requiring the real app/beat imports and keeping docker-compose stacks in sync.
 - [x] Add a `serve-grpc` CLI subcommand and verify it delegates to the runtime helpers.
@@ -95,9 +96,9 @@
 - [ ] Add integration tests that spin up `meshmind serve-grpc` and exercise ingestion/search via grpcurl to complement the unit-level coverage (blocked until network-accessible infrastructure is ready).
 - [ ] Publish protobuf-generated client artifacts (Python wheel or language-neutral bundles) so external services can consume the API once infrastructure is available.
 - [ ] Automate the live integration suite (`pytest -m integration`) in CI so Memgraph/Neo4j/Redis regressions fail fast.
-- [ ] Document ingestion workflows for the synthetic dataset generator across `docs/retrieval.md` and operations guides so benchmarking instructions stay cohesive.
 - [ ] Document the retired REST/Celery shims in release notes and communicate migration steps to downstream integrators.
 - [ ] Capture gRPC CLI usage examples (including docker-compose orchestration) in `docs/api.md` and `docs/operations.md` once integration smoke tests complete.
+- [ ] Automate ingestion of synthetic dataset payloads (JSONL/CSV) via a CLI or script wrapper so benchmarking runs do not require custom snippets.
 
 ## Recommended Waiting for Approval Tasks
 

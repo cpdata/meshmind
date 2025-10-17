@@ -20,7 +20,8 @@
 2. **Maintenance Tasks** – Tasks emit telemetry, persist consolidation/compression results, and now retry conflicting writes with
    configurable exponential backoff (`MAINTENANCE_MAX_ATTEMPTS`, `MAINTENANCE_BASE_DELAY_SECONDS`). Synthetic benchmark scripts,
    the new `scripts/generate_synthetic_dataset.py`, and integration tests against live Memgraph/Neo4j validate behaviour on larger
-   workloads; next, replay production-like datasets to tune thresholds.
+   workloads. Fresh documentation in `docs/retrieval.md` and `docs/operations.md` now describes how to ingest those synthetic datasets
+   into the target backend; next, replay production-like datasets to tune thresholds.
 3. **Importance Scoring Improvements** – Heuristic scoring is live, records distribution metrics via telemetry, and ships with
    `scripts/evaluate_importance.py` for synthetic/offline evaluation. Next: incorporate real feedback loops or LLM-assisted
    ranking to tune weights over time.
