@@ -1,5 +1,7 @@
 # Plan of Action
 
+Roadmap milestones now reference qualitative horizons (Near/Mid/Long-Term) instead of week estimates to focus this plan on sequencing rather than timeboxing.
+
 ## Phase 1 – Stabilize Runtime Basics ✅
 1. **Dependency Guards** – Implemented lazy driver factories, optional imports, and clear ImportErrors for missing packages.
 2. **Default Encoder Registration** – Bootstraps register encoders/entities automatically and the CLI invokes them on startup.

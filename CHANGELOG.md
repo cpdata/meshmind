@@ -1,5 +1,10 @@
 # Changelog
 
+## [2025-10-16T22:44:21-04:00 (America/New_York)]
+### Changed
+- Simplified roadmap section headings in `ROADMAP.md` by removing week estimates from the horizon labels to
+  emphasise qualitative prioritisation.
+
 ## [2025-10-16T21:44:46-04:00 (America/New_York)]
 ### Added
 - Documented a synthetic dataset ingestion workflow in `docs/retrieval.md` (including sample loader code) so benchmarking

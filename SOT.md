@@ -33,6 +33,7 @@ Supporting assets:
 - `pyproject.toml`: Project metadata and dependency list (pins Python `>=3.11,<3.13`; see compatibility notes in `ISSUES.md`).
 - Documentation (`PROJECT.md`, `PLAN.md`, `SOT.md`, `README.md`, etc.) describing the system and roadmap.
 - Strategic context (`ROADMAP.md`, `PLANNING_THOUGHTS.md`, `research/overview.md`) summarising milestones, planning questions, and competitor analysis.
+  Roadmap horizons now use qualitative labels (Near/Mid/Long-Term) without week estimates to emphasise sequencing over exact timing.
 - `DUMMIES.md`: Catalog of temporary shims (REST/gRPC stubs, Celery dummies, fake drivers) with removal guidance and a retired
   section for historical compatibility layers.
 
