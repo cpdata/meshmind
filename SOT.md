@@ -28,11 +28,12 @@ Supporting assets:
 - `SETUP.md`: End-to-end provisioning instructions covering Python deps, environment variables, and Compose workflows.
 - `run/install_setup.sh`, `run/maintenance_setup.sh`: Automation scripts for provisioning fresh environments and refreshing cached workspaces.
 - `scripts/evaluate_importance.py`, `scripts/consolidation_benchmark.py`, `scripts/benchmark_pagination.py`: Evaluation and benchmarking tools for importance heuristics, consolidation throughput, and driver pagination performance.
-- `scripts/generate_synthetic_dataset.py`: Produces large JSONL/CSV corpora (defaults: 10k memories, 20k triplets, 384-dim embeddings) for integration and benchmark scenarios.
+- `scripts/generate_synthetic_dataset.py`: Produces large JSONL/CSV corpora (defaults: 10k memories, 20k triplets, 384-dim embeddings) for integration and benchmark scenarios. Triplet rows include `entity_label`, so the ingestion workflow in `docs/retrieval.md` stores the generated payloads without recomputing embeddings or mutating CSV fields.
 - `.github/workflows/ci.yml`: GitHub Actions workflow running linting/formatting checks and pytest.
 - `pyproject.toml`: Project metadata and dependency list (pins Python `>=3.11,<3.13`; see compatibility notes in `ISSUES.md`).
 - Documentation (`PROJECT.md`, `PLAN.md`, `SOT.md`, `README.md`, etc.) describing the system and roadmap.
 - Strategic context (`ROADMAP.md`, `PLANNING_THOUGHTS.md`, `research/overview.md`) summarising milestones, planning questions, and competitor analysis.
+  Roadmap horizons now use qualitative labels (Near/Mid/Long-Term) without week estimates to emphasise sequencing over exact timing.
 - `DUMMIES.md`: Catalog of temporary shims (REST/gRPC stubs, Celery dummies, fake drivers) with removal guidance and a retired
   section for historical compatibility layers.
 

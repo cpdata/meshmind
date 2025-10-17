@@ -56,11 +56,14 @@ def _write_jsonl(path: Path, rows: Iterable[dict[str, object]]) -> None:
 def _write_triplets(path: Path, rows: Iterable[dict[str, object]]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", encoding="utf-8") as handle:
-        handle.write("subject,predicate,object,namespace,metadata\n")
+        handle.write("subject,predicate,object,namespace,entity_label,metadata\n")
         for row in rows:
             metadata = json.dumps(row.get("metadata", {}), ensure_ascii=False)
             handle.write(
-                f"{row['subject']},{row['predicate']},{row['object']},{row['namespace']},{metadata}\n"
+                (
+                    f"{row['subject']},{row['predicate']},{row['object']},{row['namespace']},"
+                    f"{row['entity_label']},{metadata}\n"
+                )
             )
 
 
@@ -79,16 +82,19 @@ def generate_dataset(
     memory_rows = []
     triplet_rows = []
     entity_ids: list[str] = []
+    entity_labels: dict[str, str] = {}
 
     for _ in range(memories):
         uid = str(uuid4())
         entity_ids.append(uid)
+        label = random.choice(["Note", "Task", "Observation"])
+        entity_labels[uid] = label
         memory_rows.append(
             {
                 "uuid": uid,
                 "namespace": namespace,
                 "name": _random_text(3).title(),
-                "entity_label": random.choice(["Note", "Task", "Observation"]),
+                "entity_label": label,
                 "content": _random_text(random.randint(20, 60)),
                 "embedding": _random_embedding(embedding_dim),
                 "metadata": _random_metadata(),
@@ -103,6 +109,7 @@ def generate_dataset(
                 "predicate": random.choice(["references", "follows", "relates_to", "duplicates"]),
                 "object": obj,
                 "namespace": namespace,
+                "entity_label": entity_labels[subj],
                 "metadata": {
                     "confidence": round(random.uniform(0.5, 0.99), 2),
                     "notes": _random_text(6),

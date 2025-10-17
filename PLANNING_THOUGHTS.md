@@ -14,7 +14,7 @@
 - **Pydantic Model Policy** – Follow the documented plan (target Pydantic 2.12+, refresh locks when 3.13 wheels land, record migration guidance) to avoid resurrecting compatibility shims.
 
 ## Upcoming Research
-- Benchmark consolidation heuristics on synthetic datasets representing customer scale and capture telemetry snapshots (seed data via `scripts/generate_synthetic_dataset.py`).
+- Benchmark consolidation heuristics on synthetic datasets representing customer scale and capture telemetry snapshots (seed data via `scripts/generate_synthetic_dataset.py`—whose triplet CSV now includes `entity_label`—and load it using the ingestion workflow documented in `docs/retrieval.md`).
 - Compare graph query latency across in-memory, SQLite, Memgraph, and Neo4j drivers when using pagination and filtering.
 - Evaluate rerank quality across LLM providers using a labelled evaluation set to determine optimal default models.
 - Investigate options for secure secret storage (e.g., Vault, AWS Secrets Manager) to standardise API key management.

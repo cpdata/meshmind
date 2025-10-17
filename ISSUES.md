@@ -35,7 +35,9 @@
 
 - [ ] Validate the new Docker Compose stacks (root and `meshmind/tests/docker/`) on an environment with container support and document host requirements (ports, resources).
 ## Low Priority / Nice to Have
+- [x] Align synthetic dataset triplet CSV headers with `Triplet` schema (added `entity_label`) and refresh ingestion docs.
+- [x] Remove week-based horizon estimates from roadmap headings to avoid implying precise delivery dates in planning docs.
 - [x] Offer alternative storage backends (in-memory driver, SQLite, etc.) for easier local development.
 - [x] Provide an administrative dashboard or CLI commands for listing namespaces, counts, and maintenance statistics (CLI admin subcommands now expose predicates, telemetry, and graph checks).
-- [ ] Publish onboarding guides and troubleshooting FAQs for contributors.
+- [ ] Publish onboarding guides and troubleshooting FAQs for contributors (synthetic dataset ingestion docs landed in `docs/retrieval.md`, but a broader newcomer guide is still pending).
 - [ ] Explore plugin registration for embeddings and retrieval strategies to reduce manual wiring.

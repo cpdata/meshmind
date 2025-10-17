@@ -10,9 +10,11 @@
 
 ## Latest Changes
 
+- Removed week-based estimates from roadmap section headings and refreshed planning docs (`PLAN.md`, `SOT.md`, `RECOMMENDATIONS.md`, `ISSUES.md`, `TODO.md`) to emphasise qualitative sequencing.
 - Added live integration coverage (`meshmind/tests/test_integration_live.py`) for Memgraph, Neo4j, and Redis, introduced a pytest marker configuration, and documented the workflow across README/SETUP/docs.
 - Generated a fresh `uv.lock`, pinned `.python-version` to 3.12, and updated install docs to standardise on `uv sync --all-extras`.
-- Created `scripts/generate_synthetic_dataset.py` for large JSONL/CSV corpora and referenced it across benchmarking docs.
+- Created `scripts/generate_synthetic_dataset.py` for large JSONL/CSV corpora, added `entity_label` to triplet CSV rows, and referenced it across benchmarking docs.
+- Documented the synthetic dataset ingestion workflow across `docs/retrieval.md`, `docs/operations.md`, README, and supporting planning guides so benchmarks can load corpora without recomputing embeddings.
 - Updated documentation and planning collateral (README.md, SETUP.md, docs/development.md, docs/testing.md, docs/operations.md, PROJECT.md, PLAN.md, RECOMMENDATIONS.md, ROADMAP.md, ENVIRONMENT_NEEDS.md, NEEDED_FOR_TESTING.md, SOT.md, PLANNING_THOUGHTS.md, DUMMIES.md, TODO.md, RESUME_NOTES.md) to reflect the integration workflow, dataset generation, and the new Pydantic policy.
 
 ## Environment State
@@ -26,5 +28,5 @@
 1. Address remaining `TODO.md` priority items (backend-native vector similarity, Celery worker integration, grpcurl end-to-end tests) now that graph services are accessible locally.
 2. Automate the integration suite in CI and capture resource requirements for shared infrastructure.
 3. Prepare grpcurl-based smoke tests for `meshmind serve-grpc` and plan protobuf client packaging once integration coverage extends beyond the Python stub.
-4. Feed findings from large synthetic datasets into retry/backoff defaults and document recommended values in `ENVIRONMENT_NEEDS.md`.
+4. Feed findings from large synthetic datasets into retry/backoff defaults and document recommended values in `ENVIRONMENT_NEEDS.md`, validating the new ingestion workflow as part of those runs.
 5. Continue tracking shim retirements in `DUMMIES.md` and follow the cleanup plan in `CLEANUP.md` so remaining fakes can be removed when infrastructure allows.

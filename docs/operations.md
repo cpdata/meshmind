@@ -72,7 +72,10 @@ This guide covers operational tasks for MeshMind deployments.
 
 - `make benchmarks` runs the synthetic benchmarking scripts (`scripts/evaluate_importance.py`, `scripts/consolidation_benchmark.py`, `scripts/benchmark_pagination.py`) with fast defaults and stores JSON summaries in `build/benchmarks/`.
 - Override script flags to stress specific backends (for example `--backend neo4j` or higher iteration counts) once live services are provisioned, and capture findings in `FINDINGS.md` / `ENVIRONMENT_NEEDS.md`.
-- Use `scripts/generate_synthetic_dataset.py` to produce large JSONL/CSV corpora (defaults: 10k memories, 20k triplets, 384-dim embeddings) before loading data into Memgraph/Neo4j for stress testing.
+- Use `scripts/generate_synthetic_dataset.py` to produce large JSONL/CSV corpora (defaults: 10k memories, 20k triplets, 384-dim embeddings) before loading data into Memgraph/Neo4j for stress testing. Pair the generator with the ingestion snippet from `docs/retrieval.md` to hydrate graph backends quickly without recomputing embeddings. Triplet payloads now include `entity_label` so they align with `Triplet` validation without extra preprocessing. When loading via the MeshMind client:
+  - Batch writes (for example in chunks of 500 memories/triplets) to keep request payload sizes manageable.
+  - Align namespaces across the JSONL/CSV payloads and retrieval queries so pagination filters remain effective.
+  - Call `meshmind.cli.admin counts --namespace <ns>` after ingestion to confirm memory distribution before executing benchmarks.
 
 ## Deployment Considerations
 
