@@ -202,7 +202,8 @@ Tasks instantiate the driver lazily, emit structured logs/metrics, and persist c
 ## Benchmarking & Evaluation
 - **Synthetic dataset generation** – `scripts/generate_synthetic_dataset.py` creates large JSONL/CSV corpora of
   memories/triplets (defaults: 10k memories, 20k triplets, 384-dim embeddings) so you can stress retrieval, consolidation,
-  and integration flows before ingesting real data.
+  and integration flows before ingesting real data. Triplet rows now ship with `entity_label` to match
+  `meshmind.core.types.Triplet`.
 - **Synthetic dataset ingestion** – Follow the workflow documented in `docs/retrieval.md` to load the generated JSONL/CSV
   payloads into MeshMind via the Python client. The operations guide walks through batching tips and post-ingestion
   verification so benchmark runs start from a consistent baseline.

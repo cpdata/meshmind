@@ -24,9 +24,10 @@
   consolidation heuristics and pagination under load. The new
   `scripts/generate_synthetic_dataset.py` utility produces JSONL/CSV corpora
   (defaults: 10k memories, 20k triplets, 384-dim embeddings) that can be copied to
-  shared storage for on-demand benchmarking. Pair the shared datasets with the
-  ingestion workflow documented in `docs/retrieval.md` so operators can seed
-  environments quickly without recomputing embeddings.
+  shared storage for on-demand benchmarking. Triplet rows now embed `entity_label`,
+  so pairing the shared datasets with the ingestion workflow documented in
+  `docs/retrieval.md` lets operators seed environments quickly without recomputing
+  embeddings or rewriting CSV headers.
 - Maintain outbound package download access to PyPI and vendor repositories; this
   session confirmed package installation works when the network is open, and future
   sessions need the same capability to refresh locks or install new optional

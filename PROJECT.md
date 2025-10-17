@@ -78,7 +78,7 @@
 - Docker Compose now provisions Memgraph, Neo4j, and Redis; integration-specific stacks (including the Celery worker) live under
   `meshmind/tests/docker/`. `pytest -m integration` exercises live services once the stack is running. See `ENVIRONMENT_NEEDS.md`
   and `SETUP.md` for enabling optional services locally.
-- `scripts/generate_synthetic_dataset.py` produces large JSONL/CSV corpora (defaults: 10k memories, 20k triplets, 384-dim embeddings) to stress retrieval and consolidation flows prior to ingesting real datasets. The accompanying ingestion workflow documented in `docs/retrieval.md` shows how to hydrate graph drivers without recomputing embeddings.
+- `scripts/generate_synthetic_dataset.py` produces large JSONL/CSV corpora (defaults: 10k memories, 20k triplets, 384-dim embeddings) to stress retrieval and consolidation flows prior to ingesting real datasets. Triplet rows ship with `entity_label` so the ingestion workflow documented in `docs/retrieval.md` hydrates graph drivers without additional preprocessing.
 
 ## Roadmap Highlights
 - Push graph-backed retrieval deeper into the drivers (vector similarity, structured filters) so the new server-side filtering/pagination evolves into full backend-native ranking.

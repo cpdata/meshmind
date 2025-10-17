@@ -2,6 +2,7 @@
 
 ## Completed
 
+- [x] Ensure `scripts/generate_synthetic_dataset.py` emits `entity_label` for triplet CSV rows and refresh ingestion docs.
 - [x] Remove week estimate qualifiers from roadmap horizon headings to keep milestone labels qualitative.
 - [x] Implement dependency guards and lazy imports for optional packages (`pymgclient`, `tiktoken`, `celery`, `sentence-transformers`).
 - [x] Add bootstrap helper for default encoder registration and call it from the CLI.

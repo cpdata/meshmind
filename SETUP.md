@@ -80,8 +80,9 @@ docker compose -f meshmind/tests/docker/memgraph.yml up -d
 ```
 
 > Need synthetic load? Run `python scripts/generate_synthetic_dataset.py build/datasets/benchmark`
-> to seed JSONL/CSV fixtures before loading them into Memgraph/Neo4j for stress tests. Follow the
-> ingestion workflow in `docs/retrieval.md` when copying the fixtures into your graph backend so
+> to seed JSONL/CSV fixtures before loading them into Memgraph/Neo4j for stress tests. Triplet rows
+> now include `entity_label`, so the ingestion workflow in `docs/retrieval.md` can materialize
+> `Triplet` models without mutating CSV fields. Follow the ingestion steps when copying fixtures so
 > benchmarks reuse the same namespace/layout.
 
 ### 3.2 Cleaning up

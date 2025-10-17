@@ -69,7 +69,8 @@ The command stores JSON summaries under `build/benchmarks/`:
 Adjust the script flags (for example `--backend`, `--iterations`, or `--count`) to stress alternative drivers or larger
 datasets; see `scripts/*.py` for supported options. Document notable findings in `FINDINGS.md` or `ENVIRONMENT_NEEDS.md`
 when tuning defaults for new environments. Use `scripts/generate_synthetic_dataset.py` to generate large JSONL/CSV corpora
-before loading them into Memgraph/Neo4j for scale testing.
+before loading them into Memgraph/Neo4j for scale testing; the triplet CSV now includes `entity_label` so importing with
+`Triplet(**row)` succeeds without extra preprocessing.
 
 ## Adding Tests
 
