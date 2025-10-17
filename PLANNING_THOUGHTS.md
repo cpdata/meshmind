@@ -11,9 +11,10 @@
 - **LLM Provider Strategy** – Track evaluation results for OpenAI-compatible providers (OpenRouter, Google) and capture failover requirements.
 - **Maintenance Scheduling** – Record chosen cadence, concurrency, and backoff defaults once consolidation heuristics are validated at scale.
 - **Schema Governance** – Capture conventions for namespaces, entity labels, and predicate registries so ingestion pipelines stay consistent.
+- **Pydantic Model Policy** – Follow the documented plan (target Pydantic 2.12+, refresh locks when 3.13 wheels land, record migration guidance) to avoid resurrecting compatibility shims.
 
 ## Upcoming Research
-- Benchmark consolidation heuristics on synthetic datasets representing customer scale and capture telemetry snapshots.
+- Benchmark consolidation heuristics on synthetic datasets representing customer scale and capture telemetry snapshots (seed data via `scripts/generate_synthetic_dataset.py`).
 - Compare graph query latency across in-memory, SQLite, Memgraph, and Neo4j drivers when using pagination and filtering.
 - Evaluate rerank quality across LLM providers using a labelled evaluation set to determine optimal default models.
 - Investigate options for secure secret storage (e.g., Vault, AWS Secrets Manager) to standardise API key management.

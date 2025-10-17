@@ -1,5 +1,19 @@
 # Changelog
 
+## [2025-10-16T20:39:06-04:00 (America/New_York)]
+### Added
+- Added live integration coverage for Memgraph, Neo4j, and Redis via `meshmind/tests/test_integration_live.py` and configured
+  pytest markers/default options in `pyproject.toml` so `pytest -m integration` exercises the docker-compose stack.
+- Introduced `scripts/generate_synthetic_dataset.py` to produce large JSONL/CSV corpora (defaults: 10k memories, 20k triplets,
+  384-dim embeddings) for benchmarking and load testing.
+
+### Changed
+- Regenerated `uv.lock`, pinned `.python-version` to 3.12, and updated installation guidance (`README.md`, `SETUP.md`,
+  `docs/development.md`, `docs/testing.md`, `docs/operations.md`, `ENVIRONMENT_NEEDS.md`, `NEEDED_FOR_TESTING.md`) to standardise on
+  `uv sync --all-extras` and document the new Pydantic 2.x policy.
+- Refreshed planning and status collateral (`PROJECT.md`, `PLAN.md`, `SOT.md`, `ROADMAP.md`, `PLANNING_THOUGHTS.md`,
+  `RECOMMENDATIONS.md`, `RESUME_NOTES.md`, `DUMMIES.md`, `TODO.md`, `ISSUES.md`) to reflect integration workflows, dataset
+  generation guidance, and completed approval tasks.
 ## [2025-10-16T16:35:00-04:00 (America/New_York)]
 ### Added
 - Added a `serve-grpc` CLI subcommand (`meshmind/cli/__main__.py`) that instantiates

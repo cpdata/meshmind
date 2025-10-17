@@ -79,10 +79,14 @@
 - [x] Teach docker-compose stacks (root and `meshmind/tests/docker/full-stack.yml`) to launch the gRPC service via the new CLI entry point.
 - [x] Add pytest coverage for `scripts/check_protos.py` so protobuf drift detection stays exercised.
 - [x] Expand the documentation guard mapping to require API/operations updates when CLI modules change.
+- [x] Validate Neo4j driver requirements and connectivity against a live cluster (integration suite exercises docker-compose services).
+- [x] Provision Neo4j, Memgraph, and Redis instances accessible from the development environment to unblock live integration tests (documented via docker-compose).
+- [x] Approve and install optional dependencies (`neo4j`, `pymgclient`, `redis`, `celery`, `tiktoken`, `sentence-transformers`) across CI and developer machines to exercise full workflows (standardised on `uv sync --all-extras`).
+- [x] Source or generate large synthetic datasets for consolidation and retrieval benchmarking to validate heuristics under load (`scripts/generate_synthetic_dataset.py`).
+- [x] Define and ratify a policy for reintroducing Pydantic models (version targets, rollout timeline) so compatibility shims remain unnecessary going forward (documented in `docs/development.md`).
 
 ## Priority Tasks
 
-- [ ] Validate Neo4j driver requirements and connectivity against a live cluster (exercise CLI admin checks end-to-end).
 - [ ] Implement backend-native vector similarity queries for Memgraph/Neo4j to eliminate Python-side scoring when embeddings are present.
 - [ ] Run `scripts/consolidation_benchmark.py` against a ≥10k-memory dataset and document recommended retry defaults in `README.md` and `ENVIRONMENT_NEEDS.md`.
 - [ ] Run `scripts/benchmark_pagination.py` against live Memgraph/Neo4j instances to tune default pagination limits and capture guidance in `docs/retrieval.md`.
@@ -90,10 +94,8 @@
 - [ ] Validate the documented curl/grpcurl snippets against deployed REST/gRPC services (with auth) once staging environments are reachable.
 - [ ] Add integration tests that spin up `meshmind serve-grpc` and exercise ingestion/search via grpcurl to complement the unit-level coverage (blocked until network-accessible infrastructure is ready).
 - [ ] Publish protobuf-generated client artifacts (Python wheel or language-neutral bundles) so external services can consume the API once infrastructure is available.
-- [ ] Provision Neo4j, Memgraph, and Redis instances accessible from the development environment to unblock live integration tests (requires infrastructure support).
-- [ ] Approve and install optional dependencies (`neo4j`, `pymgclient`, `redis`, `celery`, `tiktoken`, `sentence-transformers`) across CI and developer machines to exercise full workflows.
-- [ ] Source or generate large synthetic datasets for consolidation and retrieval benchmarking to validate heuristics under load.
-- [ ] Define and ratify a policy for reintroducing Pydantic models (version targets, rollout timeline) so compatibility shims remain unnecessary going forward.
+- [ ] Automate the live integration suite (`pytest -m integration`) in CI so Memgraph/Neo4j/Redis regressions fail fast.
+- [ ] Document ingestion workflows for the synthetic dataset generator across `docs/retrieval.md` and operations guides so benchmarking instructions stay cohesive.
 - [ ] Document the retired REST/Celery shims in release notes and communicate migration steps to downstream integrators.
 - [ ] Capture gRPC CLI usage examples (including docker-compose orchestration) in `docs/api.md` and `docs/operations.md` once integration smoke tests complete.
 

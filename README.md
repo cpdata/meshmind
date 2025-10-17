@@ -34,11 +34,13 @@ regex, exact-match, fuzzy, and BM25 scoring with optional LLM reranking.
 > **Tip:** For automated provisioning with internet access, run `./run/install_setup.sh` from the project root (requires sudo).
 
 1. Create and activate a virtual environment using Python 3.11/3.12 (e.g., `uv venv`, `python -m venv .venv`).
-2. Upgrade `pip` and install MeshMind with all optional extras:
+2. Upgrade tooling and install MeshMind with all optional extras via `uv` (which
+   honours the generated `uv.lock`):
    ```bash
    python -m pip install --upgrade pip
    pip install uv
-   uv pip install --system -e .[dev,docs,testing]  # drop --system if you're inside a virtualenv
+   uv python pin 3.12           # keeps `.python-version` aligned with the project requirement
+   uv sync --all-extras         # creates .venv and installs the dev/docs/testing extras
    ```
 3. Export required environment variables (or populate `.env`; see `SETUP.md`):
    ```bash
@@ -198,6 +200,9 @@ Tasks instantiate the driver lazily, emit structured logs/metrics, and persist c
   need a dry run without network access.
 
 ## Benchmarking & Evaluation
+- **Synthetic dataset generation** – `scripts/generate_synthetic_dataset.py` creates large JSONL/CSV corpora of
+  memories/triplets (defaults: 10k memories, 20k triplets, 384-dim embeddings) so you can stress retrieval, consolidation,
+  and integration flows before ingesting real data.
 - **Importance scoring** – `scripts/evaluate_importance.py` runs the heuristic against JSON or synthetic datasets and reports
   descriptive statistics for quick regression checks.
 - **Consolidation throughput** – `scripts/consolidation_benchmark.py` generates synthetic workloads to measure batch merging
@@ -270,9 +275,11 @@ Tasks instantiate the driver lazily, emit structured logs/metrics, and persist c
   once external services are provisioned.
 
 ## Testing
-- Run `pytest` to execute the suite; tests rely on fixtures and fake drivers so they do not require external services or optional libraries.
+- Run `pytest` to execute the default suite; tests rely on fixtures and fake drivers so they do not require external services or optional libraries.
+- Integration coverage lives under `meshmind/tests/test_integration_live.py` and is marked with `@pytest.mark.integration`.
+  Start the docker-compose stack (`docker compose up -d`) and run `pytest -m integration` to exercise live Memgraph, Neo4j, and Redis instances.
 - `make typecheck` invokes `pyright` and `typeguard`; install the tooling listed above beforehand.
-- See `ENVIRONMENT_NEEDS.md` for environment requirements and known blockers (Docker/Memgraph/Redis availability).
+- See `ENVIRONMENT_NEEDS.md` for environment requirements, docker resource guidance, and troubleshooting tips.
 
 ## Known Limitations
 - Graph-backed retrieval still hydrates candidates client-side (now filtered by namespace and entity label); server-side vector search remains future work.

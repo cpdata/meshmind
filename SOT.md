@@ -28,6 +28,7 @@ Supporting assets:
 - `SETUP.md`: End-to-end provisioning instructions covering Python deps, environment variables, and Compose workflows.
 - `run/install_setup.sh`, `run/maintenance_setup.sh`: Automation scripts for provisioning fresh environments and refreshing cached workspaces.
 - `scripts/evaluate_importance.py`, `scripts/consolidation_benchmark.py`, `scripts/benchmark_pagination.py`: Evaluation and benchmarking tools for importance heuristics, consolidation throughput, and driver pagination performance.
+- `scripts/generate_synthetic_dataset.py`: Produces large JSONL/CSV corpora (defaults: 10k memories, 20k triplets, 384-dim embeddings) for integration and benchmark scenarios.
 - `.github/workflows/ci.yml`: GitHub Actions workflow running linting/formatting checks and pytest.
 - `pyproject.toml`: Project metadata and dependency list (pins Python `>=3.11,<3.13`; see compatibility notes in `ISSUES.md`).
 - Documentation (`PROJECT.md`, `PLAN.md`, `SOT.md`, `README.md`, etc.) describing the system and roadmap.
@@ -139,10 +140,12 @@ Supporting assets:
   retrieval strategies.
 - `meshmind/tests`: Pytest suites rely on fixtures (`memory_factory`, `dummy_encoder`, in-memory drivers, service stubs) and
   pure-Python doubles (compatibility BaseModel, fake Memgraph/Redis/embedding/LLM clients), allowing the suite to run without
-  Memgraph, OpenAI, or Redis dependencies. `test_grpc_runtime.py` spins up the asyncio gRPC server helpers to validate
-  ingestion/search round-trips and cancellation handling, `test_protos_packaging.py` guards the packaged proto artefacts,
-  `test_setup_scripts.py` exercises the provisioning scripts in validation mode, `test_counts_smoke.py` covers REST/CLI count
-  surfaces, and `test_tasks_scheduled.py` verifies maintenance backoff semantics.
+  Memgraph, OpenAI, or Redis dependencies. `test_integration_live.py` runs when `pytest -m integration` is invoked and
+  exercises live Memgraph/Neo4j/Redis connections from the docker-compose stack. `test_grpc_runtime.py` spins up the asyncio
+  gRPC server helpers to validate ingestion/search round-trips and cancellation handling, `test_protos_packaging.py` guards
+  the packaged proto artefacts, `test_setup_scripts.py` exercises the provisioning scripts in validation mode,
+  `test_counts_smoke.py` covers REST/CLI count surfaces, and `test_tasks_scheduled.py` verifies maintenance backoff
+  semantics.
 
 - Required: `openai`, `pydantic`, `pydantic-settings`, `python-dotenv`. Install `pymgclient` (for the runtime `mgclient` module) when using Memgraph and install the `neo4j`
   driver when targeting Neo4j. Pure-Python fallbacks exist for Pydantic, numpy, scikit-learn, and rapidfuzz but production deployments

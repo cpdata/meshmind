@@ -18,8 +18,9 @@
    Graph-backed wrappers now rely on driver-side filtering, pagination, and aggregation before in-memory scoring. Next: push
    similarity computation into Memgraph/Neo4j so vector rankings can execute server-side without Python hydration.
 2. **Maintenance Tasks** – Tasks emit telemetry, persist consolidation/compression results, and now retry conflicting writes with
-   configurable exponential backoff (`MAINTENANCE_MAX_ATTEMPTS`, `MAINTENANCE_BASE_DELAY_SECONDS`). Synthetic benchmark scripts and
-   large-fixture tests validate behaviour on bigger workloads; next, replay production-like datasets to tune thresholds.
+   configurable exponential backoff (`MAINTENANCE_MAX_ATTEMPTS`, `MAINTENANCE_BASE_DELAY_SECONDS`). Synthetic benchmark scripts,
+   the new `scripts/generate_synthetic_dataset.py`, and integration tests against live Memgraph/Neo4j validate behaviour on larger
+   workloads; next, replay production-like datasets to tune thresholds.
 3. **Importance Scoring Improvements** – Heuristic scoring is live, records distribution metrics via telemetry, and ships with
    `scripts/evaluate_importance.py` for synthetic/offline evaluation. Next: incorporate real feedback loops or LLM-assisted
    ranking to tune weights over time.
@@ -30,9 +31,9 @@
 
 ## Phase 4 – Developer Experience & Tooling (In Progress)
 1. **Testing Overhaul** – Pytest suites rely on local fixtures and fake drivers with coverage for graph-backed retrieval, Neo4j
-   connectivity shims, CLI admin helpers, documentation guard, setup scripts, and the new benchmarking utilities. Continue adding
-   cross-backend integration coverage and track shim retirement progress in `DUMMIES.md` so integration suites can replace them
-   incrementally.
+   connectivity shims, CLI admin helpers, documentation guard, setup scripts, the new benchmarking utilities, and live
+   integration coverage (`pytest -m integration`) for Memgraph/Neo4j/Redis. Continue tracking shim retirement progress in
+   `DUMMIES.md` so integration suites can replace them incrementally.
 2. **Automation & CI** – Makefile provides lint/format/type/test/docs-guard targets and CI runs fmt-check, docs guard, and
    pytest. Protobuf drift now fails CI via `make protos-check`. Add caching and matrix builds when dependencies stabilize.
 3. **Environment Provisioning** – Docker Compose now provisions Memgraph, Neo4j,
