@@ -14,9 +14,9 @@
 - [x] Create real docker-compose services for Memgraph and Redis or remove the placeholder file.
 - [x] Centralize LLM provider usage behind a configurable client wrapper to remove direct `openai` imports scattered through the codebase.
 - [x] Surface LLM override fields via REST/gRPC payloads and integration tests so service clients can select providers/models like the CLI.
-- [ ] Document Neo4j driver requirements and verify connectivity against a live cluster (CLI connectivity checks exist but still need validation against a real instance).
+- [x] Document Neo4j driver requirements and verify connectivity against a live cluster (integration suite now hits the docker-compose Neo4j service).
 - [ ] Exercise the new namespace/entity-label filtering against live Memgraph/Neo4j datasets to confirm Cypher predicates behave as expected.
-- [ ] Regenerate `uv.lock` to reflect the updated dependency set (`pymgclient`, `fastapi`, `uvicorn`, extras) so CI tooling stays in sync.
+- [x] Regenerate `uv.lock` to reflect the updated dependency set (`pymgclient`, `fastapi`, `uvicorn`, extras) so CI tooling stays in sync.
 ## Medium Priority
 - [x] Persist results from consolidation and compression tasks back to the database (currently in-memory only).
 - [x] Refine `Memory.importance` scoring to reflect actual ranking heuristics instead of a constant.

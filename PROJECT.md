@@ -46,7 +46,7 @@
 
 ## Partially Implemented or Fragile Areas
 - The LLM-backed embedding wrapper still assumes dictionary-style responses; adjust once SDK models are fully adopted.
-- Neo4j driver support is import-guarded; the new CLI connectivity check still needs validation against a live cluster.
+- Neo4j driver support remains import-guarded, but integration tests now validate CRUD/count operations against the docker-compose Neo4j stack. Continue monitoring driver updates for production deployments.
 - Maintenance tasks rely on in-process heuristics for consolidation summaries; conflict resolution now retries with configurable exponential backoff, but long-term storage thresholds still need validation against production datasets.
 - Importance scoring now records telemetry but still relies on heuristics; richer scoring logic or LLM-assisted ranking is pending.
 - SQLite driver currently stores JSON blobs; future work may normalize columns for structured querying.
@@ -76,7 +76,9 @@
 - Benchmark and evaluation utilities live in `scripts/` (`evaluate_importance.py`, `consolidation_benchmark.py`, `benchmark_pagination.py`) to validate heuristics and driver performance without external infrastructure.
 - Developer-facing documentation now lives in `docs/` alongside the canonical `README.md`; the docs guard (`make docs-guard`) enforces synchronized updates when modules change.
 - Docker Compose now provisions Memgraph, Neo4j, and Redis; integration-specific stacks (including the Celery worker) live under
-  `meshmind/tests/docker/`. See `ENVIRONMENT_NEEDS.md` and `SETUP.md` for enabling optional services locally.
+  `meshmind/tests/docker/`. `pytest -m integration` exercises live services once the stack is running. See `ENVIRONMENT_NEEDS.md`
+  and `SETUP.md` for enabling optional services locally.
+- `scripts/generate_synthetic_dataset.py` produces large JSONL/CSV corpora (defaults: 10k memories, 20k triplets, 384-dim embeddings) to stress retrieval and consolidation flows prior to ingesting real datasets.
 
 ## Roadmap Highlights
 - Push graph-backed retrieval deeper into the drivers (vector similarity, structured filters) so the new server-side filtering/pagination evolves into full backend-native ranking.

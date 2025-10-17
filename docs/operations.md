@@ -20,6 +20,7 @@ This guide covers operational tasks for MeshMind deployments.
   when network access is unavailable.
 - `run/maintenance_setup.sh` refreshes cached environments with the same validation logic and respects the same skip flags so
   CI can dry-run provisioning.
+- After provisioning, run `docker compose up -d` and `pytest -m integration` to validate live Memgraph/Neo4j/Redis connectivity alongside the default unit suite.
 
 ## gRPC Service Deployment
 
@@ -71,6 +72,7 @@ This guide covers operational tasks for MeshMind deployments.
 
 - `make benchmarks` runs the synthetic benchmarking scripts (`scripts/evaluate_importance.py`, `scripts/consolidation_benchmark.py`, `scripts/benchmark_pagination.py`) with fast defaults and stores JSON summaries in `build/benchmarks/`.
 - Override script flags to stress specific backends (for example `--backend neo4j` or higher iteration counts) once live services are provisioned, and capture findings in `FINDINGS.md` / `ENVIRONMENT_NEEDS.md`.
+- Use `scripts/generate_synthetic_dataset.py` to produce large JSONL/CSV corpora (defaults: 10k memories, 20k triplets, 384-dim embeddings) before loading data into Memgraph/Neo4j for stress testing.
 
 ## Deployment Considerations
 

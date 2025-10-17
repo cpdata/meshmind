@@ -8,8 +8,8 @@
 - Use a virtual environment (`uv`, `venv`, or `conda`) to isolate dependencies.
 
 ## Python Dependencies
-- Install the project editable (with extras) using `pip install -e .[dev,docs,testing]` or
-  `uv pip install --system -e .[dev,docs,testing]` from the repository root.
+- Install the project editable (with extras) using `uv sync --all-extras` (preferred; honours `uv.lock` and the repository's
+  `.python-version`) or `pip install -e .[dev,docs,testing]` if `uv` is unavailable.
 - Core functionality relies on the OpenAI SDK (or compatible fork), `pydantic`, and `pydantic-settings`; the project now
   requires Pydantic 2.x directly (the legacy shim has been removed).
 - Optional packages improve specific workflows (now bundled in the editable install extras so they install automatically when
@@ -39,8 +39,9 @@
 - **Redis** for Celery task queues, referenced through `REDIS_URL`.
 - **LLM provider access** for extraction, embeddings, and reranking (`LLM_API_KEY` or fallback `OPENAI_API_KEY`, plus optional
   `LLM_*_BASE_URL` overrides for alternative providers).
-- Recommended: Docker Compose (shipped in repo) to run Memgraph, Neo4j, and Redis together when developing locally. Additional
-  targeted stacks live under `meshmind/tests/docker/` for integration tests.
+- Recommended: Docker Compose (shipped in repo) to run Memgraph, Neo4j, and Redis together when developing locally. Start the
+  root stack with `docker compose up -d` before executing `pytest -m integration`; targeted stacks live under
+  `meshmind/tests/docker/` for focused scenarios.
 
 ## Environment Variables
 - `GRAPH_BACKEND` — `memory`, `sqlite`, `memgraph`, or `neo4j` (defaults to `memory`).
@@ -66,15 +67,12 @@
   and exercise it with `fastapi.testclient.TestClient` (requires the `httpx`
   package); pair it with the `GrpcServiceStub` for lightweight gRPC coverage when
   external services are unavailable.
-- Use `meshmind/testing` fakes (`FakeMemgraphDriver`, `FakeRedisBroker`, `FakeEmbeddingEncoder`, `FakeLLMClient`) in tests or demos to eliminate external infrastructure requirements.
+- Use `meshmind/testing` fakes (`FakeMemgraphDriver`, `FakeRedisBroker`, `FakeEmbeddingEncoder`, `FakeLLMClient`) in tests or demos to eliminate external infrastructure requirements. Integration suites marked with `@pytest.mark.integration` exercise live Memgraph/Neo4j/Redis instances and expect the docker stack to be running.
 - Invoke `meshmind admin predicates` and `meshmind admin maintenance --max-attempts <n> --base-delay <seconds> --run <task>` during local runs to inspect predicate registries, telemetry, and tune maintenance retries without external services.
-- Use the benchmarking utilities in `scripts/` (`evaluate_importance.py`, `consolidation_benchmark.py`, `benchmark_pagination.py`) to validate heuristics and driver performance offline before connecting to live infrastructure.
+- Use the benchmarking utilities in `scripts/` (`evaluate_importance.py`, `consolidation_benchmark.py`, `benchmark_pagination.py`) to validate heuristics and driver performance offline before connecting to live infrastructure. Generate large corpora with `scripts/generate_synthetic_dataset.py` when you need ≥10k memories for stress tests.
 - Seed demo data as needed using the `examples/extract_preprocess_store_example.py` script after configuring environment
   variables.
 - Create a `.env` file storing the environment variables above for consistent local configuration.
 
 ## Current Blockers in This Environment
-- Neo4j/Memgraph binaries and Docker are unavailable in this workspace, preventing local graph provisioning; use the in-memory or SQLite drivers instead.
-- Redis cannot be installed without container or host-level access; Celery tasks remain untestable locally until a remote
-  instance is provisioned (the fake broker satisfies unit tests but not end-to-end runs).
-- External network restrictions may limit installation of proprietary packages or access to OpenAI endpoints.
+- External network restrictions may limit installation of proprietary packages or access to OpenAI-compatible endpoints.

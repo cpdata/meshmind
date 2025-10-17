@@ -32,13 +32,14 @@ execution and automated testing.
    ```bash
    python -m pip install --upgrade pip
    pip install uv
-   uv pip install --system -e .[dev,docs,testing]  # omit --system when inside an active virtualenv
+   uv python pin 3.12      # keeps `.python-version` aligned with the supported range
+   uv sync --all-extras    # installs the project plus dev/docs/testing extras into .venv
    ```
 
-   The editable install pulls in the optional dependencies used by the REST service
-  (`fastapi`, `uvicorn`), the graph drivers (`neo4j`, `pymgclient`, `redis`), LLM tooling
-   (`openai`, `tiktoken`, `sentence-transformers`), and developer utilities (ruff,
-   pyright, typeguard, docs tooling, pytest plugins).
+   The sync command honours `uv.lock` and pulls in the optional dependencies used by
+   the REST service (`fastapi`, `uvicorn`), the graph drivers (`neo4j`, `pymgclient`,
+   `redis`), LLM tooling (`openai`, `tiktoken`, `sentence-transformers`), and developer
+   utilities (ruff, pyright, typeguard, docs tooling, pytest plugins).
 
 3. Copy the sample environment file and adjust values as needed:
 
@@ -77,6 +78,9 @@ Example (Memgraph only):
 ```bash
 docker compose -f meshmind/tests/docker/memgraph.yml up -d
 ```
+
+> Need synthetic load? Run `python scripts/generate_synthetic_dataset.py build/datasets/benchmark`
+> to seed JSONL/CSV fixtures before loading them into Memgraph/Neo4j for stress tests.
 
 ### 3.2 Cleaning up
 
@@ -120,13 +124,15 @@ After installing dependencies and starting the services:
 
 ```bash
 make test
+pytest -m integration                # requires docker compose up -d
 meshmind admin graph --backend memgraph
 meshmind admin graph --backend neo4j
 meshmind admin counts --backend sqlite
 ```
 
-You should see passing pytest output and successful graph connectivity checks. Refer to
-`docs/troubleshooting.md` if any of the services fail health checks.
+You should see passing unit tests, integration output, and successful graph
+connectivity checks. Refer to `docs/troubleshooting.md` if any of the services
+fail health checks.
 
 To validate the gRPC surface locally:
 

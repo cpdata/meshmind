@@ -25,6 +25,7 @@ backends.
 - `meshmind/tests/test_benchmark_scripts.py`: smoke the benchmarking CLI utilities (`scripts/evaluate_importance.py`, `scripts/consolidation_benchmark.py`, `scripts/benchmark_pagination.py`).
 - `meshmind/tests/test_api_examples.py`: validate the documented curl/grpcurl payloads against the FastAPI app and gRPC stub.
 - `meshmind/tests/test_protos_packaging.py`: guarantee that the canonical proto file ships with the distribution and still defines the expected service endpoints.
+- `meshmind/tests/test_integration_live.py`: exercises live Memgraph, Neo4j, and Redis connections (marked with `@pytest.mark.integration`) to validate driver CRUD/counts and Redis round-trips against the docker-compose stack.
 
 ## Fakes & Fixtures
 
@@ -38,8 +39,10 @@ backends.
 ## Running Tests
 
 ```bash
-pip install -e .[dev,docs,testing]
-pytest
+uv sync --all-extras   # or pip install -e .[dev,docs,testing]
+pytest                 # default unit suite
+docker compose up -d   # start Memgraph/Neo4j/Redis for integration tests
+pytest -m integration  # exercise live services
 ```
 
 Optional extras:
@@ -65,7 +68,8 @@ The command stores JSON summaries under `build/benchmarks/`:
 
 Adjust the script flags (for example `--backend`, `--iterations`, or `--count`) to stress alternative drivers or larger
 datasets; see `scripts/*.py` for supported options. Document notable findings in `FINDINGS.md` or `ENVIRONMENT_NEEDS.md`
-when tuning defaults for new environments.
+when tuning defaults for new environments. Use `scripts/generate_synthetic_dataset.py` to generate large JSONL/CSV corpora
+before loading them into Memgraph/Neo4j for scale testing.
 
 ## Adding Tests
 

@@ -5,8 +5,8 @@ This guide summarizes expectations when contributing to MeshMind.
 ## Prerequisites
 
 - Python 3.11 or 3.12 is recommended (see `pyproject.toml`).
-- Install dependencies with `pip install -e .[dev,docs,testing]` (or `uv pip install --system -e .[dev,docs,testing]`; drop
-  `--system` when using an activated virtualenv).
+- Install dependencies with `uv sync --all-extras` (preferred) or `pip install -e .[dev,docs,testing]` if `uv` is unavailable; drop
+  `--system` when using an activated virtualenv.
 - Optional extras: none—`.[dev,docs,testing]` pulls in REST tooling (`fastapi`, `uvicorn`), graph drivers (`neo4j`, `pymgclient`,
   `redis`), LLM tooling (`openai`, `tiktoken`, `sentence-transformers`), and developer utilities. Refer to `SETUP.md` for
   service provisioning steps.
@@ -24,6 +24,15 @@ This guide summarizes expectations when contributing to MeshMind.
 - Each change batch must append a timestamped entry to `CHANGELOG.md` describing modules, functions, and rationale.
 - Maintain `RESUME_NOTES.md` at the end of every turn to capture context for future sessions.
 - Run `make docs-guard` (optionally with `BASE_REF=<ref>`) before pushing to ensure code changes have matching documentation updates.
+
+## Pydantic Model Policy
+
+- MeshMind now requires `pydantic>=2.12` and targets Python 3.11–3.12. Compatibility shims have been removed; all new models
+  must subclass the native Pydantic 2 `BaseModel`.
+- Maintain parity with the latest 2.x minor releases and plan to refresh the lockfile quarterly once upstream publishes wheels
+  for Python 3.13. Until then, enforce `.python-version` <= 3.12 in the repo.
+- When introducing breaking model changes, update REST/gRPC payloads and integration tests concurrently and record migration
+  notes in `CHANGELOG.md` and release documentation.
 
 ## Testing
 
