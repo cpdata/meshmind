@@ -4,6 +4,7 @@ from __future__ import annotations
 from typing import Callable, Iterable, List, Optional, Sequence
 
 from meshmind.api.memory_manager import MemoryManager
+from meshmind.core.embeddings import EncoderRegistry
 from meshmind.core.types import Memory, SearchConfig
 from meshmind.db.base_driver import GraphDriver
 from meshmind.retrieval.search import (
@@ -12,8 +13,8 @@ from meshmind.retrieval.search import (
     search_exact,
     search_fuzzy,
     search_regex,
-    search_vector,
 )
+from meshmind.retrieval.vector import vector_search_from_embeddings
 
 Reranker = Callable[[str, Sequence[Memory], int], Sequence[Memory]]
 
@@ -93,7 +94,31 @@ def graph_vector_search(
 ) -> List[Memory]:
     """Run vector search against graph-backed memories."""
 
+    cfg = config or SearchConfig()
     labels = _ensure_sequence(entity_labels)
+    encoder = EncoderRegistry.get(cfg.encoder)
+    query_embedding = encoder.encode([query])[0]
+
+    results: List[Memory] = []
+    try:
+        scored = driver.vector_search(
+            query_embedding,
+            namespace=namespace,
+            entity_labels=labels,
+            top_k=cfg.top_k,
+        )
+    except Exception:
+        scored = []
+
+    for record, _score in scored:
+        try:
+            results.append(Memory(**record))
+        except Exception:
+            continue
+
+    if results:
+        return results[: cfg.top_k]
+
     memories = _load_memories(
         driver,
         namespace,
@@ -102,13 +127,8 @@ def graph_vector_search(
         config=config,
         use_search=True,
     )
-    return search_vector(
-        query,
-        memories,
-        namespace=namespace,
-        entity_labels=labels,
-        config=config,
-    )
+    reranked = vector_search_from_embeddings(query_embedding, memories, cfg.top_k)
+    return [mem for mem, _ in reranked]
 
 
 def graph_regex_search(

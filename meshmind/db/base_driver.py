@@ -2,12 +2,14 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Any, Dict, List, Optional, Sequence
+from typing import Any, Dict, List, Optional, Sequence, Tuple
 import uuid
 
 
 class GraphDriver(ABC):
     """Abstract base class for graph database drivers."""
+
+    VectorSearchResult = Tuple[Dict[str, Any], float]
 
     @abstractmethod
     def upsert_entity(self, label: str, name: str, props: Dict[str, Any]) -> None:
@@ -82,3 +84,49 @@ class GraphDriver(ABC):
         """Return memory counts grouped by namespace and entity label."""
 
         raise NotImplementedError
+
+    def vector_search(
+        self,
+        query_embedding: Sequence[float],
+        *,
+        namespace: Optional[str] = None,
+        entity_labels: Optional[Sequence[str]] = None,
+        top_k: int = 10,
+    ) -> List[VectorSearchResult]:
+        """Compute cosine similarity against stored embeddings on the client side.
+
+        Drivers with native vector capabilities should override this method with
+        a backend implementation. The fallback retrieves matching entities and
+        ranks them locally.
+        """
+
+        if top_k <= 0:
+            return []
+        embedding = list(query_embedding)
+        if not embedding:
+            return []
+
+        try:
+            candidates = self.list_entities(
+                namespace=namespace,
+                entity_labels=entity_labels,
+            )
+        except NotImplementedError:
+            candidates = []
+
+        if not candidates:
+            return []
+
+        from meshmind.core.similarity import cosine_similarity
+
+        results: List[GraphDriver.VectorSearchResult] = []
+        for candidate in candidates:
+            stored = candidate.get("embedding")
+            try:
+                score = float(cosine_similarity(embedding, list(stored)))
+            except Exception:
+                continue
+            results.append((dict(candidate), score))
+
+        results.sort(key=lambda item: item[1], reverse=True)
+        return results[:top_k]

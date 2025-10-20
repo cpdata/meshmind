@@ -70,8 +70,11 @@ def test_memgraph_driver_connect_and_basic_operations(monkeypatch):
     driver._cursor._rows = [(('s',), ('p',), ('o',), ('ns',), ({'k': 'v'},), (None,))]
     triplets = driver.list_triplets()
     assert triplets and triplets[0]['subject'] == ('s',)
-    # Test vector_search returns list
-    # Use dummy record
-    driver._cursor._rows = [([1.0], {'uuid': 'id1'})]
+    # Test vector_search issues backend query and parses results
+    driver._cursor.description = [('node',), ('score',)]
+    driver._cursor._rows = [({'uuid': 'id1', 'embedding': [1.0]}, 0.9)]
     out = driver.vector_search([1.0], top_k=1)
     assert isinstance(out, list)
+    assert out[0][0]['uuid'] == 'id1'
+    assert pytest.approx(out[0][1]) == 0.9
+    assert 'ORDER BY score DESC' in driver._cursor._last_query
