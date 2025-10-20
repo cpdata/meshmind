@@ -1,5 +1,8 @@
 # Issues Checklist
 
+> [!NOTE]
+> Issue and task tracking now lives in the Beads issue tracker (`bd`). Use `bd list`, `bd show <issue>`, and `bd ready` for the live source of truth; the checklists below remain as historical context.
+
 ## Blockers
 - [x] MeshMind client fails without the `mgclient` module; introduce lazy driver initialization or documented in-memory fallback.
 - [x] Register a default embedding encoder (OpenAI or sentence-transformers) during startup so extraction and hybrid search can run.
