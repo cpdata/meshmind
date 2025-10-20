@@ -1,5 +1,14 @@
 # Changelog
 
+## [2025-10-20T04:12:44-04:00 (America/New_York)]
+### Added
+- Introduced `.beads/` project database and exported Beads issue JSONL by initializing bd and migrating existing TODO items.
+- Added `reference-docs/` snapshots of upstream Beads documentation (`Beads-*.md`) for local reference.
+
+### Changed
+- Rewrote `AGENTS.md` to mandate Beads-based workflow and appended the `bd quickstart` reference output; simplified `TODO.md` to delegate planning to bd.
+- Imported every task from the legacy `TODO.md` into the Beads tracker with appropriate open/closed status and added an `ISSUES.md` note pointing contributors to bd commands.
+
 ## [2025-10-16T20:39:06-04:00 (America/New_York)]
 ### Added
 - Added live integration coverage for Memgraph, Neo4j, and Redis via `meshmind/tests/test_integration_live.py` and configured
