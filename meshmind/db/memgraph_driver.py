@@ -234,22 +234,51 @@ class MemgraphDriver(GraphDriver):
     # ------------------------------------------------------------------
     # Convenience helpers
     # ------------------------------------------------------------------
-    def vector_search(self, embedding: List[float], top_k: int = 10) -> List[Dict[str, Any]]:
-        from meshmind.core.similarity import cosine_similarity
+    def vector_search(
+        self,
+        query_embedding: Sequence[float],
+        *,
+        namespace: Optional[str] = None,
+        entity_labels: Optional[Sequence[str]] = None,
+        top_k: int = 10,
+    ) -> List[GraphDriver.VectorSearchResult]:
+        if top_k <= 0:
+            return []
+        embedding = list(query_embedding)
+        if not embedding:
+            return []
 
-        records = self.find(
-            "MATCH (n) WHERE exists(n.embedding) RETURN n.embedding AS emb, n AS node",
-            {},
+        cypher = (
+            "WITH $embedding AS query\n"
+            "MATCH (m)\n"
+            "WHERE exists(m.embedding)\n"
+            "  AND size(m.embedding) = size(query)\n"
+            "  AND ($namespace IS NULL OR m.namespace = $namespace)\n"
+            "  AND ($labels IS NULL OR m.entity_label IN $labels)\n"
+            "WITH m, query,\n"
+            "     reduce(dot = 0.0, idx IN range(0, size(query) - 1) |\n"
+            "         dot + query[idx] * m.embedding[idx]) AS dot,\n"
+            "     sqrt(reduce(sumq = 0.0, value IN query | sumq + value * value)) AS query_norm,\n"
+            "     sqrt(reduce(sumn = 0.0, value IN m.embedding | sumn + value * value)) AS node_norm\n"
+            "WITH m, CASE WHEN query_norm = 0 OR node_norm = 0 THEN 0.0 ELSE dot / (query_norm * node_norm) END AS score\n"
+            "ORDER BY score DESC\n"
+            "LIMIT $top_k\n"
+            "RETURN m AS node, score"
         )
-        scored = []
-        for rec in records:
-            emb = rec.get("emb")
-            if not isinstance(emb, list):
-                continue
+        params = {
+            "embedding": embedding,
+            "namespace": namespace,
+            "labels": list(entity_labels) if entity_labels else None,
+            "top_k": int(top_k),
+        }
+
+        records = self._execute(cypher, params)
+        results: List[GraphDriver.VectorSearchResult] = []
+        for record in records:
+            node = self._normalize_node(record.get("node"))
             try:
-                score = cosine_similarity(embedding, emb)
+                score = float(record.get("score", 0.0))
             except Exception:
                 score = 0.0
-            scored.append({"node": rec.get("node"), "score": float(score)})
-        scored.sort(key=lambda item: item["score"], reverse=True)
-        return scored[:top_k]
+            results.append((node, score))
+        return results

@@ -1,30 +1,18 @@
 # Resume Notes
 
-## Current Context
-
-- Branch: `work` (rebased from `integration`; PR target remains `integration`).
-- Optional dependencies ship with the `.[dev,docs,testing]` extras; `uv sync --all-extras` (now pinned to Python 3.12 via `.python-version`) installs FastAPI/Uvicorn, Celery/Redis, Neo4j/Memgraph drivers, LLM tooling, and developer linters. The provisioning scripts in `run/` validate these extras before syncing `uv.lock`.
-- Docker orchestration (root `docker-compose.yml` and `meshmind/tests/docker/*.yml`) provisions Memgraph, Neo4j, Redis, the Celery worker, and a gRPC server container; `pytest -m integration` exercises these services once the stack is running.
-- Docker orchestration (root `docker-compose.yml` and `meshmind/tests/docker/*.yml`) now provisions Memgraph, Neo4j, Redis, the Celery worker, and a gRPC server container driven by the new CLI command.
-- The documentation guard enforces updates whenever code within mapped directories changes; planning artifacts (`PLAN.md`, `PROJECT.md`, `SOT.md`, `ROADMAP.md`, `PLANNING_THOUGHTS.md`, `research/`) remain synchronized per agent instructions.
-
 ## Latest Changes
-
-- Added live integration coverage (`meshmind/tests/test_integration_live.py`) for Memgraph, Neo4j, and Redis, introduced a pytest marker configuration, and documented the workflow across README/SETUP/docs.
-- Generated a fresh `uv.lock`, pinned `.python-version` to 3.12, and updated install docs to standardise on `uv sync --all-extras`.
-- Created `scripts/generate_synthetic_dataset.py` for large JSONL/CSV corpora and referenced it across benchmarking docs.
-- Updated documentation and planning collateral (README.md, SETUP.md, docs/development.md, docs/testing.md, docs/operations.md, PROJECT.md, PLAN.md, RECOMMENDATIONS.md, ROADMAP.md, ENVIRONMENT_NEEDS.md, NEEDED_FOR_TESTING.md, SOT.md, PLANNING_THOUGHTS.md, DUMMIES.md, TODO.md, RESUME_NOTES.md) to reflect the integration workflow, dataset generation, and the new Pydantic policy.
+- Implemented backend-native vector search for Memgraph/Neo4j (`meshmind-82`) by adding `GraphDriver.vector_search`, delegating retrieval helpers to the driver, and covering the flow with targeted tests.
+- Reviewed the Beads backlog and created explicit blocker issues (`meshmind-95`–`meshmind-103`) so infrastructure/data gaps stop surfacing as ready work.
+- Assigned codex/human ownership plus `area/*` and `status/blocked` labels across the tracker, giving `bd ready` a clean next-action queue.
+- Streamlined AGENTS.md and ISSUES.md to reference Beads directly while highlighting the new blocker lineup.
 
 ## Environment State
-
-- Docker Compose is available; starting the stack locally (`docker compose up -d`) allows integration tests (`pytest -m integration`) to hit live Memgraph/Neo4j/Redis instances.
-- Internet access is currently enabled and optional packages have been installed via `uv sync`. Keep the network open so dependency locks and maintenance scripts remain functional.
-- Changelog entries must continue using Eastern time with timezone codes; remember to update `CHANGELOG.md` after every batch of changes.
+- `bd ready` now surfaces 10 items: two codex-owned tasks (`meshmind-103`, `meshmind-93`) and eight human-owned blockers (Celery/Redis stack, staging REST/gRPC env, benchmarking clusters, dataset regeneration, protobuf release pipeline, REST/Celery migration context, PyPI access, Pydantic packaging watch).
+- The repository keeps Beads metadata in `.beads/issues.jsonl`; run `bd export -o .beads/issues.jsonl` after mutating the database to sync labels into git.
+- Continue recording changelog entries with America/New_York timestamps and maintain Beads dependencies whenever new blockers emerge.
 
 ## Next Session Starting Points
-
-1. Address remaining `TODO.md` priority items (backend-native vector similarity, Celery worker integration, grpcurl end-to-end tests) now that graph services are accessible locally.
-2. Automate the integration suite in CI and capture resource requirements for shared infrastructure.
-3. Prepare grpcurl-based smoke tests for `meshmind serve-grpc` and plan protobuf client packaging once integration coverage extends beyond the Python stub.
-4. Feed findings from large synthetic datasets into retry/backoff defaults and document recommended values in `ENVIRONMENT_NEEDS.md`.
-5. Continue tracking shim retirements in `DUMMIES.md` and follow the cleanup plan in `CLEANUP.md` so remaining fakes can be removed when infrastructure allows.
+1. With vector search complete, shift focus to `meshmind-103` (API hardening backlog) once the outstanding infrastructure blockers begin to fall.
+2. Follow up with benchmarking/doc tasks (`meshmind-83`/`meshmind-84`/`meshmind-90`) after the dataset and clusters exist.
+3. Expand gRPC coverage (`meshmind-85`–`meshmind-88`) as soon as the Celery/Redis stack and staging endpoints are available.
+4. Keep monitoring `meshmind-101` (PyPI access) so dependency lock updates and gRPC tooling installs can proceed in future iterations.

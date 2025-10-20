@@ -142,6 +142,55 @@ class Neo4jGraphDriver(GraphDriver):
         records = self.find("\n".join(cypher), params)
         return [self._normalize_node(rec.get("m", rec)) for rec in records]
 
+    def vector_search(
+        self,
+        query_embedding: Sequence[float],
+        *,
+        namespace: Optional[str] = None,
+        entity_labels: Optional[Sequence[str]] = None,
+        top_k: int = 10,
+    ) -> List[GraphDriver.VectorSearchResult]:
+        if top_k <= 0:
+            return []
+        embedding = list(query_embedding)
+        if not embedding:
+            return []
+
+        cypher = (
+            "WITH $embedding AS query\n"
+            "MATCH (m)\n"
+            "WHERE exists(m.embedding)\n"
+            "  AND size(m.embedding) = size(query)\n"
+            "  AND ($namespace IS NULL OR m.namespace = $namespace)\n"
+            "  AND ($labels IS NULL OR m.entity_label IN $labels)\n"
+            "WITH m, query,\n"
+            "     reduce(dot = 0.0, idx IN range(0, size(query) - 1) |\n"
+            "         dot + query[idx] * m.embedding[idx]) AS dot,\n"
+            "     sqrt(reduce(sumq = 0.0, value IN query | sumq + value * value)) AS query_norm,\n"
+            "     sqrt(reduce(sumn = 0.0, value IN m.embedding | sumn + value * value)) AS node_norm\n"
+            "WITH m, CASE WHEN query_norm = 0 OR node_norm = 0 THEN 0.0 ELSE dot / (query_norm * node_norm) END AS score\n"
+            "ORDER BY score DESC\n"
+            "LIMIT $top_k\n"
+            "RETURN m AS node, score"
+        )
+        params = {
+            "embedding": embedding,
+            "namespace": namespace,
+            "labels": list(entity_labels) if entity_labels else None,
+            "top_k": int(top_k),
+        }
+
+        records = self._run(cypher, params)
+        results: List[GraphDriver.VectorSearchResult] = []
+        for record in records:
+            node = self._normalize_node(record.get("node"))
+            try:
+                score = float(record.get("score", 0.0))
+            except Exception:
+                score = 0.0
+            results.append((node, score))
+        return results
+
     def delete(self, uuid: Any) -> None:
         self._run("MATCH (m {uuid: $uuid}) DETACH DELETE m", {"uuid": str(uuid)})
 

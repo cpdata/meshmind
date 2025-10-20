@@ -14,6 +14,7 @@ class TrackingDriver(InMemoryGraphDriver):
         super().__init__()
         self.search_calls: list[dict[str, object]] = []
         self.list_calls = 0
+        self.vector_calls: list[dict[str, object]] = []
 
     def search_entities(self, *args, **kwargs):  # noqa: ANN002 - passthrough to super
         self.search_calls.append(dict(kwargs))
@@ -22,6 +23,10 @@ class TrackingDriver(InMemoryGraphDriver):
     def list_entities(self, *args, **kwargs):  # noqa: ANN002 - passthrough to super
         self.list_calls += 1
         return super().list_entities(*args, **kwargs)
+
+    def vector_search(self, *args, **kwargs):  # noqa: ANN002 - passthrough to super
+        self.vector_calls.append(dict(kwargs))
+        return super().vector_search(*args, **kwargs)
 
 
 def test_graph_hybrid_search_uses_driver(dummy_encoder):
@@ -66,6 +71,8 @@ def test_graph_vector_search_filters_namespace(dummy_encoder):
 
     assert len(results) == 1
     assert results[0].name == include.name
+    assert driver.vector_calls
+    assert driver.vector_calls[0]["namespace"] == "keep"
 
 
 def test_graph_exact_search_filters_entity_labels(dummy_encoder):
